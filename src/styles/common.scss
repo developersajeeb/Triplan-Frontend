@@ -1,3 +1,7 @@
 .tp-container {
     @apply max-w-[1880px] mx-auto px-4;
 }
+
+.tp-primary-btn {
+    @apply text-base font-semibold bg-primary-900 hover:bg-primary-400 text-white hover:text-white py-4 px-9 rounded-full transition duration-300;
+}
