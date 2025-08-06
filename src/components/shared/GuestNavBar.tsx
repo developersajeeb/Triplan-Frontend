@@ -11,12 +11,13 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import headerBg from '../../assets/images/line-pattern.png'
-import { NavLink } from "react-router";
+import { Link } from "react-router";
 import WhiteSvgIcon from "./WhiteSvgIcon";
 import { TiLocationOutline } from 'react-icons/ti';
 import { IoTimeOutline } from 'react-icons/io5';
 import { IoMdLogIn } from 'react-icons/io';
 import { AiOutlineUserAdd } from 'react-icons/ai';
+import { useEffect, useState } from 'react';
 
 const navigationLinks = [
   { href: "/", label: "Home", submenu: false, type: "", items: [] },
@@ -29,6 +30,18 @@ const navigationLinks = [
 ]
 
 export default function GuestNavBar() {
+  const [isShowStickyHeader, setShowStickyHeader] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollTop = window.scrollY;
+      setShowStickyHeader(scrollTop > 200);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
     <>
       <section className='bg-white border-b border-gray-200 hidden lg:block'>
@@ -38,15 +51,19 @@ export default function GuestNavBar() {
             <span className='w-[2px] h-3 bg-gray-400 block'></span>
             <p className='flex items-center gap-1 text-sm font-semibold text-gray-600'><IoTimeOutline size={20} /> Sun to Friday: 8.00 am - 7.00 pm, Austria</p>
           </div>
-          
-          <div className='flex items-center gap-5'>
-            <NavLink to='/login' className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-500 duration-300'><IoMdLogIn size={20} /> Login</NavLink>
-            <NavLink to='/registration' className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-500 duration-300'><AiOutlineUserAdd size={20} /> Registration</NavLink>
+
+          <div className='flex items-center gap-4'>
+            <Link to='/login' className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-500 duration-300'><IoMdLogIn size={20} /> Login</Link>
+            <span className='w-[2px] h-3 bg-gray-400 block'></span>
+            <Link to='/registration' className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-500 duration-300'><AiOutlineUserAdd size={20} /> Registration</Link>
           </div>
         </div>
       </section>
-      <header className="bg-cover bg-no-repeat bg-center" style={{ backgroundImage: `url(${headerBg})` }}>
-        <div className="flex items-center justify-between gap-4 tp-container py-4">
+      <header
+        className={`z-50 w-full bg-cover bg-no-repeat bg-center transition-all duration-500 ease-in-out ${isShowStickyHeader ? "fixed top-0 shadow-md animate-slideDown" : "relative"}`}
+        style={{ backgroundImage: `url(${headerBg})` }}
+      >
+        <div className={`flex items-center justify-between gap-4 tp-container ${isShowStickyHeader ? "py-3" : "py-4"}`}>
           {/* Left side */}
           <div className="flex items-center gap-2 w-full">
             {/* Mobile menu trigger */}
@@ -113,9 +130,9 @@ export default function GuestNavBar() {
                         {/* <NavigationMenuLink href={link.href} className="">
                         {link.label}
                       </NavigationMenuLink> */}
-                        <NavLink to={link.href} className='py-1.5 text-base font-semibold text-gray-700 hover:text-primary-600'>
+                        <Link to={link.href} className='py-1.5 text-base font-semibold text-gray-700 hover:text-primary-600'>
                           {link.label}
-                        </NavLink>
+                        </Link>
                         {/* {index < navigationLinks.length - 1 &&
                         // Show separator if:
                         // 1. One is submenu and one is simple link OR
@@ -135,8 +152,8 @@ export default function GuestNavBar() {
                         )} */}
                       </NavigationMenuItem>
                     ))}
-                    <NavLink to='/login' className='flex items-center gap-1 text-base font-semibold text-primary-700 hover:text-primary-500 duration-300'><IoMdLogIn size={20} /> Login</NavLink>
-            <NavLink to='/registration' className='flex items-center gap-1 text-base font-semibold text-primary-700 hover:text-primary-500 duration-300'><AiOutlineUserAdd size={20} /> Registration</NavLink>
+                    <Link to='/login' className='flex items-center gap-1 text-base font-semibold text-primary-700 hover:text-primary-500 duration-300'><IoMdLogIn size={20} /> Login</Link>
+                    <Link to='/registration' className='flex items-center gap-1 text-base font-semibold text-primary-700 hover:text-primary-500 duration-300'><AiOutlineUserAdd size={20} /> Registration</Link>
                   </NavigationMenuList>
                 </NavigationMenu>
               </PopoverContent>
@@ -144,9 +161,9 @@ export default function GuestNavBar() {
             </Popover>
             {/* Main nav */}
             <div className="flex items-center gap-6 flex-1 w-full">
-              <a href="#" className="w-full max-w-[150px] md:max-w-[160px] xl:max-w-[200px] inline-block">
+              <Link to="/" className={`w-full inline-block ${isShowStickyHeader ? "max-w-[150px]" : "max-w-[150px] md:max-w-[160px] xl:max-w-[200px]"}`}>
                 <img src={Logo} alt="logo" />
-              </a>
+              </Link>
               {/* Navigation menu */}
               <NavigationMenu viewport={false} className="max-lg:hidden w-full max-w-full">
                 <NavigationMenuList className="gap-2 xl:gap-6">
@@ -226,9 +243,9 @@ export default function GuestNavBar() {
                         // </>
                         <></>
                       ) : (
-                        <NavLink to={link.href} className='text-muted-foreground py-1.5 px-2 text-base font-semibold text-gray-700 hover:text-primary-600'>
+                        <Link to={link.href} className='text-muted-foreground py-1.5 px-2 text-base font-semibold text-gray-700 hover:text-primary-600'>
                           {link.label}
-                        </NavLink>
+                        </Link>
                       )}
                     </NavigationMenuItem>
                   ))}
@@ -238,10 +255,10 @@ export default function GuestNavBar() {
           </div>
           {/* Right side */}
           <div className="flex items-center">
-            <NavLink to="/registration" className="tp-primary-btn flex items-center gap-3 !px-5 !py-3 md:!py-4 md:!px-9">
+            <Link to="/registration" className="tp-primary-btn flex items-center gap-3 !px-5 !py-3 md:!py-4 md:!px-9">
               <span className="whitespace-nowrap">Book Now</span>
               <WhiteSvgIcon className="w-4 md:w-auto h-4 md:h-auto" />
-            </NavLink>
+            </Link>
           </div>
         </div>
       </header>
