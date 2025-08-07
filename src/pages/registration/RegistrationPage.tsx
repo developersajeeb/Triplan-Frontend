@@ -1,0 +1,19 @@
+import TourBg from '../../assets/images/tour_login_bg.jpg'
+import RegImage from '../../assets/images/reg-page-img.svg'
+import { RxCross2 } from "react-icons/rx";
+
+import { Link } from "react-router";
+import { RegisterFrom } from './RegisterFrom';
+
+export default function RegistrationPage() {
+  return (
+    <div className='rounded-[20px] grid grid-cols-1 lg:grid-cols-2 min-h-svh'>
+      <img className='w-full min-h-full h-full object-cover' src={RegImage} alt="login image" />
+
+      <div className='bg-cover bg-no-repeat bg-center flex flex-col justify-center items-center' style={{ backgroundImage: `url(${TourBg})` }}>
+        <Link to={'/'} className='absolute top-0 right-0 cursor-pointer z-50 w-12 h-12 flex items-center justify-center bg-white rounded-l-full rounded-b-full shadow-sm'><RxCross2 size={22} /></Link>
+        <RegisterFrom />
+      </div>
+    </div>
+  );
+}
