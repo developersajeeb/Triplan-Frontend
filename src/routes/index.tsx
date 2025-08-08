@@ -4,6 +4,7 @@ import About from "@/pages/about/About";
 import Dashboard from "@/pages/dashboard/Dashboard";
 import LoginPage from "@/pages/login/LoginPage";
 import RegistrationPage from "@/pages/registration/RegistrationPage";
+import VerifyPage from "@/pages/verify/VerifyPage";
 import { createBrowserRouter } from "react-router";
 
 export const router = createBrowserRouter([
@@ -24,6 +25,10 @@ export const router = createBrowserRouter([
   {
     Component: RegistrationPage,
     path: "registration"
+  },
+  {
+    Component: VerifyPage,
+    path: "verify"
   },
   {
     Component: AdminLayout,

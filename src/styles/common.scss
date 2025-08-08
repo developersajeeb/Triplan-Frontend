@@ -5,3 +5,7 @@
 .tp-primary-btn {
     @apply text-base font-semibold bg-primary-900 hover:bg-primary-400 text-white hover:text-white py-4 px-9 rounded-full transition duration-300;
 }
+
+.tp-input {
+    @apply w-full !text-base bg-white font-medium hover:border-primary-400 focus:border-primary-400 focus-visible:ring-0 px-3 py-5;
+}
