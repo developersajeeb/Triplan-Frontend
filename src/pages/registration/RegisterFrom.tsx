@@ -65,8 +65,8 @@ export function RegisterFrom({
         resolver: zodResolver(registerSchema),
         defaultValues: {
             name: "",
-            phone: "",
             email: "",
+            phone: "",
             password: "",
             confirmPassword: "",
         },

@@ -11,7 +11,7 @@ import { Toaster } from './components/ui/sonner.tsx'
 createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <ReduxProvider store={store}>
-      <Toaster richColors />
+      <Toaster richColors position="top-right" />
       <RouterProvider router={router} />
     </ReduxProvider>
   </React.StrictMode>

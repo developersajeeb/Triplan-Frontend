@@ -22,9 +22,18 @@ export function LoginForm({
             console.log(res);
         } catch (err) {
             console.error(err);
-            const error = err as { status?: number };
-            if (error?.status === 401) {
-                toast.error("Your account is not verified!");
+            const error = err as {  data: { message: string }; };
+
+            if (error.data.message === "Password does not match") {
+                toast.error("Invalid credentials");
+            }
+
+            if (error.data.message === "User does not exist") {
+                toast.error("User does not exist");
+            }
+
+            if (error.data.message === "User is not verified") {
+                toast.error("Your account is not verified");
                 navigate("/verify", { state: data.email });
             }
         }
