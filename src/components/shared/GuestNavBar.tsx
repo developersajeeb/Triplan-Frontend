@@ -15,22 +15,28 @@ import { Link } from "react-router";
 import WhiteSvgIcon from "./WhiteSvgIcon";
 import { TiLocationOutline } from 'react-icons/ti';
 import { IoTimeOutline } from 'react-icons/io5';
-import { IoMdLogIn } from 'react-icons/io';
+import { IoMdLogIn, IoMdLogOut } from 'react-icons/io';
 import { AiOutlineUserAdd } from 'react-icons/ai';
 import { useEffect, useState } from 'react';
+import { authApi, useLogoutMutation, useUserInfoQuery } from '@/redux/features/auth/auth.api';
+import { TbLayoutDashboard } from "react-icons/tb";
+import { useAppDispatch } from '@/redux/hook';
 
 const navigationLinks = [
   { href: "/", label: "Home", submenu: false, type: "", items: [] },
   { href: "/about-us", label: "About Us", submenu: false, type: "", items: [] },
   { href: "/our-services", label: "Our Services", submenu: false, type: "", items: [] },
-  { href: "/trip", label: "Trip", submenu: false, type: "", items: [] },
+  { href: "/tours", label: "Tours", submenu: false, type: "", items: [] },
   { href: "/destinations", label: "Destinations", submenu: false, type: "", items: [] },
   { href: "/tour-guider", label: "Tour Guider", submenu: false, type: "", items: [] },
   { href: "/blog", label: "Blog", submenu: false, type: "", items: [] },
 ]
 
 export default function GuestNavBar() {
+  const { data } = useUserInfoQuery(undefined);
   const [isShowStickyHeader, setShowStickyHeader] = useState<boolean>(false);
+  const [logout] = useLogoutMutation();
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -41,6 +47,11 @@ export default function GuestNavBar() {
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
+
+  const handleLogout = async () => {
+    await logout(undefined);
+    dispatch(authApi.util.resetApiState());
+  };
 
   return (
     <>
@@ -53,9 +64,21 @@ export default function GuestNavBar() {
           </div>
 
           <div className='flex items-center gap-4'>
-            <Link to='/login' className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-500 duration-300'><IoMdLogIn size={20} /> Login</Link>
-            <span className='w-[2px] h-3 bg-gray-400 block'></span>
-            <Link to='/registration' className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-500 duration-300'><AiOutlineUserAdd size={20} /> Registration</Link>
+            {data?.data?.email && (
+              <>
+                <Link to='/dashboard' className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-500 duration-300'><TbLayoutDashboard size={16} /> My Dashboard</Link>
+                <span className='w-[2px] h-3 bg-gray-400 block'></span>
+                <button className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-white hover:bg-primary-500 hover:border-primary-500 border border-primary-600 px-3 py-1 rounded-full duration-300' onClick={handleLogout}>Log Out <IoMdLogOut size={16} /></button>
+              </>
+
+            )}
+            {!data?.data?.email && (
+              <>
+                <Link to='/login' className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-500 duration-300'><IoMdLogIn size={20} /> Login</Link>
+                <span className='w-[2px] h-3 bg-gray-400 block'></span>
+                <Link to='/registration' className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-500 duration-300'><AiOutlineUserAdd size={20} /> Registration</Link>
+              </>
+            )}
           </div>
         </div>
       </section>
@@ -255,7 +278,7 @@ export default function GuestNavBar() {
           </div>
           {/* Right side */}
           <div className="flex items-center">
-            <Link to="/registration" className="tp-primary-btn flex items-center gap-3 !px-5 !py-3 md:!py-4 md:!px-9">
+            <Link to={`${data?.data?.email ? `/tours` : `/login`}`} className="tp-primary-btn flex items-center gap-3 !px-5 !py-3 md:!py-4 md:!px-9">
               <span className="whitespace-nowrap">Book Now</span>
               <WhiteSvgIcon className="w-4 md:w-auto h-4 md:h-auto" />
             </Link>

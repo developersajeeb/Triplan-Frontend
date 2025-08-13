@@ -1,11 +1,14 @@
 import App from "@/App";
 import AdminLayout from "@/components/layouts/AdminLayout";
 import About from "@/pages/about/About";
-import Dashboard from "@/pages/dashboard/Dashboard";
 import LoginPage from "@/pages/login/LoginPage";
 import RegistrationPage from "@/pages/registration/RegistrationPage";
 import VerifyPage from "@/pages/verify/VerifyPage";
-import { createBrowserRouter } from "react-router";
+import { generateRoutes } from "@/utils/generateRoutes";
+import { createBrowserRouter, Navigate } from "react-router";
+import { adminSidebarMenus } from "./adminSidebarMenus";
+import UserLayout from "@/components/layouts/UserLayout";
+import { userSidebarMenus } from "./userSidebarMenus";
 
 export const router = createBrowserRouter([
   {
@@ -18,7 +21,26 @@ export const router = createBrowserRouter([
       },
     ],
   },
+  
   {
+    Component: UserLayout,
+    path: "/user",
+    children: [
+      { index: true, element: <Navigate to="/user/dashboard" /> },
+      ...generateRoutes(userSidebarMenus),
+    ],
+  },
+
+  {
+    Component: AdminLayout,
+    path: "/admin",
+    children: [
+      { index: true, element: <Navigate to="/admin/dashboard" /> },
+      ...generateRoutes(adminSidebarMenus),
+    ],
+  },
+
+    {
     Component: LoginPage,
     path: "login"
   },
@@ -29,15 +51,5 @@ export const router = createBrowserRouter([
   {
     Component: VerifyPage,
     path: "verify"
-  },
-  {
-    Component: AdminLayout,
-    path: "admin",
-    children: [
-      {
-        Component: Dashboard,
-        path: "dashboard",
-      },
-    ],
-  },
+  }
 ]);
