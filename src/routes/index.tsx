@@ -9,6 +9,9 @@ import { createBrowserRouter, Navigate } from "react-router";
 import { adminSidebarMenus } from "./adminSidebarMenus";
 import UserLayout from "@/components/layouts/UserLayout";
 import { userSidebarMenus } from "./userSidebarMenus";
+import { withAuth } from "@/utils/withAuth";
+import type { TRole } from "@/types";
+import { role } from "@/constants/role";
 
 export const router = createBrowserRouter([
   {
@@ -23,7 +26,7 @@ export const router = createBrowserRouter([
   },
   
   {
-    Component: UserLayout,
+    Component: withAuth(UserLayout, role.user as TRole),
     path: "/user",
     children: [
       { index: true, element: <Navigate to="/user/dashboard" /> },
@@ -32,7 +35,7 @@ export const router = createBrowserRouter([
   },
 
   {
-    Component: AdminLayout,
+    Component: withAuth(AdminLayout, role.superAdmin as TRole),
     path: "/admin",
     children: [
       { index: true, element: <Navigate to="/admin/dashboard" /> },

@@ -21,6 +21,7 @@ import { useEffect, useState } from 'react';
 import { authApi, useLogoutMutation, useUserInfoQuery } from '@/redux/features/auth/auth.api';
 import { TbLayoutDashboard } from "react-icons/tb";
 import { useAppDispatch } from '@/redux/hook';
+import { role } from '@/constants/role';
 
 const navigationLinks = [
   { href: "/", label: "Home", submenu: false, type: "", items: [] },
@@ -51,7 +52,7 @@ export default function GuestNavBar() {
   const handleLogout = async () => {
     await logout(undefined);
     dispatch(authApi.util.resetApiState());
-  };
+  };  
 
   return (
     <>
@@ -66,7 +67,7 @@ export default function GuestNavBar() {
           <div className='flex items-center gap-4'>
             {data?.data?.email && (
               <>
-                <Link to='/dashboard' className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-500 duration-300'><TbLayoutDashboard size={16} /> My Dashboard</Link>
+                <Link to={`${data?.data?.role === role.user && '/user' || data?.data?.role === role.superAdmin && '/admin'}`} className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-500 duration-300'><TbLayoutDashboard size={16} /> My Dashboard</Link>
                 <span className='w-[2px] h-3 bg-gray-400 block'></span>
                 <button className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-white hover:bg-primary-500 hover:border-primary-500 border border-primary-600 px-3 py-1 rounded-full duration-300' onClick={handleLogout}>Log Out <IoMdLogOut size={16} /></button>
               </>
