@@ -30,23 +30,23 @@ export default function TourTypes() {
   };
 
   return (
-    <div className="w-full max-w-7xl mx-auto px-5">
-      <div className="flex justify-between my-8">
-        <h1 className="text-xl font-semibold">Tour Types</h1>
+    <>
+      <div className="flex justify-between gap-4 mb-6">
+        <h1 className="text-2xl font-semibold">Tour Types</h1>
         <AddTourTypeModal />
       </div>
-      <div className="border border-muted rounded-md">
+      <div className="border bg-white rounded-lg shadow-[0px_2px_30px_-22px_#0000004d]">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">Name</TableHead>
-              <TableHead className="text-right">Action</TableHead>
+            <TableRow className="">
+              <TableHead className="w-[100px] pl-5 font-bold bg-gray-100 rounded-tl-lg">Name</TableHead>
+              <TableHead className="text-right pr-5 font-bold bg-gray-100 rounded-tr-lg">Action</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {data?.data?.map((item: { name: string, _id: string }, index: number) => (
               <TableRow key={index}>
-                <TableCell className="font-medium w-full">
+                <TableCell className="font-medium w-full pl-5">
                   {item?.name}
                 </TableCell>
                 <TableCell>
@@ -61,6 +61,6 @@ export default function TourTypes() {
           </TableBody>
         </Table>
       </div>
-    </div>
+    </>
   );
 }

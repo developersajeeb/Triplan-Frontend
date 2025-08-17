@@ -112,7 +112,7 @@ export function RegisterFrom({
                                 name="name"
                                 render={({ field }) => (
                                     <FormItem className="space-y-1">
-                                        <Label className="font-semibold text-gray-600 text-base" htmlFor="name">Name</Label>
+                                        <Label className="font-semibold text-gray-600 text-sm" htmlFor="name">Name<span className="text-destructive text-base">*</span></Label>
                                         <FormControl>
                                             <Input className="tp-input" placeholder="Your name" {...field} />
                                         </FormControl>
@@ -128,7 +128,7 @@ export function RegisterFrom({
                                 name="phone"
                                 render={({ field }) => (
                                     <FormItem className="space-y-1">
-                                        <Label className="font-semibold text-gray-600 text-base" htmlFor="phone">Phone</Label>
+                                        <Label className="font-semibold text-gray-600 text-sm" htmlFor="phone">Phone<span className="text-destructive text-base">*</span></Label>
                                         <FormControl>
                                             <Input className="tp-input" placeholder="01XXXXXXXXX" {...field} />
                                         </FormControl>
@@ -145,7 +145,7 @@ export function RegisterFrom({
                             name="email"
                             render={({ field }) => (
                                 <FormItem className="space-y-1">
-                                    <Label className="font-semibold text-gray-600 text-base" htmlFor="email">Email</Label>
+                                    <Label className="font-semibold text-gray-600 text-sm" htmlFor="email">Email<span className="text-destructive text-base">*</span></Label>
                                     <FormControl>
                                         <Input className="tp-input" placeholder="m@example.com" {...field} />
                                     </FormControl>
@@ -162,7 +162,7 @@ export function RegisterFrom({
                                 name="password"
                                 render={({ field }) => (
                                     <FormItem className="space-y-1">
-                                        <Label className="font-semibold text-gray-600 text-base" htmlFor="password">Password</Label>
+                                        <Label className="font-semibold text-gray-600 text-sm" htmlFor="password">Password<span className="text-destructive text-base">*</span></Label>
                                         <FormControl>
                                             <Input type="password" className="tp-input" placeholder="Your password" {...field} />
                                         </FormControl>
@@ -178,7 +178,7 @@ export function RegisterFrom({
                                 name="confirmPassword"
                                 render={({ field }) => (
                                     <FormItem className="space-y-1">
-                                        <Label className="font-semibold text-gray-600 text-base" htmlFor="confirmPassword">Confirm Password</Label>
+                                        <Label className="font-semibold text-gray-600 text-sm" htmlFor="confirmPassword">Confirm Password<span className="text-destructive text-base">*</span></Label>
                                         <FormControl>
                                             <Input type="password" className="tp-input" placeholder="Re-type password" {...field} />
                                         </FormControl>

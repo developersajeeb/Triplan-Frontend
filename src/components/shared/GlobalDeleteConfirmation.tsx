@@ -10,6 +10,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import type { ReactNode } from "react";
+import { CgDanger } from "react-icons/cg";
 
 interface IProps {
   children: ReactNode;
@@ -26,15 +27,15 @@ export function GlobalDeleteConfirmation({ children, onConfirm }: IProps) {
       <AlertDialogTrigger asChild>{children}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
-          <AlertDialogDescription>
+          <AlertDialogTitle className="text-xl text-red-500 flex items-center gap-2"><CgDanger size={30} /> Are you absolutely sure?</AlertDialogTitle>
+          <AlertDialogDescription className="font-semibold">
             This action cannot be undone. This will permanently delete your
             account and remove your data from our servers.
           </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>No, Keep it</AlertDialogCancel>
-          <AlertDialogAction onClick={handleConfirm}>
+        <AlertDialogFooter className="mt-4">
+          <AlertDialogCancel className="tp-cancel-btn !border-gray-400 !text-gray-500">No, Keep it</AlertDialogCancel>
+          <AlertDialogAction onClick={handleConfirm} className="tp-action-btn !bg-red-600">
             Yes
           </AlertDialogAction>
         </AlertDialogFooter>

@@ -52,7 +52,7 @@ export function LoginForm({
         <div className={cn("flex flex-col gap-6 w-full max-w-[380px]", className)} {...props}>
             <Form {...form}>
                 <form className="px-5 py-8" onSubmit={form.handleSubmit(onSubmit)}>
-                    <div className="flex flex-col gap-3">
+                    <div className="flex flex-col gap-4">
                         <div className="flex flex-col items-center text-center mb-3">
                             <Link to='/'><img className="w-32 mb-3" src={Logo} alt="logo" /></Link>
                             <h1 className="text-3xl font-bold">Welcome back</h1>
@@ -66,7 +66,7 @@ export function LoginForm({
                             name="email"
                             render={({ field }) => (
                                 <FormItem className="space-y-1">
-                                    <Label className="font-semibold text-gray-600 text-base" htmlFor="email">Email</Label>
+                                    <Label className="font-semibold text-gray-600 text-sm" htmlFor="email">Email</Label>
                                     <FormControl>
                                         <Input
                                             className="tp-input"
@@ -86,7 +86,7 @@ export function LoginForm({
                             render={({ field }) => (
                                 <FormItem className="space-y-1">
                                     <div className="flex items-center gap-1">
-                                        <Label className="font-semibold text-gray-600 text-base" htmlFor="password">Password</Label>
+                                        <Label className="font-semibold text-gray-600 text-sm" htmlFor="password">Password</Label>
                                         <Link
                                             to="/forgot-password"
                                             className="ml-auto text-sm underline-offset-2 hover:underline"
@@ -106,7 +106,7 @@ export function LoginForm({
                                 </FormItem>
                             )}
                         />
-                        <Button disabled={isLoginBtnLoading} type="submit" className={`tp-primary-btn h-11 !rounded-lg mt-4 ${isLoginBtnLoading && 'pointer-events-none'}`}>
+                        <Button disabled={isLoginBtnLoading} type="submit" className={`tp-primary-btn h-11 !rounded-lg mt-3 ${isLoginBtnLoading && 'pointer-events-none'}`}>
                             {isLoginBtnLoading && <RiLoaderLine className="w-4 h-4 animate-spin" />} Login
                         </Button>
                         <div className="my-3 after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-gray-300">

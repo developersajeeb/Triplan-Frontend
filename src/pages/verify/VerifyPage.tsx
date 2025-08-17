@@ -167,7 +167,7 @@ export default function VerifyPage() {
                             control={form.control}
                             name="pin"
                             render={({ field }) => (
-                                <FormItem>
+                                <FormItem className="space-y-1">
                                     <FormControl>
                                         <OTPInput
                                             id={id}

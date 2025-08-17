@@ -2,6 +2,7 @@ import * as React from "react"
 import {
   Sidebar,
   SidebarContent,
+  SidebarFooter,
   SidebarGroup,
   SidebarGroupContent,
   SidebarGroupLabel,
@@ -11,38 +12,59 @@ import {
   SidebarMenuItem,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { Link } from "react-router"
+import { Link, useLocation } from "react-router"
 import { getSidebarMenus } from "@/utils/getSidebarMenus"
+import Logo from '../../assets/triPlan-logo.svg';
+import { RiLogoutCircleLine } from "react-icons/ri";
+import { authApi, useLogoutMutation } from "@/redux/features/auth/auth.api";
+import { useAppDispatch } from "@/redux/hook";
 
 const menuItems = {
   navMain: getSidebarMenus("ADMIN"),
 }
 
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const location = useLocation();
+  const [logout] = useLogoutMutation();
+  const dispatch = useAppDispatch();
+
+  const handleLogout = async () => {
+    await logout(undefined);
+    dispatch(authApi.util.resetApiState());
+  };
+
   return (
     <Sidebar {...props}>
       <SidebarHeader>
-        <img src="/assets/triPlan-logo.svg" alt="" />
+        <Link to="/"><img className="w-36 py-3 px-2" src={Logo} alt="" /></Link>
       </SidebarHeader>
-      <SidebarContent>
+      <SidebarContent className="px-2">
         {/* We create a SidebarGroup for each parent. */}
         {menuItems.navMain.map((item) => (
           <SidebarGroup key={item.title}>
             <SidebarGroupLabel>{item.title}</SidebarGroupLabel>
             <SidebarGroupContent>
               <SidebarMenu>
-                {item.items.map((item) => (
-                  <SidebarMenuItem key={item.title}>
-                    <SidebarMenuButton asChild>
-                      <Link to={item.url}>{item.title}</Link>
-                    </SidebarMenuButton>
-                  </SidebarMenuItem>
-                ))}
+                {item.items.map((item) => {
+                  const isActive = location?.pathname === item?.url;
+                  return (
+                    (
+                      <SidebarMenuItem key={item.title}>
+                        <SidebarMenuButton asChild className={`${isActive ? "bg-primary-400 text-white" : ""} duration-300 transition-all hover:bg-primary-600 hover:text-white`}>
+                          <Link className="font-semibold" to={item?.url}>{item.icon && <item.icon className={item?.iconClassName || ""} size={item?.iconSize} />} {item?.title}</Link>
+                        </SidebarMenuButton>
+                      </SidebarMenuItem>
+                    )
+                  )
+                })}
               </SidebarMenu>
             </SidebarGroupContent>
           </SidebarGroup>
         ))}
       </SidebarContent>
+      <SidebarFooter className="bg-gray-100 px-4 py-4">
+        <p className="flex items-center gap-2 font-semibold text-sm cursor-pointer" onClick={handleLogout}><RiLogoutCircleLine size={18} /> <span>Logout</span></p>
+      </SidebarFooter>
       <SidebarRail />
     </Sidebar>
   )

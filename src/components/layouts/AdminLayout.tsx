@@ -29,7 +29,7 @@ const AdminLayout = () => {
                         </BreadcrumbList>
                     </Breadcrumb> */}
                 </header>
-                <main className='px-5 py-5'><Outlet /></main>
+                <main className='px-5 py-5 bg-[#F1F5FF] min-h-full'><Outlet /></main>
             </SidebarInset>
         </SidebarProvider>
     );
