@@ -12,6 +12,7 @@ import { userSidebarMenus } from "./userSidebarMenus";
 import { withAuth } from "@/utils/withAuth";
 import type { TRole } from "@/types";
 import { role } from "@/constants/role";
+import Tours from "@/pages/tours/Tours";
 
 export const router = createBrowserRouter([
   {
@@ -21,6 +22,10 @@ export const router = createBrowserRouter([
       {
         Component: About,
         path: "about-us",
+      },
+      {
+        Component: Tours,
+        path: "tours",
       },
     ],
   },

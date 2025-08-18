@@ -84,7 +84,7 @@ export default function GuestNavBar() {
         </div>
       </section>
       <header
-        className={`z-50 w-full bg-cover bg-no-repeat bg-center transition-all duration-500 ease-in-out ${isShowStickyHeader ? "fixed top-0 shadow-md animate-slideDown" : "relative"}`}
+        className={`z-50 w-full bg-white bg-cover bg-no-repeat bg-center transition-all duration-500 ease-in-out ${isShowStickyHeader ? "fixed top-0 shadow-md animate-slideDown" : "relative"}`}
         style={{ backgroundImage: `url(${headerBg})` }}
       >
         <div className={`flex items-center justify-between gap-4 tp-container ${isShowStickyHeader ? "py-3" : "py-4"}`}>
