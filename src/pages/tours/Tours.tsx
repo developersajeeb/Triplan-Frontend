@@ -77,7 +77,7 @@ const Tours = () => {
                                         <p className='text-sm text-gray-600 font-medium w-full max-w-[150px] text-end'><span className='bg-[#FFCA18] text-[13px] text-gray-900 px-2 pt-[1px] pb-[2px] font-semibold rounded mr-1'>4.8</span> <span className='hover:underline cursor-pointer duration-300'>(180 Reviews)</span></p>
                                     </div>
 
-                                    <h2 className='mt-3 mb-1'><Link to={`${tour?.slug}`} className='text-gray-800 hover:text-primary-500 text-xl font-bold cursor-pointer duration-300'>{tour?.title}</Link></h2>
+                                    <h2 className='mt-3 mb-1'><Link to={tour?.slug} className='text-gray-800 hover:text-primary-500 text-xl font-bold cursor-pointer duration-300'>{tour?.title}</Link></h2>
                                     <p className='text-base text-gray-500 font-medium flex gap-1'><span><FaLocationDot size={20} className='pt-1' /></span> {tour?.arrivalLocation +", "+ tour?.divisionName}</p>
                                     <p className='text-base text-gray-500 font-medium flex gap-1 mt-1'><span><HiOutlineUsers size={20} className='pt-[2px]' /></span> {tour?.maxGuest} Guests</p>
 

@@ -39,8 +39,8 @@ export default function TourDetails() {
           </div>
         </div>
         <div>
-          <Button asChild>
-            <Link to={`/booking/${tourData?._id}`}>Book Now</Link>
+          <Button asChild className="tp-primary-btn h-12">
+            <Link to={`/booking/${tourData?.slug}`}>Book Now</Link>
           </Button>
         </div>
       </div>

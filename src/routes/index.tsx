@@ -14,6 +14,10 @@ import type { TRole } from "@/types";
 import { role } from "@/constants/role";
 import Tours from "@/pages/tours/Tours";
 import TourDetails from "@/pages/tour-details/TourDetails";
+import Booking from "@/pages/booking/Booking";
+import PaymentSuccess from "@/pages/payment/PaymentSuccess";
+import PaymentFail from "@/pages/payment/PaymentFail";
+import PaymentCancel from "@/pages/payment/PaymentCancel";
 
 export const router = createBrowserRouter([
   {
@@ -32,9 +36,25 @@ export const router = createBrowserRouter([
         Component: TourDetails,
         path: "tours/:slug",
       },
+      {
+        Component: withAuth(Booking),
+        path: "booking/:slug",
+      },
+      {
+        Component: PaymentSuccess,
+        path: "/payment/success",
+      },
+      {
+        Component: PaymentFail,
+        path: "/payment/fail",
+      },
+      {
+        Component: PaymentCancel,
+        path: "/payment/cancel",
+      },
     ],
   },
-  
+
   {
     Component: withAuth(UserLayout, role.user as TRole),
     path: "/user",
@@ -53,7 +73,7 @@ export const router = createBrowserRouter([
     ],
   },
 
-    {
+  {
     Component: LoginPage,
     path: "login"
   },
