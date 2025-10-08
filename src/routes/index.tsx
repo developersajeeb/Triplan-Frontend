@@ -18,12 +18,17 @@ import Booking from "@/pages/booking/Booking";
 import PaymentSuccess from "@/pages/payment/PaymentSuccess";
 import PaymentFail from "@/pages/payment/PaymentFail";
 import PaymentCancel from "@/pages/payment/PaymentCancel";
+import Home from "@/pages/home/Home";
 
 export const router = createBrowserRouter([
   {
     Component: App,
     path: "/",
     children: [
+      {
+        index: true,
+        Component: Home,
+      },
       {
         Component: About,
         path: "about-us",
