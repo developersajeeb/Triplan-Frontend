@@ -39,7 +39,7 @@ const Tours = () => {
             <section>
                 {/* Big search area */}
             </section>
-            <section className='flex flex-col lg:flex-row gap-6 bg-[#F1F5FF] tp-container pt-6 pb-16'>
+            <section className='flex flex-col lg:flex-row gap-6 bg-[#F1F5FF] tp-big-container pt-6 pb-16'>
                 {/* Filters */}
                 <div className='w-full lg:w-[350px] bg-white rounded-xl border border-gray-200 shadow-[0px_4px_24px_0px_rgba(194, 194, 194, 0.25)]'>
                     <div className='flex justify-between items-center px-5 py-4'>

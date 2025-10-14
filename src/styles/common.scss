@@ -1,9 +1,17 @@
+.tp-big-container {
+    @apply w-full max-w-[1880px] mx-auto px-4;
+}
+
 .tp-container {
-    @apply max-w-[1880px] mx-auto px-4;
+    @apply w-full max-w-[1300px] mx-auto px-5;
 }
 
 .tp-primary-btn {
-    @apply text-base font-semibold bg-primary-900 hover:bg-primary-400 text-white hover:text-white py-4 px-9 rounded-full transition duration-300;
+    @apply text-base font-semibold bg-primary-900 hover:bg-primary-400 text-white hover:text-white py-4 px-8 rounded-full transition duration-300;
+}
+
+.tp-primary-btn-light {
+    @apply text-base font-semibold bg-primary-400 hover:bg-primary-900 text-white hover:text-white py-4 px-8 rounded-full transition duration-300;
 }
 
 .tp-action-btn {

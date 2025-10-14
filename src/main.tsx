@@ -2,8 +2,9 @@ import React from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import './styles/app.scss'
-import 'swiper/css';
-import 'swiper/css/pagination';
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
 import { RouterProvider } from 'react-router'
 import { router } from './routes/index.tsx'
 import { Provider as ReduxProvider } from "react-redux";

@@ -57,7 +57,7 @@ export default function GuestNavBar() {
   return (
     <>
       <section className='bg-white border-b border-gray-200 hidden lg:block'>
-        <div className='tp-container py-2 flex justify-between gap-2 items-center'>
+        <div className='tp-big-container py-2 flex justify-between gap-2 items-center'>
           <div className='flex items-center gap-4'>
             <p className='flex items-center gap-1 text-sm font-semibold text-gray-600'><TiLocationOutline size={20} /> 123, Street, New York</p>
             <span className='w-[2px] h-3 bg-gray-400 block'></span>
@@ -87,7 +87,7 @@ export default function GuestNavBar() {
         className={`z-50 w-full bg-white bg-cover bg-no-repeat bg-center transition-all duration-500 ease-in-out ${isShowStickyHeader ? "fixed top-0 shadow-md animate-slideDown" : "relative"}`}
         style={{ backgroundImage: `url(${headerBg})` }}
       >
-        <div className={`flex items-center justify-between gap-4 tp-container ${isShowStickyHeader ? "py-3" : "py-4"}`}>
+        <div className={`flex items-center justify-between gap-4 tp-big-container ${isShowStickyHeader ? "py-3" : "py-4"}`}>
           {/* Left side */}
           <div className="flex items-center gap-2 w-full">
             {/* Mobile menu trigger */}

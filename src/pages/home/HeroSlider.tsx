@@ -1,28 +1,24 @@
-"use client";
-
 import { useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay, Parallax } from "swiper/modules";
-import "swiper/css";
-import "swiper/css/navigation";
-import "swiper/css/pagination";
-import "./style/HeroSlider.scss"; // custom SCSS styling
-import { Button } from "@/components/ui/button"; // shadcn button (optional)
-import { ChevronRight } from "lucide-react";
+import styles from "./style/HeroSlider.module.scss";
+import Slider1 from '../../assets/images/home-slider/tours-slider-1.jpg';
+import { Link } from "react-router";
+import WhiteSvgIcon from "@/components/shared/WhiteSvgIcon";
 
 const slides = [
   {
     id: 1,
-    title: "GUITAR CLASSES\nFOR KIDS",
-    text: "Want to see your kid become more expressive?",
-    img: "https://images.unsplash.com/photo-1578934191836-ff5f608c2228?auto=format&fit=crop&w=1349&q=80",
+    subtitle: "Get unforgettable pleasure with us",
+    title: "Explore beauty of\n the whole world",
+    img: Slider1,
   },
-  {
-    id: 2,
-    title: "MUSIC LESSONS\nFOR EVERY AGE",
-    text: "Learn to play and express your passion for music.",
-    img: "https://images.unsplash.com/photo-1579003087287-997fd4d18771?auto=format&fit=crop&w=1350&q=80",
-  },
+  // {
+  //   id: 2,
+  //   title: "MUSIC LESSONS\nFOR EVERY AGE",
+  //   text: "Learn to play and express your passion for music.",
+  //   img: "https://images.unsplash.com/photo-1579003087287-997fd4d18771?auto=format&fit=crop&w=1350&q=80",
+  // },
 ];
 
 export default function HeroSlider() {
@@ -34,13 +30,13 @@ export default function HeroSlider() {
   }, []);
 
   return (
-    <section className="hero-slider hero-style relative">
+    <section className={styles["hero-slider"]}>
       <Swiper
         modules={[Navigation, Pagination, Autoplay, Parallax]}
         loop
-        speed={1000}
+        speed={1200}
         parallax
-        autoplay={{ delay: 6500, disableOnInteraction: false }}
+        autoplay={{ delay: 5000, disableOnInteraction: false }}
         pagination={{ clickable: true }}
         navigation
         className="w-full h-full"
@@ -48,36 +44,29 @@ export default function HeroSlider() {
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>
             <div
-              className="slide-inner slide-bg-image"
-              data-background={slide.img}
+              className="slide-inner"
+              style={{backgroundImage: `url(${slide.img})`}}
             >
-              <div className="container mx-auto px-4" data-swiper-parallax="300">
-                <div className="slide-title mb-6">
-                  <h2 className="text-white font-semibold text-[80px] leading-[1.1] whitespace-pre-line md:text-[60px] sm:text-[40px]">
-                    {slide.title}
-                  </h2>
-                </div>
-
-                <div className="slide-text mb-6" data-swiper-parallax="400">
-                  <p className="text-white/90 text-2xl md:text-xl sm:text-base">
-                    {slide.text}
-                  </p>
-                </div>
-
+              <div
+                className="tp-container"
+                data-swiper-parallax="300"
+              >
+                <h4 className="text-[40px] font-Nunito">{slide.subtitle}</h4>
+                <h2 className="mb-8 text-white font-bold leading-[1.1] whitespace-pre-line text-[80px] sm:text-[40px] md:text-[75px]">
+                  {slide.title}
+                </h2>
                 <div
-                  className="slide-btns flex gap-4"
+                  className="flex gap-4"
                   data-swiper-parallax="500"
                 >
-                  <Button className="bg-white text-[#2b3b95] hover:bg-[#2b3b95] hover:text-white text-lg px-8 py-3 rounded">
-                    Register now
-                  </Button>
-                  <Button
-                    variant="ghost"
-                    className="text-white text-base uppercase flex items-center gap-2 hover:text-gray-300"
-                  >
-                    <ChevronRight size={20} />
-                    Get Info
-                  </Button>
+                  <Link to="/registration" className="tp-primary-btn-light flex items-center gap-3">
+                    Register Now
+                    <WhiteSvgIcon className="w-4 md:w-auto h-4 md:h-auto" />
+                  </Link>
+                  <Link to="/tours" className="group tp-transparent-btn flex items-center gap-3">
+                    All Tours
+                    <WhiteSvgIcon className="group-hover:stroke-primary-400 w-4 md:w-auto h-4 md:h-auto" />
+                  </Link>
                 </div>
               </div>
             </div>
