@@ -1,77 +1,89 @@
-'use client';
-import React from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
+"use client";
 
-const categories = [
+import { useEffect } from "react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, Autoplay, Parallax } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import "./style/HeroSlider.scss"; // custom SCSS styling
+import { Button } from "@/components/ui/button"; // shadcn button (optional)
+import { ChevronRight } from "lucide-react";
+
+const slides = [
   {
-    title: 'Cruises',
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e',
+    id: 1,
+    title: "GUITAR CLASSES\nFOR KIDS",
+    text: "Want to see your kid become more expressive?",
+    img: "https://images.unsplash.com/photo-1578934191836-ff5f608c2228?auto=format&fit=crop&w=1349&q=80",
   },
   {
-    title: 'Hiking',
-    image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee',
-  },
-  {
-    title: 'Airbirds',
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?fit=crop&w=900&q=80',
-  },
-  {
-    title: 'Wildlife',
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?fit=crop&w=900&q=80',
-  },
-  {
-    title: 'Walking',
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?fit=crop&w=900&q=80',
-  },
-  {
-    title: 'Walking',
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?fit=crop&w=900&q=80',
-  },
-  {
-    title: 'Walking',
-    image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?fit=crop&w=900&q=80',
+    id: 2,
+    title: "MUSIC LESSONS\nFOR EVERY AGE",
+    text: "Learn to play and express your passion for music.",
+    img: "https://images.unsplash.com/photo-1579003087287-997fd4d18771?auto=format&fit=crop&w=1350&q=80",
   },
 ];
 
-const HeroSlider = () => {
+export default function HeroSlider() {
+  useEffect(() => {
+    document.querySelectorAll<HTMLElement>(".slide-bg-image").forEach((el) => {
+      const bg = el.dataset.background;
+      if (bg) el.style.backgroundImage = `url(${bg})`;
+    });
+  }, []);
+
   return (
-    <div className="w-full max-w-[1300px] mx-auto py-12">
+    <section className="hero-slider hero-style relative">
       <Swiper
-        slidesPerView={1.3}
-        spaceBetween={20}
+        modules={[Navigation, Pagination, Autoplay, Parallax]}
+        loop
+        speed={1000}
+        parallax
+        autoplay={{ delay: 6500, disableOnInteraction: false }}
         pagination={{ clickable: true }}
-        breakpoints={{
-          640: { slidesPerView: 2.3 },
-          768: { slidesPerView: 3.3 },
-          1024: { slidesPerView: 4.3 },
-          1280: { slidesPerView: 5 },
-        }}
-        modules={[Pagination]}
-        className="travel-swiper"
+        navigation
+        className="w-full h-full"
       >
-        {categories.map((item, index) => (
-          <SwiperSlide key={index}>
+        {slides.map((slide) => (
+          <SwiperSlide key={slide.id}>
             <div
-              className={`group text-center cursor-pointer transition-transform duration-500 hover:-translate-y-2`}
+              className="slide-inner slide-bg-image"
+              data-background={slide.img}
             >
-              <div className="relative w-full h-[240px] overflow-hidden rounded-[24px] shadow-xl">
-                <img
-                  src={item.image}
-                  alt={item.title}
-                  className="w-full h-full object-cover rounded-[24px] transition-transform duration-500 group-hover:scale-110"
-                />
+              <div className="container mx-auto px-4" data-swiper-parallax="300">
+                <div className="slide-title mb-6">
+                  <h2 className="text-white font-semibold text-[80px] leading-[1.1] whitespace-pre-line md:text-[60px] sm:text-[40px]">
+                    {slide.title}
+                  </h2>
+                </div>
+
+                <div className="slide-text mb-6" data-swiper-parallax="400">
+                  <p className="text-white/90 text-2xl md:text-xl sm:text-base">
+                    {slide.text}
+                  </p>
+                </div>
+
+                <div
+                  className="slide-btns flex gap-4"
+                  data-swiper-parallax="500"
+                >
+                  <Button className="bg-white text-[#2b3b95] hover:bg-[#2b3b95] hover:text-white text-lg px-8 py-3 rounded">
+                    Register now
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="text-white text-base uppercase flex items-center gap-2 hover:text-gray-300"
+                  >
+                    <ChevronRight size={20} />
+                    Get Info
+                  </Button>
+                </div>
               </div>
-              <h3 className="mt-4 text-[18px] font-semibold text-[#003049]">{item.title}</h3>
-              <p className="text-[14px] text-gray-500">See More</p>
             </div>
           </SwiperSlide>
         ))}
       </Swiper>
-    </div>
+    </section>
   );
-};
-
-export default HeroSlider;
+}
