@@ -14,6 +14,10 @@
     @apply text-base font-semibold bg-primary-400 hover:bg-primary-900 text-white hover:text-white py-4 px-8 rounded-full transition duration-300;
 }
 
+.tp-transparent-btn {
+    @apply text-base font-semibold bg-transparent hover:bg-white text-white hover:text-gray-800 border border-white py-4 px-8 rounded-full transition duration-300;
+}
+
 .tp-action-btn {
     @apply text-[14px] font-semibold bg-primary-900 hover:bg-primary-400 text-white hover:text-white px-5 h-10 rounded-lg transition duration-300;
 }
