@@ -2,9 +2,11 @@ import { useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, Autoplay, Parallax } from "swiper/modules";
 import styles from "./style/HeroSlider.module.scss";
-import Slider1 from '../../assets/images/home-slider/tours-slider-1.jpg';
 import { Link } from "react-router";
 import WhiteSvgIcon from "@/components/shared/WhiteSvgIcon";
+import Slider1 from '../../assets/images/home-slider/tours-slider-1.webp';
+import Slider2 from '../../assets/images/home-slider/tours-slider-2.webp';
+import Slider3 from '../../assets/images/home-slider/tours-slider-3.webp';
 
 const slides = [
   {
@@ -13,12 +15,18 @@ const slides = [
     title: "Explore beauty of\n the whole world",
     img: Slider1,
   },
-  // {
-  //   id: 2,
-  //   title: "MUSIC LESSONS\nFOR EVERY AGE",
-  //   text: "Learn to play and express your passion for music.",
-  //   img: "https://images.unsplash.com/photo-1579003087287-997fd4d18771?auto=format&fit=crop&w=1350&q=80",
-  // },
+  {
+    id: 2,
+    subtitle: "Get unforgettable pleasure with us",
+    title: " Natural Wonder\n of the world ",
+    img: Slider2,
+  },
+  {
+    id: 3,
+    subtitle: "Get unforgettable pleasure with us",
+    title: "Let’s make your\n best trip with us",
+    img: Slider3,
+  },
 ];
 
 export default function HeroSlider() {
@@ -44,19 +52,20 @@ export default function HeroSlider() {
         {slides.map((slide) => (
           <SwiperSlide key={slide.id}>
             <div
-              className="slide-inner"
+              className="flex h-full w-full items-center justify-center bg-cover bg-center text-left relative"
               style={{backgroundImage: `url(${slide.img})`}}
             >
+              <div className="absolute top-0 right-0 left-0 bottom-0 inset-0 bg-black/50"></div>
               <div
                 className="tp-container"
                 data-swiper-parallax="300"
               >
-                <h4 className="text-[40px] font-Nunito">{slide.subtitle}</h4>
-                <h2 className="mb-8 text-white font-bold leading-[1.1] whitespace-pre-line text-[80px] sm:text-[40px] md:text-[75px]">
+                <h4 className="text-[22px] sm:text-[28px] md:text-[40px] font-Nunito">{slide.subtitle}</h4>
+                <h2 className="mb-8 text-white font-bold leading-[1.1] whitespace-pre-line text-[34px] sm:text-[58px] md:text-[75px]">
                   {slide.title}
                 </h2>
                 <div
-                  className="flex gap-4"
+                  className="inline-flex flex-col sm:flex-row gap-4"
                   data-swiper-parallax="500"
                 >
                   <Link to="/registration" className="tp-primary-btn-light flex items-center gap-3">

@@ -2,16 +2,11 @@
 
 @layer components {
   .hero-slider {
-    @apply relative h-[600px] xl:h-[700px] 2xl:h-[700px];
+    @apply relative h-[550px] sm:h-[600px] xl:h-[700px] 2xl:h-[700px];
 
     // Swiper slide
     :global(.swiper-slide) {
       @apply overflow-hidden text-white h-full;
-    }
-
-    // Slide inner
-    :global(.slide-inner) {
-      @apply absolute inset-0 z-[1] flex h-full w-full items-center justify-center bg-cover bg-center text-left;
     }
 
     // Navigation buttons
