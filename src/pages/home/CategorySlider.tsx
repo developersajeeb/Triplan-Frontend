@@ -1,9 +1,10 @@
 'use client';
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
+import styles from './style/category_slider.module.scss';
 
 const categories = [
   { title: 'Cruises', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' },
@@ -17,33 +18,30 @@ const categories = [
 ];
 
 export default function CategorySlider() {
-  const [activeIndex, setActiveIndex] = useState(0);
+  const middleIndex = Math.floor(categories.length / 2);
+  const [activeIndex, setActiveIndex] = useState(middleIndex);
 
-  // tweakable values
-  const VISIBLE_SIDE = 5;   // left/right কতটুকু (মোট visible = 1 + 2 + 2 = 5)
+  const VISIBLE_SIDE = 5;
   const ANGLE_STEP = 20;
   const OUTER_ANGLE = 0;
   const ARC_STRENGTH = 10;
   const H_GAP = 0;
 
   return (
-    <div className="w-full max-w-[1300px] mx-auto py-12">
+    <div className={styles["tp-ctg-slider"]}>
       <Swiper
-        // এখানে মূল পরিবর্তন: slidesPerView=5 (ডেস্কটপ/বড় স্ক্রিনে সবসময় 5 দেখাবে)
-        // loop
         slidesPerView={5}
         spaceBetween={20}
         centeredSlides={true}
         pagination={{ clickable: true }}
+        initialSlide={middleIndex}
         breakpoints={{
-          // ছোট স্ক্রিনে responsive রাখতে চাইলে:
           0: { slidesPerView: 1 },
           640: { slidesPerView: 2 },
           768: { slidesPerView: 3 },
-          1024: { slidesPerView: 4 }, // >=1024px এ 5 দেখবে
+          1024: { slidesPerView: 5 },
         }}
         modules={[Pagination]}
-        className="travel-swiper"
         onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
         onSwiper={(swiper) => setActiveIndex(swiper.activeIndex)}
       >
@@ -56,7 +54,6 @@ export default function CategorySlider() {
           const rotateY = Math.max(-OUTER_ANGLE, Math.min(OUTER_ANGLE, baseAngle));
 
           const translateY = inVisibleRange ? Math.pow(offset, 2) * ARC_STRENGTH : 40 + absOffset * 10;
-          // ছোট/বড় স্ক্রিনে spread সামঞ্জস্য রাখার জন্য H_GAP*12 ব্যবহার করি (প্রয়োজনে পরিবর্তন করো)
           const translateX = inVisibleRange ? offset * H_GAP * 0 : offset * H_GAP * 0;
 
           const zIndex = inVisibleRange ? 100 - absOffset * 10 : 10;
@@ -65,9 +62,9 @@ export default function CategorySlider() {
           const transform = `translateX(${translateX}px) translateY(${translateY}px) rotateY(${rotateY}deg)`;
 
           return (
-            <SwiperSlide key={index}>
+            <SwiperSlide key={index} className='pb-20'>
               <div
-                className="group text-center cursor-pointer transition-transform duration-500"
+                className="group text-center transition-transform duration-500"
                 style={{
                   transform,
                   zIndex,
@@ -86,8 +83,8 @@ export default function CategorySlider() {
                   />
                 </div>
 
-                <h3 className="mt-4 text-[18px] font-semibold text-[#003049]">{item.title}</h3>
-                <p className="text-[14px] text-gray-500">See More</p>
+                <h3 className="mt-4 text-[20px] font-semibold text-primary-900 hover:text-primary-400 duration-300 cursor-pointer">{item.title}</h3>
+                <p className="text-[14px] font-medium text-primary-900 cursor-pointer">See More</p>
               </div>
             </SwiperSlide>
           );

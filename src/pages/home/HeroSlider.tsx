@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay, Parallax } from "swiper/modules";
-import styles from "./style/HeroSlider.module.scss";
+import styles from "./style/hero_slider.module.scss";
 import { Link } from "react-router";
 import WhiteSvgIcon from "@/components/shared/WhiteSvgIcon";
 import Slider1 from '../../assets/images/home-slider/tours-slider-1.webp';
@@ -59,7 +59,7 @@ export default function HeroSlider() {
                 className="tp-container"
                 data-swiper-parallax="300"
               >
-                <h4 className="text-[22px] sm:text-[28px] md:text-[40px] font-Nunito text-white">{slide.subtitle}</h4>
+                <h4 className="section-sub-title text-white">{slide.subtitle}</h4>
                 <h2 className="mb-8 text-white font-bold leading-[1.1] whitespace-pre-line text-[34px] sm:text-[58px] md:text-[75px]">
                   {slide.title}
                 </h2>

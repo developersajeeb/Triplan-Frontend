@@ -1,0 +1,15 @@
+@tailwind components;
+
+@layer components {
+    .tp-ctg-slider {
+        :global(.swiper-pagination) {
+            :global(.swiper-pagination-bullet) {
+                @apply w-4 h-4 bg-transparent border-2 border-primary-500 opacity-100 rounded-full hover:bg-primary-200 duration-300;
+    
+                &:global(.swiper-pagination-bullet-active) {
+                    @apply bg-primary-500;
+                }
+            }
+        }
+    }
+}
