@@ -4,14 +4,8 @@ import ctgBg from '../../assets/images/tour_login_bg.jpg';
 import DestinationSlider from "./DestinationSlider";
 import { Link } from "react-router";
 import WhiteSvgIcon from "@/components/shared/WhiteSvgIcon";
-import { useRef, useState } from "react";
 
 const Home = () => {
-  const [progress, setProgress] = useState<number>(0);
-  const prevRef = useRef<HTMLButtonElement>(null);
-  const nextRef = useRef<HTMLButtonElement>(null);
-  
-
   return (
     <>
       <HeroSlider />
@@ -33,29 +27,9 @@ const Home = () => {
             All Destination
             <WhiteSvgIcon className="w-4 md:w-auto h-4 md:h-auto" />
           </Link>
-
-          <div className="flex gap-4 mb-6">
-            <button ref={prevRef} className="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button ref={nextRef} className="p-2 bg-gray-200 rounded-full hover:bg-gray-300 transition-colors">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </div>
         </div>
-        <DestinationSlider
-          setProgress={setProgress}
-          prevRef={prevRef}
-          nextRef={nextRef}
-        />
+        <DestinationSlider />
       </section>
-      <div className="w-full bg-gray-200 rounded-full h-2.5">
-        <div className="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style={{ width: `${progress}%` }}></div>
-      </div>
     </>
   );
 };
