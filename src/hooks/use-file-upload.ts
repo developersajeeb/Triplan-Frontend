@@ -96,9 +96,9 @@ export const useFileUpload = (
       }
 
       if (accept !== "*") {
-        const acceptedTypes = accept.split(",").map((type) => type.trim())
+        const acceptedTypes = accept?.split(",").map((type) => type.trim())
         const fileType = file instanceof File ? file.type || "" : file.type
-        const fileExtension = `.${file instanceof File ? file.name.split(".").pop() : file.name.split(".").pop()}`
+        const fileExtension = `.${file instanceof File ? file?.name?.split(".").pop() : file?.name?.split(".").pop()}`
 
         const isAccepted = acceptedTypes.some((type) => {
           if (type.startsWith(".")) {
