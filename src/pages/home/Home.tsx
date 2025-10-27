@@ -18,17 +18,21 @@ const Home = () => {
         </div>
       </section>
 
-      <section className="tp-container py-12 md:py-16 lg:py-20 flex gap-10">
-        <div className="destination-left-side max-w-[500px] w-full">
-          <h4 className="section-sub-title text-primary-950">Top Destination</h4>
-          <h2 className="section-title text-primary-950 mb-4">Popular Destination</h2>
-          <p className="text-lg font-medium text-gray-700 mb-7">From peaceful beaches to breathtaking mountains, explore our top and most loved destinations — perfect for your next unforgettable escape into nature.</p>
-          <Link className="tp-primary-btn inline-flex items-center gap-3 mb-6 sm:mb-10 lg:mb-12" to="/destinations">
-            All Destination
-            <WhiteSvgIcon className="w-4 md:w-auto h-4 md:h-auto" />
-          </Link>
+      <section className="overflow-hidden">
+        <div className="tp-container py-12 md:py-16 lg:py-20 flex gap-10">
+          <div className="destination-left-side max-w-[500px] w-full">
+            <h4 className="section-sub-title text-primary-950">Top Destination</h4>
+            <h2 className="section-title text-primary-950 mb-4">Popular Destination</h2>
+            <p className="text-lg font-medium text-gray-700 mb-7">From peaceful beaches to breathtaking mountains, explore our top and most loved destinations — perfect for your next unforgettable escape into nature.</p>
+            <Link className="tp-primary-btn inline-flex items-center gap-3 mb-6 sm:mb-10 lg:mb-12" to="/destinations">
+              All Destination
+              <WhiteSvgIcon className="w-4 md:w-auto h-4 md:h-auto" />
+            </Link>
+
+            <div className="swiper-scrollbar"></div>
+          </div>
+          <DestinationSlider />
         </div>
-        <DestinationSlider />
       </section>
     </>
   );

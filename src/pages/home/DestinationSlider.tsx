@@ -3,16 +3,16 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 
 const DestinationSlider = () => {
   return (
-    <div className='w-[calc(100%-500px)] bg-red-200 clip-path-[polygon(0_0,_500%_0,_500%_100%,_0%_100%)] relative overflow-visible'>
+    <div className='w-[calc(100%-500px)] bg-red-200'>
       <Swiper
         pagination={{
           type: 'progressbar',
         }}
+        className='destination-swiper'
         slidesPerView={3}
         spaceBetween={30}
         navigation={true}
         modules={[Pagination, Navigation]}
-        className="mySwiper"
         freeMode={true}
         grabCursor={true}
       >
