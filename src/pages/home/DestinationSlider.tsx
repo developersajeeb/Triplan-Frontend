@@ -34,46 +34,59 @@ const DestinationSlider = () => {
   ];
 
   return (
-    <div className='lg:w-[calc(100%-500px)]'>
-      <Swiper
-        pagination={{
-          type: 'progressbar',
-        }}
-        className={styles["destination-swiper"]}
-        slidesPerView={1}
-        spaceBetween={20}
-        modules={[Pagination]}
-        freeMode={true}
-        grabCursor={true}
-        breakpoints={{
-          640: {
-            slidesPerView: 2.3,
-          },
-          1024: {
-            slidesPerView: 1.5,
-          },
-          1200: {
-            slidesPerView: 2,
-          },
-        }}
-      >
-        {sliderData.map((item, index) => (
-          <SwiperSlide className='bg-no-repeat bg-cover p-5 rounded-2xl gap-2 justify-between !flex !flex-col relative overflow-hidden !h-[420px]' key={index} style={{ backgroundImage: `url(${item?.image})` }}>
-            <div className='absolute top-0 right-0 left-0 bottom-0 inset-0 bg-black/30 z-0'></div>
-            <div className='z-10'>
-              <p className='text-white font-medium'>{item?.totalListings} Listings</p>
-              <p className='text-2xl text-white font-semibold'>{item?.city}</p>
-            </div>
-            <div className='z-10'>
-              <Link to='/#' className='group tp-transparent-btn !text-sm !px-6 !py-3 inline-flex items-center gap-3'>
-                Explore
-                <WhiteSvgIcon className="group-hover:stroke-primary-400 w-4 md:w-auto h-4 md:h-auto" />
-              </Link>
-            </div>
-          </SwiperSlide>
-        ))}
-      </Swiper>
-    </div>
+    <section className="overflow-hidden">
+      <div className="tp-container relative py-12 md:py-16 lg:py-20 flex flex-col lg:flex-row gap-10">
+        <div className="destination-left-side max-w-[500px] w-full">
+          <h4 className="section-sub-title text-primary-950">Top Destination</h4>
+          <h2 className="section-title text-primary-950 mb-4">Popular Destination</h2>
+          <p className="text-lg font-medium text-gray-700 mb-7">From peaceful beaches to breathtaking mountains, explore our top and most loved destinations — perfect for your next unforgettable escape into nature.</p>
+          <Link className="tp-primary-btn inline-flex items-center gap-3" to="/destinations">
+            All Destination
+            <WhiteSvgIcon className="w-4 md:w-auto h-4 md:h-auto" />
+          </Link>
+        </div>
+        <div className='lg:w-[calc(100%-500px)]'>
+          <Swiper
+            pagination={{
+              type: 'progressbar',
+            }}
+            className={styles["destination-swiper"]}
+            slidesPerView={1}
+            spaceBetween={20}
+            modules={[Pagination]}
+            freeMode={true}
+            grabCursor={true}
+            breakpoints={{
+              640: {
+                slidesPerView: 2.3,
+              },
+              1024: {
+                slidesPerView: 1.5,
+              },
+              1200: {
+                slidesPerView: 2,
+              },
+            }}
+          >
+            {sliderData.map((item, index) => (
+              <SwiperSlide className='bg-no-repeat bg-cover p-5 rounded-2xl gap-2 justify-between !flex !flex-col relative overflow-hidden !h-[420px]' key={index} style={{ backgroundImage: `url(${item?.image})` }}>
+                <div className='absolute top-0 right-0 left-0 bottom-0 inset-0 bg-black/30 z-0'></div>
+                <div className='z-10'>
+                  <p className='text-white font-medium'>{item?.totalListings} Listings</p>
+                  <p className='text-2xl text-white font-semibold'>{item?.city}</p>
+                </div>
+                <div className='z-10'>
+                  <Link to='/#' className='group tp-transparent-btn !text-sm !px-6 !py-3 inline-flex items-center gap-3'>
+                    Explore
+                    <WhiteSvgIcon className="group-hover:stroke-primary-400 w-4 md:w-auto h-4 md:h-auto" />
+                  </Link>
+                </div>
+              </SwiperSlide>
+            ))}
+          </Swiper>
+        </div>
+      </div>
+    </section>
   );
 };
 
