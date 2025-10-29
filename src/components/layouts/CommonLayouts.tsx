@@ -1,4 +1,3 @@
-import React from 'react';
 import GuestNavBar from '../shared/GuestNavBar';
 
 interface IProps {

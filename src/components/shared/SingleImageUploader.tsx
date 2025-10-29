@@ -1,9 +1,12 @@
 import { AlertCircleIcon, ImageIcon, UploadIcon, XIcon } from "lucide-react"
-
 import { useFileUpload } from "@/hooks/use-file-upload"
 import { useEffect } from "react"
 
-export default function SingleImageUploader({ onChange }) {
+interface Props {
+  onChange: (file: File | null) => void
+}
+
+export default function SingleImageUploader({ onChange }: Props) {
   const maxSizeMB = 2
   const maxSize = maxSizeMB * 1024 * 1024
 
@@ -25,11 +28,16 @@ export default function SingleImageUploader({ onChange }) {
 
   useEffect(() => {
     if (files.length > 0) {
-      onChange(files[0].file);
+      const firstFile = files[0].file
+      if (firstFile instanceof File) {
+        onChange(firstFile)
+      } else {
+        onChange(null)
+      }
     } else {
-      onChange(null);
+      onChange(null)
     }
-  }, [files, onChange]);
+  }, [files, onChange])
 
   const previewUrl = files[0]?.preview || null
 
