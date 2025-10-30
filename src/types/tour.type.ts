@@ -12,7 +12,9 @@ export interface ITourPackage {
   maxGuest: number;
   minAge: number;
   division: string;
+  divisionName: string;
   tourType: string;
+  tourTypeName: string;
   amenities: string[];
   included: string[];
   excluded: string[];
