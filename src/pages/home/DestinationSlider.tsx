@@ -185,7 +185,7 @@ const DestinationSlider = () => {
 
           <span
             ref={dragTextRef}
-            className="drag-text absolute pointer-events-none text-white text-base bg-primary-500 bg-opacity-70 w-20 font-medium h-20 rounded-full flex justify-center items-center"
+            className="drag-text absolute pointer-events-none text-white text-base bg-primary-400/40 backdrop-blur w-20 font-medium h-20 rounded-full flex justify-center items-center"
           >
             {"<"}Drag{">"}
           </span>
