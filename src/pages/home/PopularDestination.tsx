@@ -4,6 +4,7 @@ import { Pagination } from "swiper/modules";
 import { useGetDivisionsQuery } from "@/redux/features/division/division.api";
 import TourCard from "@/components/modules/tour/TourCard";
 import { Skeleton } from "@/components/ui/skeleton";
+import type { ITourPackage } from "@/types";
 
 const PopularDestination = () => {
     const { data: tours, isLoading } = useGetAllToursQuery(undefined);
@@ -87,13 +88,13 @@ const PopularDestination = () => {
                         </div>
                     ) : (
                         (toursData ?? []).length > 0 ? (
-                            (toursData ?? []).map((tour) => (
+                            (toursData ?? []).map((tour: ITourPackage) => (
                                 <SwiperSlide key={tour.slug}>
                                     <TourCard tour={tour} />
                                 </SwiperSlide>
                             ))
                         ) : (
-                            <p>No tours available.</p>
+                            <p className="text-center font-medium text-xl text-gray-500">No tours available.</p> 
                         )
                     )}
                 </Swiper>
