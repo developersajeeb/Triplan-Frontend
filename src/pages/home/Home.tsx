@@ -2,8 +2,10 @@ import CategorySlider from "./CategorySlider";
 import HeroSlider from "./HeroSlider";
 import DestinationSlider from "./DestinationSlider";
 import WhyUs from "./WhyUs";
-import PopularDestination from "./PopularDestination";
 import RecentGallery from "./RecentGallery";
+import TourCardSlider from "@/components/modules/tour/TourCardSlider";
+import CustomerReview from "@/components/shared/sections/CustomerReview";
+import TourGuide from "@/components/shared/sections/TourGuide";
 
 const Home = () => {
   return (
@@ -12,8 +14,10 @@ const Home = () => {
       <CategorySlider />
       <DestinationSlider />
       <WhyUs />
-      <PopularDestination />
+      <TourCardSlider />
       <RecentGallery />
+      <TourGuide />
+      <CustomerReview />
     </>
   );
 };

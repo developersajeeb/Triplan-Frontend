@@ -10,7 +10,7 @@ import { useGetTourTypesQuery, useRemoveTourTypeMutation } from "@/redux/feature
 import { Trash2 } from "lucide-react";
 import { AddTourTypeModal } from "./AddTourTypeModal";
 import { toast } from "sonner";
-import { GlobalDeleteConfirmation } from "@/components/shared/GlobalDeleteConfirmation";
+import { GlobalDeleteConfirmation } from "@/components/shared/blocks/GlobalDeleteConfirmation";
 
 export default function TourTypes() {
   const { data } = useGetTourTypesQuery(undefined);

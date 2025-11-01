@@ -1,4 +1,4 @@
-import MultipleImageUploader from "@/components/shared/MultipleImageUploader";
+import MultipleImageUploader from "@/components/shared/uploaders/MultipleImageUploader";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import {

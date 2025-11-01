@@ -14,7 +14,7 @@ import {
 } from "@/components/ui/sidebar"
 import { Link, useLocation } from "react-router"
 import { getSidebarMenus } from "@/utils/getSidebarMenus"
-import Logo from '../../assets/triPlan-logo.svg';
+import Logo from '@/assets/triPlan-logo.svg';
 import { RiLogoutCircleLine } from "react-icons/ri";
 import { authApi, useLogoutMutation } from "@/redux/features/auth/auth.api";
 import { useAppDispatch } from "@/redux/hook";

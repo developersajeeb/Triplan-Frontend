@@ -5,7 +5,7 @@ import { Pagination } from 'swiper/modules';
 import 'swiper/css';
 import 'swiper/css/pagination';
 import styles from './style/category_slider.module.scss';
-import ctgBg from '../../assets/images/tour_login_bg.jpg';
+import ctgBg from '@/assets/images/tour_login_bg.jpg';
 
 const categories = [
   { title: 'Cruises', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' },

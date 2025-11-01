@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import SingleImageUploader from "@/components/shared/SingleImageUploader";
+import SingleImageUploader from "@/components/shared/uploaders/SingleImageUploader";
 import { Button } from "@/components/ui/button";
 import {
     Dialog,

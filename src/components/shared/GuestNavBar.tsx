@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/popover"
 import headerBg from '../../assets/images/line-pattern.png'
 import { Link } from "react-router";
-import WhiteSvgIcon from "./WhiteSvgIcon";
+import WhiteSvgIcon from "./blocks/WhiteSvgIcon";
 import { TiLocationOutline } from 'react-icons/ti';
 import { IoTimeOutline } from 'react-icons/io5';
 import { IoMdLogIn, IoMdLogOut } from 'react-icons/io';

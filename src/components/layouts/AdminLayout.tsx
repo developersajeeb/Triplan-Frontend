@@ -1,5 +1,5 @@
 import { Outlet } from 'react-router';
-import { AdminSidebar } from '../shared/AdminSidebar';
+import { AdminSidebar } from '../shared/sidebars/AdminSidebar';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '../ui/sidebar';
 import { Separator } from '../ui/separator';
 

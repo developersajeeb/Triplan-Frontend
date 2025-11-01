@@ -2,7 +2,7 @@ import { Pagination } from "swiper/modules";
 import { Swiper, SwiperSlide } from "swiper/react";
 import styles from "./style/destination_slider.module.scss";
 import { Link } from "react-router";
-import WhiteSvgIcon from "@/components/shared/WhiteSvgIcon";
+import WhiteSvgIcon from "@/components/shared/blocks/WhiteSvgIcon";
 import { useEffect, useRef } from "react";
 
 const DestinationSlider = () => {
@@ -106,7 +106,7 @@ const DestinationSlider = () => {
           <h2 className="section-title text-primary-950 mb-4">
             Popular Destination
           </h2>
-          <p className="text-lg font-medium text-gray-700 mb-7">
+          <p className="section-heading-paragraph mb-7">
             From peaceful beaches to breathtaking mountains, explore our top and
             most loved destinations — perfect for your next unforgettable escape
             into nature.

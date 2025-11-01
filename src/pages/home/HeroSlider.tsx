@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination, Autoplay, Parallax } from "swiper/modules";
 import styles from "./style/hero_slider.module.scss";
 import { Link } from "react-router";
-import WhiteSvgIcon from "@/components/shared/WhiteSvgIcon";
+import WhiteSvgIcon from "@/components/shared/blocks/WhiteSvgIcon";
 import Slider1 from '../../assets/images/home-slider/tours-slider-1.webp';
 import Slider2 from '../../assets/images/home-slider/tours-slider-2.webp';
 import Slider3 from '../../assets/images/home-slider/tours-slider-3.webp';

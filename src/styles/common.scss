@@ -9,15 +9,15 @@
 
 // Button class
 .tp-primary-btn {
-    @apply text-base font-semibold bg-primary-900 hover:bg-primary-400 text-white hover:text-white py-4 px-8 rounded-full transition duration-300;
+    @apply text-base font-semibold bg-primary-900 hover:bg-primary-400 text-white hover:text-white px-5 py-3 md:py-4 md:px-8 rounded-full transition duration-300;
 }
 
 .tp-primary-btn-light {
-    @apply text-base font-semibold bg-primary-400 hover:bg-primary-900 text-white hover:text-white py-4 px-8 rounded-full transition duration-300;
+    @apply text-base font-semibold bg-primary-400 hover:bg-primary-900 text-white hover:text-white px-5 py-3 md:py-4 md:px-8 rounded-full transition duration-300;
 }
 
 .tp-transparent-btn {
-    @apply text-base font-semibold bg-transparent hover:bg-white text-white hover:text-gray-800 border border-white py-4 px-8 rounded-full transition duration-300;
+    @apply text-base font-semibold bg-transparent hover:bg-white text-white hover:text-gray-800 border border-white px-5 py-3 md:py-4 md:px-8 rounded-full transition duration-300;
 }
 
 .tp-action-btn {
@@ -43,7 +43,10 @@
 }
 
 .section-title {
-    @apply text-[30px] sm:text-[38px] md:text-[48px] font-bold;
+    @apply text-[30px] sm:text-[38px] md:text-[48px] font-bold -mt-2 tracking-tight;
+}
+.section-heading-paragraph {
+    @apply text-base md:text-lg font-medium text-gray-700 tracking-tight;
 }
 
 // Drag Text style

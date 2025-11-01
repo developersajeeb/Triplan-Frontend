@@ -6,7 +6,7 @@ import { LuNotepadText } from "react-icons/lu";
 import { TbCalendarClock } from "react-icons/tb";
 import { Link } from "react-router";
 import type { ITourPackage } from "@/types";
-import ImageWaterMark from '../../../assets/images/image-watermark.webp'
+import ImageWaterMark from '@/assets/images/image-watermark.webp'
 
 interface Props {
     tour: ITourPackage;

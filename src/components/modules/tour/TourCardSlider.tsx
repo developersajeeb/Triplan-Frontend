@@ -5,8 +5,10 @@ import { useGetDivisionsQuery } from "@/redux/features/division/division.api";
 import TourCard from "@/components/modules/tour/TourCard";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ITourPackage } from "@/types";
+import WhiteSvgIcon from "@/components/shared/blocks/WhiteSvgIcon";
+import { Link } from "react-router";
 
-const PopularDestination = () => {
+const TourCardSlider = () => {
     const { data: tours, isLoading } = useGetAllToursQuery(undefined);
     const { data: tourTypes } = useGetTourTypesQuery(undefined);
     const { data: divisions } = useGetDivisionsQuery(undefined);
@@ -17,17 +19,16 @@ const PopularDestination = () => {
             ? divisions.find(d => d._id === item.division)?.name || "Unknown"
             : "Unknown"
     }));
-    console.log(tours);
-
 
     return (
         <section className="tp-container py-12 md:py-16 lg:py-20">
             <h4 className="section-sub-title text-primary-950 text-center">Best Recommended Places</h4>
-            <h2 className="section-title text-primary-950 mb-4 text-center">Best Destinations For Everyone</h2>
-            <p className="text-lg font-medium text-gray-700 mb-7 text-center max-w-3xl mx-auto">Discover handpicked destinations — from vibrant cities to serene natural wonders — blending adventure, culture, and relaxation for every traveler.</p>
+            <h2 className="section-title text-primary-950 mb-2 text-center">Best Destinations For Everyone</h2>
+            <p className="section-heading-paragraph mb-6 sm:mb-8 text-center max-w-3xl mx-auto">Discover handpicked destinations — from vibrant cities to serene natural wonders — blending adventure, culture, and relaxation for every traveler.</p>
 
             <div>
                 <Swiper
+                    className="swiper-pagination-dot !pb-[52px]"
                     pagination={{ clickable: true }}
                     loop
                     autoplay={{ delay: 5000, disableOnInteraction: false }}
@@ -94,13 +95,25 @@ const PopularDestination = () => {
                                 </SwiperSlide>
                             ))
                         ) : (
-                            <p className="text-center font-medium text-xl text-gray-500">No tours available.</p> 
+                            <p className="text-center font-medium text-xl text-gray-500">No tours available.</p>
                         )
                     )}
                 </Swiper>
             </div>
+
+            {(toursData ?? []).length > 0 && (
+                <div className="text-center mt-2">
+                    <Link
+                        className="tp-primary-btn inline-flex items-center gap-3"
+                        to="/destinations"
+                    >
+                        All Destination
+                        <WhiteSvgIcon className="w-4 md:w-auto h-4 md:h-auto" />
+                    </Link>
+                </div>
+            )}
         </section>
     );
 };
 
-export default PopularDestination;
+export default TourCardSlider;
