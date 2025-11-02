@@ -173,7 +173,7 @@ const DestinationSlider = () => {
                 <div className="z-10">
                   <Link
                     to="/#"
-                    className="group tp-transparent-btn !text-sm !px-6 !py-3 inline-flex items-center gap-3"
+                    className="group tp-transparent-white-btn !text-sm !px-6 !py-3 inline-flex items-center gap-3"
                   >
                     Explore
                     <WhiteSvgIcon className="group-hover:stroke-primary-400 w-4 md:w-auto h-4 md:h-auto" />

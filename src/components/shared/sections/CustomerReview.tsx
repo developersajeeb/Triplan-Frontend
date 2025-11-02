@@ -1,5 +1,5 @@
 import { Swiper, SwiperSlide } from "swiper/react";
-import { Pagination } from "swiper/modules";
+import { Pagination, Autoplay } from "swiper/modules";
 import { FaStar } from "react-icons/fa";
 import { PiQuotes } from "react-icons/pi";
 import NotUserIcon from "../blocks/NotUserIcon";
@@ -19,7 +19,7 @@ const CustomerReview = () => {
                     autoplay={{ delay: 2500, disableOnInteraction: false }}
                     slidesPerView={1}
                     spaceBetween={20}
-                    modules={[Pagination]}
+                    modules={[Pagination, Autoplay]}
                     grabCursor={true}
                     breakpoints={{
                         640: {
@@ -31,7 +31,7 @@ const CustomerReview = () => {
                     }}
                 >
                     <SwiperSlide>
-                        <div className="bg-primary-50 border border-primary-200 px-5 pt-5 pb-10 rounded-xl">
+                        <div className="bg-white border border-primary-200 px-5 pt-5 pb-10 rounded-xl">
                             <p className="text-base font-medium text-gray-700 tracking-tight">Dream Tours is the only way to go. We had the time of our life on our trip to the Ark. The customer service was wonderful, and the staff was very helpful.</p>
                             <div className="w-full h-[1px] bg-primary-100 my-4"></div>
                             <div className="flex items-center justify-between gap-2">
@@ -49,7 +49,7 @@ const CustomerReview = () => {
                         </div>
                     </SwiperSlide>
                     <SwiperSlide>
-                        <div className="bg-primary-50 border border-primary-200 px-5 pt-5 pb-10 rounded-xl">
+                        <div className="bg-white border border-primary-200 px-5 pt-5 pb-10 rounded-xl">
                             <p className="text-base font-medium text-gray-700 tracking-tight">Dream Tours is the only way to go. We had the time of our life on our trip to the Ark. The customer service was wonderful, and the staff was very helpful.</p>
                             <div className="w-full h-[1px] bg-primary-100 my-4"></div>
                             <div className="flex items-center justify-between gap-2">
@@ -67,7 +67,7 @@ const CustomerReview = () => {
                         </div>
                     </SwiperSlide>
                     <SwiperSlide>
-                        <div className="bg-primary-50 border border-primary-200 px-5 pt-5 pb-10 rounded-xl">
+                        <div className="bg-white border border-primary-200 px-5 pt-5 pb-10 rounded-xl">
                             <p className="text-base font-medium text-gray-700 tracking-tight">Dream Tours is the only way to go. We had the time of our life on our trip to the Ark. The customer service was wonderful, and the staff was very helpful.</p>
                             <div className="w-full h-[1px] bg-primary-100 my-4"></div>
                             <div className="flex items-center justify-between gap-2">
@@ -85,7 +85,7 @@ const CustomerReview = () => {
                         </div>
                     </SwiperSlide>
                     <SwiperSlide>
-                        <div className="bg-primary-50 border border-primary-200 px-5 pt-5 pb-10 rounded-xl">
+                        <div className="bg-white border border-primary-200 px-5 pt-5 pb-10 rounded-xl">
                             <p className="text-base font-medium text-gray-700 tracking-tight">Dream Tours is the only way to go. We had the time of our life on our trip to the Ark. The customer service was wonderful, and the staff was very helpful.</p>
                             <div className="w-full h-[1px] bg-primary-100 my-4"></div>
                             <div className="flex items-center justify-between gap-2">

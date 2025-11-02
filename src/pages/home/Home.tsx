@@ -6,6 +6,9 @@ import RecentGallery from "./RecentGallery";
 import TourCardSlider from "@/components/modules/tour/TourCardSlider";
 import CustomerReview from "@/components/shared/sections/CustomerReview";
 import TourGuide from "@/components/shared/sections/TourGuide";
+import PartnerLogos from "@/components/shared/sections/PartnerLogos";
+import NewsArticles from "./NewsArticles";
+import HomeAccordion from "./HomeAccordion";
 
 const Home = () => {
   return (
@@ -18,6 +21,9 @@ const Home = () => {
       <RecentGallery />
       <TourGuide />
       <CustomerReview />
+      <PartnerLogos />
+      <NewsArticles />
+      <HomeAccordion />
     </>
   );
 };

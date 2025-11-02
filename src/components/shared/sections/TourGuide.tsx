@@ -8,7 +8,7 @@ const TourGuide = () => {
     return (
         <section className="tp-container py-12 md:py-16 lg:py-20">
             <div className='flex flex-col sm:flex-row sm:items-end gap-2'>
-                <div className='flex-1 mb-3'>
+                <div className='flex-1 mb-3 sm:mb-0'>
                     <h4 className="section-sub-title text-primary-950">
                         Meet with Guide
                     </h4>

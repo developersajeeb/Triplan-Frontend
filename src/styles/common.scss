@@ -16,8 +16,12 @@
     @apply text-base font-semibold bg-primary-400 hover:bg-primary-900 text-white hover:text-white px-5 py-3 md:py-4 md:px-8 rounded-full transition duration-300;
 }
 
-.tp-transparent-btn {
+.tp-transparent-white-btn {
     @apply text-base font-semibold bg-transparent hover:bg-white text-white hover:text-gray-800 border border-white px-5 py-3 md:py-4 md:px-8 rounded-full transition duration-300;
+}
+
+.tp-transparent-black-btn {
+    @apply text-base font-semibold bg-transparent hover:bg-gray-800 text-gray-800 hover:text-white border border-gray-800 px-5 py-3 md:py-4 md:px-8 rounded-full transition duration-300;
 }
 
 .tp-action-btn {

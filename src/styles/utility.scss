@@ -13,3 +13,34 @@
         }
     }
 }
+
+.logo-infinity-slider {
+
+    &::before,
+    &::after {
+        content: "";
+        position: absolute;
+        top: 0;
+        z-index: 10;
+        width: 80px;
+        height: 100%;
+        pointer-events: none;
+    }
+
+    &::before {
+        left: 0;
+        background: linear-gradient(to right, white 35%, transparent 100%);
+    }
+
+    &::after {
+        right: 0;
+        background: linear-gradient(to left, white 35%, transparent 100%);
+    }
+
+    .swiper-wrapper {
+        -webkit-transition-timing-function: linear !important;
+        -moz-transition-timing-function: linear !important;
+        -o-transition-timing-function: linear !important;
+        transition-timing-function: linear !important;
+    }
+}

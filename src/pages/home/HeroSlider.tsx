@@ -71,7 +71,7 @@ export default function HeroSlider() {
                     Register Now
                     <WhiteSvgIcon className="w-4 md:w-auto h-4 md:h-auto" />
                   </Link>
-                  <Link to="/tours" className="group tp-transparent-btn flex items-center gap-3">
+                  <Link to="/tours" className="group tp-transparent-white-btn flex items-center gap-3">
                     All Tours
                     <WhiteSvgIcon className="group-hover:stroke-primary-400 w-4 md:w-auto h-4 md:h-auto" />
                   </Link>
