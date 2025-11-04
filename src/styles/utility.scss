@@ -44,3 +44,7 @@
         transition-timing-function: linear !important;
     }
 }
+
+.tp-newsletter-input {
+    @apply bg-transparent text-white placeholder:text-gray-300 py-3 px-6 h-[54px] rounded-full border-2 border-primary-300 text-base font-medium;
+}
