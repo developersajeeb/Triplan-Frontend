@@ -43,11 +43,11 @@
 
 // Font related class
 .section-sub-title {
-    @apply text-[22px] sm:text-[28px] md:text-[38px] font-Nunito;
+    @apply text-[20px] sm:text-[26px] md:text-[36px] font-Nunito;
 }
 
 .section-title {
-    @apply text-[30px] sm:text-[38px] md:text-[48px] font-bold -mt-2 tracking-tight;
+    @apply text-[30px] leading-[42px] sm:text-[34px] sm:leading-[48px] md:leading-[58px] md:text-[44px] font-bold tracking-tight;
 }
 .section-heading-paragraph {
     @apply text-base md:text-lg font-medium text-gray-700 tracking-tight;

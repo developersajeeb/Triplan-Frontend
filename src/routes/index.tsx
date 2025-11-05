@@ -1,6 +1,5 @@
 import App from "@/App";
 import AdminLayout from "@/components/layouts/AdminLayout";
-import About from "@/pages/about/About";
 import LoginPage from "@/pages/login/LoginPage";
 import RegistrationPage from "@/pages/registration/RegistrationPage";
 import VerifyPage from "@/pages/verify/VerifyPage";
@@ -12,13 +11,16 @@ import { userSidebarMenus } from "./userSidebarMenus";
 import { withAuth } from "@/utils/withAuth";
 import type { TRole } from "@/types";
 import { role } from "@/constants/role";
-import Tours from "@/pages/tours/Tours";
 import TourDetails from "@/pages/tour-details/TourDetails";
 import Booking from "@/pages/booking/Booking";
 import PaymentSuccess from "@/pages/payment/PaymentSuccess";
 import PaymentFail from "@/pages/payment/PaymentFail";
 import PaymentCancel from "@/pages/payment/PaymentCancel";
 import Home from "@/pages/home/Home";
+import { lazy } from "react";
+
+const AboutUs = lazy(() => import("@/pages/about/About"));
+const Tours = lazy(() => import("@/pages/tours/Tours"));
 
 export const router = createBrowserRouter([
   {
@@ -30,7 +32,7 @@ export const router = createBrowserRouter([
         Component: Home,
       },
       {
-        Component: About,
+        Component: AboutUs,
         path: "about-us",
       },
       {

@@ -1,8 +1,12 @@
+import PageBanner from "@/components/shared/sections/PageBanner";
+import OurStory from "./OurStory";
+
 const About = () => {
     return (
-        <div>
-            im from about
-        </div>
+        <>
+            <PageBanner title="About Us" />
+            <OurStory />
+        </>
     );
 };
 
