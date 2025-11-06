@@ -1,4 +1,4 @@
-import UserDashboard from "@/pages/user/UserDashboard/UserDashboard";
+import UserDashboard from "@/pages/user/UserDashboard";
 import type { ISidebarItem } from "@/types";
 
 

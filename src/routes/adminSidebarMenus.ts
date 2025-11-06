@@ -1,13 +1,13 @@
 // import AdminDashboard from "@/pages/admin/admin-dashboard/AdminDashboard";
-import Earnings from "@/pages/admin/earnings/Earnings";
-import Enquiries from "@/pages/admin/enquiries/Enquiries";
-import Reviews from "@/pages/admin/reviews/Reviews";
-import Settings from "@/pages/admin/settings/Settings";
-import TourGuides from "@/pages/admin/tour-guides/Tour-Guides";
-import TourListing from "@/pages/admin/tour-listing/Tour-Listing";
-import TourTypes from "@/pages/admin/tour-type/TourTypes";
-import Division from "@/pages/admin/division/Division";
-import AddTour from "@/pages/admin/add-tour/AddTour";
+import Earnings from "@/pages/admin/earnings";
+import Enquiries from "@/pages/admin/enquiries";
+import Reviews from "@/pages/admin/reviews";
+import Settings from "@/pages/admin/settings";
+import TourGuides from "@/pages/admin/tour-guides";
+import TourListing from "@/pages/admin/tour-listing";
+import TourTypes from "@/pages/admin/tour-type";
+import Division from "@/pages/admin/division";
+import AddTour from "@/pages/admin/add-tour";
 import type { ISidebarItem } from "@/types";
 import { lazy } from "react";
 import { LuLayoutDashboard } from "react-icons/lu";
@@ -21,7 +21,7 @@ import { TbSettings } from "react-icons/tb";
 import { PiMapPinArea } from "react-icons/pi";
 import { MdOutlineAddLocationAlt } from "react-icons/md";
 
-const AdminDashboard = lazy(() => import("@/pages/admin/admin-dashboard/AdminDashboard"));
+const AdminDashboard = lazy(() => import("@/pages/admin/admin-dashboard"));
 
 export const adminSidebarMenus: ISidebarItem[] = [
     {

@@ -1,8 +1,8 @@
 import App from "@/App";
 import AdminLayout from "@/components/layouts/AdminLayout";
-import LoginPage from "@/pages/login/LoginPage";
-import RegistrationPage from "@/pages/registration/RegistrationPage";
-import VerifyPage from "@/pages/verify/VerifyPage";
+import LoginPage from "@/pages/login";
+import RegistrationPage from "@/pages/registration";
+import VerifyPage from "@/pages/verify";
 import { generateRoutes } from "@/utils/generateRoutes";
 import { createBrowserRouter, Navigate } from "react-router";
 import { adminSidebarMenus } from "./adminSidebarMenus";
@@ -11,16 +11,16 @@ import { userSidebarMenus } from "./userSidebarMenus";
 import { withAuth } from "@/utils/withAuth";
 import type { TRole } from "@/types";
 import { role } from "@/constants/role";
-import TourDetails from "@/pages/tour-details/TourDetails";
-import Booking from "@/pages/booking/Booking";
+import TourDetails from "@/pages/tour-details";
+import Booking from "@/pages/booking";
 import PaymentSuccess from "@/pages/payment/PaymentSuccess";
 import PaymentFail from "@/pages/payment/PaymentFail";
 import PaymentCancel from "@/pages/payment/PaymentCancel";
-import Home from "@/pages/home/Home";
+import Home from "@/pages/home";
 import { lazy } from "react";
 
-const AboutUs = lazy(() => import("@/pages/about/About"));
-const Tours = lazy(() => import("@/pages/tours/Tours"));
+const AboutUs = lazy(() => import("@/pages/about"));
+const Tours = lazy(() => import("@/pages/tours"));
 
 export const router = createBrowserRouter([
   {
