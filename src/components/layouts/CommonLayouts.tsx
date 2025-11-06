@@ -1,5 +1,6 @@
-import GuestNavBar from '../shared/GuestNavBar';
-import Footer from '../shared/sections/Footer';
+
+import Footer from '../utilities/Footer';
+import GuestNavBar from '../utilities/GuestNavBar';
 
 interface IProps {
     children: React.ReactNode;

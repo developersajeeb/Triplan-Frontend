@@ -18,6 +18,7 @@ import PaymentFail from "@/pages/payment/PaymentFail";
 import PaymentCancel from "@/pages/payment/PaymentCancel";
 import Home from "@/pages/home";
 import { lazy } from "react";
+import ContactUs from "@/pages/contact-us";
 
 const AboutUs = lazy(() => import("@/pages/about"));
 const Tours = lazy(() => import("@/pages/tours"));
@@ -58,6 +59,10 @@ export const router = createBrowserRouter([
       {
         Component: PaymentCancel,
         path: "/payment/cancel",
+      },
+      {
+        Component: ContactUs,
+        path: "contact-us",
       },
     ],
   },

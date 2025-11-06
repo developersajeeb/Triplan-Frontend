@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/popover"
 import headerBg from '../../assets/images/line-pattern.png'
 import { Link } from "react-router";
-import WhiteSvgIcon from "./blocks/WhiteSvgIcon";
 import { TiLocationOutline } from 'react-icons/ti';
 import { IoTimeOutline } from 'react-icons/io5';
 import { IoMdLogIn, IoMdLogOut } from 'react-icons/io';
@@ -22,15 +21,16 @@ import { authApi, useLogoutMutation, useUserInfoQuery } from '@/redux/features/a
 import { TbLayoutDashboard } from "react-icons/tb";
 import { useAppDispatch } from '@/redux/hook';
 import { role } from '@/constants/role';
+import WhiteSvgIcon from '../shared/blocks/WhiteSvgIcon';
 
 const navigationLinks = [
   { href: "/", label: "Home", submenu: false, type: "", items: [] },
   { href: "/about-us", label: "About Us", submenu: false, type: "", items: [] },
-  { href: "/our-services", label: "Our Services", submenu: false, type: "", items: [] },
   { href: "/tours", label: "Tours", submenu: false, type: "", items: [] },
   { href: "/destinations", label: "Destinations", submenu: false, type: "", items: [] },
   { href: "/tour-guider", label: "Tour Guider", submenu: false, type: "", items: [] },
   { href: "/blog", label: "Blog", submenu: false, type: "", items: [] },
+  { href: "/contact-us", label: "Contact Us", submenu: false, type: "", items: [] },
 ]
 
 export default function GuestNavBar() {

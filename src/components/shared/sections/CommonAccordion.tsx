@@ -15,10 +15,10 @@ interface Props {
   defaultOpen?: number;
 }
 
-export default function CommonAccordion({ items }: Props) {
+export default function CommonAccordion({ items, defaultOpen }: Props) {
   return (
     <div className="space-y-4">
-      <Accordion type="single" collapsible className="w-full" defaultValue="3">
+      <Accordion type="single" collapsible className="w-full" defaultValue={String(defaultOpen)}>
         {items.map((item, index) => (
           <AccordionItem value={String(index)} key={index} className="py-2">
             <AccordionTrigger className="py-2 text-[18px] md:text-[20px] text-primary-950 leading-6 hover:no-underline">

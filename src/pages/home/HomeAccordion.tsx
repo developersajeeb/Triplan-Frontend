@@ -30,7 +30,7 @@ const HomeAccordion = () => {
                 <h4 className="section-sub-title text-primary-950 text-center">FAQ</h4>
                 <h2 className="section-title text-primary-950 mb-3 md:mb-8 text-center">Frequently Asked Questions</h2>
 
-                <div><CommonAccordion items={faqItems} defaultOpen={0} /></div>
+                <CommonAccordion items={faqItems} defaultOpen={0} />
             </div>
         </section>
     );
