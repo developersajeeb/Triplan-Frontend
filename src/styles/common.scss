@@ -34,7 +34,7 @@
 
 // Form input related class
 .tp-input {
-    @apply w-full !text-sm bg-white font-medium border border-gray-300 hover:border-primary-400 focus:border-primary-400 focus-visible:ring-0 px-3 py-5;
+    @apply w-full !text-sm bg-white font-medium border border-gray-300 hover:border-primary-400 focus:border-primary-400 focus-visible:ring-0 px-3 py-2 h-11;
 }
 
 .tp-textarea {

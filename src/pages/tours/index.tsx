@@ -6,6 +6,7 @@ import { useGetDivisionsQuery } from '@/redux/features/division/division.api';
 import TourCard from '@/components/modules/tour/TourCard';
 import { useSearchParams } from 'react-router';
 import React from 'react';
+import TourSideFilter from '@/components/modules/tour/TourSideFilter';
 
 const Tours = () => {
     const [searchParams] = useSearchParams();
@@ -35,12 +36,7 @@ const Tours = () => {
             </section>
             <section className='flex flex-col lg:flex-row gap-6 bg-[#F1F5FF] tp-big-container pt-6 pb-16'>
                 {/* Filters */}
-                <div className='w-full lg:w-[350px] bg-white rounded-xl border border-gray-200 shadow-[0px_4px_24px_0px_rgba(194, 194, 194, 0.25)]'>
-                    <div className='flex justify-between items-center px-5 py-4'>
-                        <h2 className='text-gray-800 text-xl font-bold'>Filters</h2>
-                        <button className='text-sm font-semibold text-primary-400'>Reset</button>
-                    </div>
-                </div>
+                <TourSideFilter />
 
                 {/* Tour Cards */}
                 <div className='w-full'>
