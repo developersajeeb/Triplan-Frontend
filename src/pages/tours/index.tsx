@@ -5,16 +5,23 @@ import { useGetAllToursQuery, useGetTourTypesQuery } from '@/redux/features/tour
 import { useGetDivisionsQuery } from '@/redux/features/division/division.api';
 import TourCard from '@/components/modules/tour/TourCard';
 import { useSearchParams } from 'react-router';
-import React from 'react';
 import TourSideFilter from '@/components/modules/tour/TourSideFilter';
+import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
+import type { ITourPackage } from '@/types';
+import { IoIosArrowDown } from 'react-icons/io';
+import React from 'react';
+import { IoFilter } from 'react-icons/io5';
+
 
 const Tours = () => {
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
 
     const division = searchParams.get("division") || undefined;
     const tourType = searchParams.get("tourType") || undefined;
 
-    const { data: tours } = useGetAllToursQuery({ division, tourType });
+    const { data: tours, isLoading } = useGetAllToursQuery({ division, tourType });
     const { data: tourTypes } = useGetTourTypesQuery(undefined);
     const { data: divisions } = useGetDivisionsQuery(undefined);
     const toursData = tours?.map((item) => ({
@@ -24,7 +31,7 @@ const Tours = () => {
             ? divisions.find(d => d._id === item.division)?.name || "Unknown"
             : "Unknown"
     }));
-    
+
     return (
         <>
             <section className="relative bg-center bg-cover bg-no-repeat px-4 py-14" style={{ backgroundImage: `url(${bgImage})` }}>
@@ -40,20 +47,90 @@ const Tours = () => {
 
                 {/* Tour Cards */}
                 <div className='w-full'>
-                    <div className='flex justify-between gap-5 flex-wrap mb-4'>
-                        <h5 className='text-gray-800 text-base font-semibold'>1920 Tours Available</h5>
+                    <div className='flex justify-between gap-5 mb-6'>
+                        <div className='flex gap-2 items-end flex-wrap'>
+                            <Button className='bg-transparent hover:bg-primary-100 rounded-full border border-gray-400 shadow-none text-gray-700 lg:hidden'>Filter <span><IoFilter size={18} /></span></Button>
+                            <h5 className='text-gray-800 text-base font-semibold mt-1 hidden lg:block'>1920 Tours Available</h5>
+                        </div>
 
-                        <ul className='flex gap-2'>
-                            <li className='cursor-pointer p-1 rounded bg-primary-500 text-white'><LuGrid2X2 size={22} /></li>
-                            <li className='cursor-pointer p-1 rounded hover:bg-primary-500 hover:text-white duration-300 text-gray-800'><RiListCheck2 size={22} /></li>
-                        </ul>
+                        <div className='flex gap-3'>
+                            <DropdownMenu>
+                                <DropdownMenuTrigger asChild>
+                                    <Button
+                                        variant="outline"
+                                        className="rounded-full shadow-none border-none hover:bg-primary-500 hover:text-white focus-visible:outline-none h-8"
+                                    >
+                                        Sort by <span><IoIosArrowDown size={16} /></span>
+                                    </Button>
+                                </DropdownMenuTrigger>
+                                <DropdownMenuContent className="w-auto">
+                                    <DropdownMenuCheckboxItem
+                                        checked={false}
+                                        onClick={() => {
+                                            searchParams.set("sort", "newest");
+                                            setSearchParams(searchParams);
+                                        }}
+                                    >
+                                        Newest
+                                    </DropdownMenuCheckboxItem>
+                                    <DropdownMenuCheckboxItem
+                                        checked={false}
+                                        onClick={() => {
+                                            searchParams.set("sort", "priceLowToHigh");
+                                            setSearchParams(searchParams);
+                                        }}
+                                    >
+                                        Price: Low to High
+                                    </DropdownMenuCheckboxItem>
+                                    <DropdownMenuCheckboxItem
+                                        checked={false}
+                                        onClick={() => {
+                                            searchParams.set("sort", "priceHighToLow");
+                                            setSearchParams(searchParams);
+                                        }}
+                                    >
+                                        Price: High to Low
+                                    </DropdownMenuCheckboxItem>
+                                </DropdownMenuContent>
+                            </DropdownMenu>
+
+                            <ul className='flex gap-2'>
+                                <li><span className='inline-block cursor-pointer p-1 rounded bg-primary-500 text-white'><LuGrid2X2 size={22} /></span></li>
+                                <li><span className='inline-block cursor-pointer p-1 rounded hover:bg-primary-500 hover:text-white duration-300 text-gray-800'><RiListCheck2 size={22} /></span></li>
+                            </ul>
+                        </div>
                     </div>
 
-                    <div className='grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6'>
-                        {toursData?.map((tour) => (
-                            <React.Fragment key={tour.slug}><TourCard tour={tour} /></React.Fragment>
-                        ))}
-                    </div>
+                    {isLoading ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                            {[...Array(3)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="rounded-[10px] border border-gray-200 bg-white"
+                                >
+                                    <Skeleton className="h-[170px] rounded-b-0" />
+                                    <div className="p-5">
+                                        <Skeleton className="h-4 rounded-full max-w-[100px]" />
+                                        <Skeleton className="h-4 rounded-full max-w-[140px] mt-2" />
+                                        <Skeleton className="h-5 rounded-full max-w-[250px] mt-5" />
+                                        <Skeleton className="h-5 rounded-full max-w-[200px] mt-2" />
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    ) : (toursData ?? []).length > 0 ? (
+                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                            {(toursData ?? []).map((tour: ITourPackage) => (
+                                <React.Fragment key={tour.slug}>
+                                    <TourCard tour={tour} />
+                                </React.Fragment>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-center font-medium text-xl text-gray-500">
+                            No tours available.
+                        </p>
+                    )}
                 </div>
             </section>
         </>

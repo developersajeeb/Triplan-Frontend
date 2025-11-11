@@ -50,42 +50,20 @@ const TourCardSlider = () => {
                 >
                     {isLoading ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
-                            <div className="rounded-[10px] border border-gray-200 bg-white shadow-[0px_4px_24px_0px_rgba(194, 194, 194, 0.25)]">
-                                <Skeleton className="h-[170px] rounded-b-0" />
-                                <div className="p-5">
-                                    <Skeleton className="h-4 rounded-full max-w-[100px]" />
-                                    <Skeleton className="h-4 rounded-full max-w-[140px] mt-2" />
-                                    <Skeleton className="h-5 rounded-full max-w-[250px] mt-5" />
-                                    <Skeleton className="h-5 rounded-full max-w-[200px] mt-2" />
+                            {[...Array(4)].map((_, i) => (
+                                <div
+                                    key={i}
+                                    className="rounded-[10px] border border-gray-200 bg-white shadow-[0px_4px_24px_0px_rgba(194,194,194,0.25)]"
+                                >
+                                    <Skeleton className="h-[170px] rounded-b-0" />
+                                    <div className="p-5">
+                                        <Skeleton className="h-4 rounded-full max-w-[100px]" />
+                                        <Skeleton className="h-4 rounded-full max-w-[140px] mt-2" />
+                                        <Skeleton className="h-5 rounded-full max-w-[250px] mt-5" />
+                                        <Skeleton className="h-5 rounded-full max-w-[200px] mt-2" />
+                                    </div>
                                 </div>
-                            </div>
-                            <div className="rounded-[10px] border border-gray-200 bg-white shadow-[0px_4px_24px_0px_rgba(194, 194, 194, 0.25)]">
-                                <Skeleton className="h-[170px] rounded-b-0" />
-                                <div className="p-5">
-                                    <Skeleton className="h-4 rounded-full max-w-[100px]" />
-                                    <Skeleton className="h-4 rounded-full max-w-[140px] mt-2" />
-                                    <Skeleton className="h-5 rounded-full max-w-[250px] mt-5" />
-                                    <Skeleton className="h-5 rounded-full max-w-[200px] mt-2" />
-                                </div>
-                            </div>
-                            <div className="rounded-[10px] border border-gray-200 bg-white shadow-[0px_4px_24px_0px_rgba(194, 194, 194, 0.25)]">
-                                <Skeleton className="h-[170px] rounded-b-0" />
-                                <div className="p-5">
-                                    <Skeleton className="h-4 rounded-full max-w-[100px]" />
-                                    <Skeleton className="h-4 rounded-full max-w-[140px] mt-2" />
-                                    <Skeleton className="h-5 rounded-full max-w-[250px] mt-5" />
-                                    <Skeleton className="h-5 rounded-full max-w-[200px] mt-2" />
-                                </div>
-                            </div>
-                            <div className="rounded-[10px] border border-gray-200 bg-white shadow-[0px_4px_24px_0px_rgba(194, 194, 194, 0.25)]">
-                                <Skeleton className="h-[170px] rounded-b-0" />
-                                <div className="p-5">
-                                    <Skeleton className="h-4 rounded-full max-w-[100px]" />
-                                    <Skeleton className="h-4 rounded-full max-w-[140px] mt-2" />
-                                    <Skeleton className="h-5 rounded-full max-w-[250px] mt-5" />
-                                    <Skeleton className="h-5 rounded-full max-w-[200px] mt-2" />
-                                </div>
-                            </div>
+                            ))}
                         </div>
                     ) : (
                         (toursData ?? []).length > 0 ? (
