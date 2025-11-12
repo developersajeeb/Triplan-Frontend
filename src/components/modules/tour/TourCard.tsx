@@ -17,7 +17,7 @@ const TourCard = ({ tour }: Props) => {
     return (
         <div className='group rounded-[10px] border border-gray-200 overflow-hidden bg-white shadow-[0px_4px_24px_0px_rgba(194, 194, 194, 0.25)]'>
             <div className='relative h-[200px] overflow-hidden'>
-                <ul className='flex gap-2 justify-between absolute left-3 top-3 right-3 z-50'>
+                <ul className='flex gap-2 justify-between absolute left-3 top-3 right-3 z-10'>
                     <li className='bg-white shadow w-6 h-6 rounded-full flex justify-center items-center cursor-pointer'><FaHeart className='text-gray-400' size={14} /></li>
                     <li className='text-xs text-white font-medium bg-primary-500 px-2 pr-3 py-1 rounded-full inline-flex items-center gap-1'><BiSolidHot size={14} /> Trending</li>
                 </ul>

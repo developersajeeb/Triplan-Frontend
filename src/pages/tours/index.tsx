@@ -12,7 +12,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import type { ITourPackage } from '@/types';
 import { IoIosArrowDown } from 'react-icons/io';
 import React from 'react';
-import { IoFilter } from 'react-icons/io5';
+import { IoClose, IoFilter } from 'react-icons/io5';
+import { Drawer, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 
 
 const Tours = () => {
@@ -43,13 +44,25 @@ const Tours = () => {
             </section>
             <section className='flex flex-col lg:flex-row gap-6 bg-[#F1F5FF] tp-big-container pt-6 pb-16'>
                 {/* Filters */}
-                <TourSideFilter />
+                <TourSideFilter className='hidden lg:block' />
 
                 {/* Tour Cards */}
                 <div className='w-full'>
                     <div className='flex justify-between gap-5 mb-6'>
                         <div className='flex gap-2 items-end flex-wrap'>
-                            <Button className='bg-transparent hover:bg-primary-100 rounded-full border border-gray-400 shadow-none text-gray-700 lg:hidden'>Filter <span><IoFilter size={18} /></span></Button>
+                            <Drawer direction="left">
+                                <DrawerTrigger asChild>
+                                    <Button className='bg-transparent hover:bg-primary-100 rounded-full border border-gray-400 shadow-none text-gray-700 lg:hidden'>Filter <span><IoFilter size={18} /></span></Button>
+                                </DrawerTrigger>
+                                <DrawerContent className='max-w-[300px] h-full rounded-none overflow-y-auto'>
+                                    <div className='text-end px-4 pb-4'>
+                                        <DrawerClose asChild>
+                                            <button className='inline-flex items-center gap-1 text-gray-600 font-semibold border border-gray-400 max-w-[100px] py-2 px-4 rounded-full'>Close <IoClose size={22} /></button>
+                                        </DrawerClose>
+                                    </div>
+                                    <TourSideFilter className='pt-0 rounded-t-none' />
+                                </DrawerContent>
+                            </Drawer>
                             <h5 className='text-gray-800 text-base font-semibold mt-1 hidden lg:block'>1920 Tours Available</h5>
                         </div>
 

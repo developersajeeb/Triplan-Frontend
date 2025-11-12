@@ -16,7 +16,7 @@ import { TiLocationOutline } from 'react-icons/ti';
 import { IoTimeOutline } from 'react-icons/io5';
 import { IoMdLogIn, IoMdLogOut } from 'react-icons/io';
 import { AiOutlineUserAdd } from 'react-icons/ai';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { authApi, useLogoutMutation, useUserInfoQuery } from '@/redux/features/auth/auth.api';
 import { TbLayoutDashboard } from "react-icons/tb";
 import { useAppDispatch } from '@/redux/hook';
@@ -38,6 +38,14 @@ export default function GuestNavBar() {
   const [isShowStickyHeader, setShowStickyHeader] = useState<boolean>(false);
   const [logout] = useLogoutMutation();
   const dispatch = useAppDispatch();
+  const headerRef = useRef<HTMLDivElement | null>(null);
+  const [headerHeight, setHeaderHeight] = useState<number>(0);
+
+  useEffect(() => {
+    if (headerRef.current) {
+      setHeaderHeight(headerRef.current.offsetHeight);
+    }
+  }, [isShowStickyHeader]);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -52,7 +60,7 @@ export default function GuestNavBar() {
   const handleLogout = async () => {
     await logout(undefined);
     dispatch(authApi.util.resetApiState());
-  };  
+  };
 
   return (
     <>
@@ -83,7 +91,9 @@ export default function GuestNavBar() {
           </div>
         </div>
       </section>
+      {isShowStickyHeader && <div style={{ height: headerHeight }}></div>}
       <header
+        ref={headerRef}
         className={`z-50 w-full bg-white bg-cover bg-no-repeat bg-center transition-all duration-500 ease-in-out ${isShowStickyHeader ? "fixed top-0 shadow-md animate-slideDown" : "relative"}`}
         style={{ backgroundImage: `url(${headerBg})` }}
       >
