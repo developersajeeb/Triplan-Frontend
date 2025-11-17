@@ -1,23 +1,25 @@
 import { LuGrid2X2 } from 'react-icons/lu';
-import bgImage from '../../assets/images/tour-page-img.jpg';
 import { RiListCheck2 } from 'react-icons/ri';
 import { useGetAllToursQuery, useGetTourTypesQuery } from '@/redux/features/tour/tour.api';
 import { useGetDivisionsQuery } from '@/redux/features/division/division.api';
-import TourCard from '@/components/modules/tour/TourCard';
+import TourCardBox from '@/components/modules/tour/TourCardBox';
 import { useSearchParams } from 'react-router';
 import TourSideFilter from '@/components/modules/tour/TourSideFilter';
-import { DropdownMenu, DropdownMenuCheckboxItem, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import type { ITourPackage } from '@/types';
-import { IoIosArrowDown } from 'react-icons/io';
-import React from 'react';
+import React, { useState } from 'react';
 import { IoClose, IoFilter } from 'react-icons/io5';
 import { Drawer, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
+import TourCardList from '@/components/modules/tour/TourCardList';
+import PageBanner from '@/components/shared/sections/PageBanner';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
 
 
 const Tours = () => {
+    const [viewType, setViewType] = useState<string>("grid");
     const [searchParams, setSearchParams] = useSearchParams();
+    const sortValue = searchParams.get("sort") || "newest";
 
     const division = searchParams.get("division") || undefined;
     const tourType = searchParams.get("tourType") || undefined;
@@ -33,22 +35,26 @@ const Tours = () => {
             : "Unknown"
     }));
 
+    const handleSortChange = (value: string) => {
+        searchParams.set("sort", value);
+        setSearchParams(searchParams);
+    };
+
+    const handleResetSort = () => {
+        searchParams.delete("sort");
+        setSearchParams(searchParams);
+    };
+
     return (
         <>
-            <section className="relative bg-center bg-cover bg-no-repeat px-4 py-14" style={{ backgroundImage: `url(${bgImage})` }}>
-                <div className="absolute inset-0 bg-black/50 z-0"></div>
-                <h1 className='text-5xl font-bold text-white text-center z-20 relative'>Tours</h1>
-            </section>
-            <section>
-                {/* Big search area */}
-            </section>
+            <PageBanner title='Tours' />
             <section className='flex flex-col lg:flex-row gap-6 bg-[#F1F5FF] tp-big-container pt-6 pb-16'>
                 {/* Filters */}
                 <TourSideFilter className='hidden lg:block' />
 
                 {/* Tour Cards */}
                 <div className='w-full'>
-                    <div className='flex justify-between gap-5 mb-6'>
+                    <div className='flex flex-wrap justify-between gap-2 mb-6'>
                         <div className='flex gap-2 items-end flex-wrap'>
                             <Drawer direction="left">
                                 <DrawerTrigger asChild>
@@ -67,49 +73,54 @@ const Tours = () => {
                         </div>
 
                         <div className='flex gap-3'>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button
-                                        variant="outline"
-                                        className="rounded-full shadow-none border-none hover:bg-primary-500 hover:text-white focus-visible:outline-none h-8"
-                                    >
-                                        Sort by <span><IoIosArrowDown size={16} /></span>
-                                    </Button>
-                                </DropdownMenuTrigger>
-                                <DropdownMenuContent className="w-auto">
-                                    <DropdownMenuCheckboxItem
-                                        checked={false}
-                                        onClick={() => {
-                                            searchParams.set("sort", "newest");
-                                            setSearchParams(searchParams);
-                                        }}
-                                    >
-                                        Newest
-                                    </DropdownMenuCheckboxItem>
-                                    <DropdownMenuCheckboxItem
-                                        checked={false}
-                                        onClick={() => {
-                                            searchParams.set("sort", "priceLowToHigh");
-                                            setSearchParams(searchParams);
-                                        }}
-                                    >
-                                        Price: Low to High
-                                    </DropdownMenuCheckboxItem>
-                                    <DropdownMenuCheckboxItem
-                                        checked={false}
-                                        onClick={() => {
-                                            searchParams.set("sort", "priceHighToLow");
-                                            setSearchParams(searchParams);
-                                        }}
-                                    >
-                                        Price: High to Low
-                                    </DropdownMenuCheckboxItem>
-                                </DropdownMenuContent>
-                            </DropdownMenu>
+                            <Select value={sortValue} onValueChange={handleSortChange}>
+                                <SelectTrigger className="w-[160px] rounded-full shadow-none h-[34px] bg-white focus:ring-0 border border-primary-200">
+                                    <SelectValue placeholder="Sort by" />
+                                </SelectTrigger>
+
+                                <SelectContent>
+
+                                    <SelectItem value="newest">Newest</SelectItem>
+                                    <SelectItem value="priceLowToHigh">Price: Low to High</SelectItem>
+                                    <SelectItem value="priceHighToLow">Price: High to Low</SelectItem>
+
+                                    {/* ---- FOOTER RESET BUTTON ---- */}
+                                    <div className="border-t mt-2 pt-2 px-2 pb-1">
+                                        <button
+                                            onClick={handleResetSort}
+                                            className="w-full text-center py-2 text-sm font-medium rounded-md bg-red-100 hover:bg-red-200 text-red-700"
+                                        >
+                                            Reset
+                                        </button>
+                                    </div>
+
+                                </SelectContent>
+                            </Select>
 
                             <ul className='flex gap-2'>
-                                <li><span className='inline-block cursor-pointer p-1 rounded bg-primary-500 text-white'><LuGrid2X2 size={22} /></span></li>
-                                <li><span className='inline-block cursor-pointer p-1 rounded hover:bg-primary-500 hover:text-white duration-300 text-gray-800'><RiListCheck2 size={22} /></span></li>
+                                <li>
+                                    <span
+                                        onClick={() => setViewType("grid")}
+                                        className={`inline-block cursor-pointer p-1 rounded ${viewType === "grid"
+                                            ? "bg-primary-500 text-white"
+                                            : "hover:bg-primary-500 hover:text-white duration-300 text-gray-800"
+                                            }`}
+                                    >
+                                        <LuGrid2X2 size={22} />
+                                    </span>
+                                </li>
+
+                                <li>
+                                    <span
+                                        onClick={() => setViewType("list")}
+                                        className={`inline-block cursor-pointer p-1 rounded ${viewType === "list"
+                                            ? "bg-primary-500 text-white"
+                                            : "hover:bg-primary-500 hover:text-white duration-300 text-gray-800"
+                                            }`}
+                                    >
+                                        <RiListCheck2 size={22} />
+                                    </span>
+                                </li>
                             </ul>
                         </div>
                     </div>
@@ -132,13 +143,23 @@ const Tours = () => {
                             ))}
                         </div>
                     ) : (toursData ?? []).length > 0 ? (
-                        <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                            {(toursData ?? []).map((tour: ITourPackage) => (
-                                <React.Fragment key={tour.slug}>
-                                    <TourCard tour={tour} />
-                                </React.Fragment>
-                            ))}
-                        </div>
+
+                        viewType === "grid" ? (
+                            // GRID VIEW
+                            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                                {(toursData ?? []).map((tour: ITourPackage) => (
+                                    <React.Fragment key={tour.slug}><TourCardBox tour={tour} /></React.Fragment>
+                                ))}
+                            </div>
+                        ) : (
+                            // LIST VIEW
+                            <div className="flex flex-col gap-4">
+                                {(toursData ?? []).map((tour: ITourPackage) => (
+                                    <TourCardList key={tour.slug} tour={tour} />
+                                ))}
+                            </div>
+                        )
+
                     ) : (
                         <p className="text-center font-medium text-xl text-gray-500">
                             No tours available.

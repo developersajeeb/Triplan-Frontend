@@ -2,7 +2,7 @@ import { useGetAllToursQuery, useGetTourTypesQuery } from "@/redux/features/tour
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import { useGetDivisionsQuery } from "@/redux/features/division/division.api";
-import TourCard from "@/components/modules/tour/TourCard";
+import TourCardBox from "@/components/modules/tour/TourCardBox";
 import { Skeleton } from "@/components/ui/skeleton";
 import type { ITourPackage } from "@/types";
 import WhiteSvgIcon from "@/components/shared/blocks/WhiteSvgIcon";
@@ -69,7 +69,7 @@ const TourCardSlider = () => {
                         (toursData ?? []).length > 0 ? (
                             (toursData ?? []).map((tour: ITourPackage) => (
                                 <SwiperSlide key={tour.slug}>
-                                    <TourCard tour={tour} />
+                                    <TourCardBox tour={tour} />
                                 </SwiperSlide>
                             ))
                         ) : (
