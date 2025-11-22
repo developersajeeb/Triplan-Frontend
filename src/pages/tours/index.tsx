@@ -6,34 +6,64 @@ import TourCardBox from '@/components/modules/tour/TourCardBox';
 import { useSearchParams } from 'react-router';
 import TourSideFilter from '@/components/modules/tour/TourSideFilter';
 import { Button } from '@/components/ui/button';
-import { Skeleton } from '@/components/ui/skeleton';
 import type { ITourPackage } from '@/types';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IoClose, IoFilter } from 'react-icons/io5';
 import { Drawer, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
 import TourCardList from '@/components/modules/tour/TourCardList';
 import PageBanner from '@/components/shared/sections/PageBanner';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue, } from "@/components/ui/select"
+import PaginationComponent from '@/components/ui/PaginationComponent';
+import TourCardLoader from '@/components/shared/blocks/TourCardLoader';
+import { useAppDispatch } from '@/redux/hook';
+import { setMaxPrice } from '@/redux/features/tour/priceSlice';
 
 
 const Tours = () => {
+    const dispatch = useAppDispatch();
     const [viewType, setViewType] = useState<string>("grid");
     const [searchParams, setSearchParams] = useSearchParams();
     const sortValue = searchParams.get("sort") || "newest";
 
-    const division = searchParams.get("division") || undefined;
-    const tourType = searchParams.get("tourType") || undefined;
+    const division = searchParams.getAll("division");
+    const tourType = searchParams.getAll("tourType");
+    const rating = searchParams.getAll("rating");
 
-    const { data: tours, isLoading } = useGetAllToursQuery({ division, tourType });
+    const minPrice = searchParams.get("minPrice") || "";
+    const maxPrice = searchParams.get("maxPrice") || "";
+    const search = searchParams.get("search") || "";
+    const sort = searchParams.get("sort") || "newest";
+
     const { data: tourTypes } = useGetTourTypesQuery(undefined);
     const { data: divisions } = useGetDivisionsQuery(undefined);
-    const toursData = tours?.map((item) => ({
+    const queryParams: Record<string, string> = {};
+
+    if (division?.length) queryParams.division = division.join(",");
+    if (tourType?.length) queryParams.tourType = tourType.join(",");
+    if (rating?.length) queryParams.rating = rating.join(",");
+    if (minPrice) queryParams.minPrice = minPrice;
+    if (maxPrice) queryParams.maxPrice = maxPrice;
+    if (search) queryParams.search = search;
+    if (sort) queryParams.sort = sort;
+
+    const { data: tours, isLoading, isFetching } = useGetAllToursQuery({ ...queryParams });
+    console.log(tours);
+
+    const toursData = tours?.data?.map((item) => ({
         ...item,
         tourTypeName: tourTypes?.data?.find((tt: { _id: string; }) => tt._id === item.tourType)?.name || "Unknown",
         divisionName: Array.isArray(divisions)
             ? divisions.find(d => d._id === item.division)?.name || "Unknown"
             : "Unknown"
     }));
+
+    useEffect(() => {
+        if (tours && Array.isArray(tours.data) && tours.data.length > 0) {
+            const prices = tours.data.map(t => t.costFrom || 0);
+            const max = Math.max(...prices);
+            dispatch(setMaxPrice(max));
+        }
+    }, [dispatch, tours]);
 
     const handleSortChange = (value: string) => {
         searchParams.set("sort", value);
@@ -83,8 +113,6 @@ const Tours = () => {
                                     <SelectItem value="newest">Newest</SelectItem>
                                     <SelectItem value="priceLowToHigh">Price: Low to High</SelectItem>
                                     <SelectItem value="priceHighToLow">Price: High to Low</SelectItem>
-
-                                    {/* ---- FOOTER RESET BUTTON ---- */}
                                     <div className="border-t mt-2 pt-2 px-2 pb-1">
                                         <button
                                             onClick={handleResetSort}
@@ -125,34 +153,21 @@ const Tours = () => {
                         </div>
                     </div>
 
-                    {isLoading ? (
+                    {isLoading || isFetching ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                             {[...Array(3)].map((_, i) => (
-                                <div
-                                    key={i}
-                                    className="rounded-[10px] border border-gray-200 bg-white"
-                                >
-                                    <Skeleton className="h-[170px] rounded-b-0" />
-                                    <div className="p-5">
-                                        <Skeleton className="h-4 rounded-full max-w-[100px]" />
-                                        <Skeleton className="h-4 rounded-full max-w-[140px] mt-2" />
-                                        <Skeleton className="h-5 rounded-full max-w-[250px] mt-5" />
-                                        <Skeleton className="h-5 rounded-full max-w-[200px] mt-2" />
-                                    </div>
-                                </div>
+                                <React.Fragment key={i}><TourCardLoader /></React.Fragment>
                             ))}
                         </div>
                     ) : (toursData ?? []).length > 0 ? (
 
                         viewType === "grid" ? (
-                            // GRID VIEW
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
                                 {(toursData ?? []).map((tour: ITourPackage) => (
                                     <React.Fragment key={tour.slug}><TourCardBox tour={tour} /></React.Fragment>
                                 ))}
                             </div>
                         ) : (
-                            // LIST VIEW
                             <div className="flex flex-col gap-4">
                                 {(toursData ?? []).map((tour: ITourPackage) => (
                                     <TourCardList key={tour.slug} tour={tour} />
@@ -165,6 +180,13 @@ const Tours = () => {
                             No tours available.
                         </p>
                     )}
+                    <div className='mt-6'>
+                        <PaginationComponent
+                            currentPage={tours?.meta?.page || 1}
+                            totalPages={tours?.meta?.totalPages || 1}
+                            onPageChange={(page) => setSearchParams({ page: String(page) })}
+                        />
+                    </div>
                 </div>
             </section>
         </>

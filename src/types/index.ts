@@ -1,5 +1,6 @@
 import type { ComponentType } from "react";
 import type { IconType } from "react-icons/lib";
+import type { ITourPackage } from "./tour.type";
 
 // Child file export
 export type { ISendOtp, IVerifyOtp, ILogin } from "./auth.type";
@@ -10,6 +11,22 @@ export interface IResponse<T> {
   success: boolean;
   message: string;
   data: T;
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export interface IToursResponse {
+  data: ITourPackage[];
+  meta: {
+    page: number;
+    limit: number;
+    total: number;
+    totalPages: number;
+  };
 }
 
 export interface ISidebarItem {

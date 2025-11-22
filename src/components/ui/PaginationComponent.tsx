@@ -13,12 +13,14 @@ type PaginationProps = {
   currentPage: number
   totalPages: number
   paginationItemsToDisplay?: number
+  onPageChange: (page: number) => void
 }
 
-export default function Component({
+export default function PaginationComponent({
   currentPage,
   totalPages,
   paginationItemsToDisplay = 5,
+  onPageChange,
 }: PaginationProps) {
   const { pages, showLeftEllipsis, showRightEllipsis } = usePagination({
     currentPage,
@@ -33,9 +35,8 @@ export default function Component({
         <PaginationItem>
           <PaginationPrevious
             className="aria-disabled:pointer-events-none aria-disabled:opacity-50"
-            href={currentPage === 1 ? undefined : `#/page/${currentPage - 1}`}
-            aria-disabled={currentPage === 1 ? true : undefined}
-            role={currentPage === 1 ? "link" : undefined}
+            onClick={() => onPageChange(currentPage - 1)}
+            aria-disabled={currentPage === 1}
           />
         </PaginationItem>
 
@@ -50,8 +51,8 @@ export default function Component({
         {pages.map((page) => (
           <PaginationItem key={page}>
             <PaginationLink
-              href={`#/page/${page}`}
               isActive={page === currentPage}
+              onClick={() => onPageChange(page)}
             >
               {page}
             </PaginationLink>
@@ -69,13 +70,8 @@ export default function Component({
         <PaginationItem>
           <PaginationNext
             className="aria-disabled:pointer-events-none aria-disabled:opacity-50"
-            href={
-              currentPage === totalPages
-                ? undefined
-                : `#/page/${currentPage + 1}`
-            }
-            aria-disabled={currentPage === totalPages ? true : undefined}
-            role={currentPage === totalPages ? "link" : undefined}
+            onClick={() => onPageChange(currentPage + 1)}
+            aria-disabled={currentPage === totalPages}
           />
         </PaginationItem>
       </PaginationContent>

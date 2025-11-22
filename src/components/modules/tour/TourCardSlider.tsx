@@ -3,10 +3,11 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
 import { useGetDivisionsQuery } from "@/redux/features/division/division.api";
 import TourCardBox from "@/components/modules/tour/TourCardBox";
-import { Skeleton } from "@/components/ui/skeleton";
 import type { ITourPackage } from "@/types";
 import WhiteSvgIcon from "@/components/shared/blocks/WhiteSvgIcon";
 import { Link } from "react-router";
+import React from "react";
+import TourCardLoader from "@/components/shared/blocks/TourCardLoader";
 
 const TourCardSlider = () => {
     const { data: tours, isLoading } = useGetAllToursQuery(undefined);
@@ -51,18 +52,7 @@ const TourCardSlider = () => {
                     {isLoading ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5">
                             {[...Array(4)].map((_, i) => (
-                                <div
-                                    key={i}
-                                    className="rounded-[10px] border border-gray-200 bg-white shadow-[0px_4px_24px_0px_rgba(194,194,194,0.25)]"
-                                >
-                                    <Skeleton className="h-[170px] rounded-b-0" />
-                                    <div className="p-5">
-                                        <Skeleton className="h-4 rounded-full max-w-[100px]" />
-                                        <Skeleton className="h-4 rounded-full max-w-[140px] mt-2" />
-                                        <Skeleton className="h-5 rounded-full max-w-[250px] mt-5" />
-                                        <Skeleton className="h-5 rounded-full max-w-[200px] mt-2" />
-                                    </div>
-                                </div>
+                                <React.Fragment key={i}><TourCardLoader /></React.Fragment>
                             ))}
                         </div>
                     ) : (

@@ -4,44 +4,39 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
-import { useState } from "react";
-import { useForm, type FieldValues, type SubmitHandler } from "react-hook-form";
+import { useGetDivisionsQuery } from "@/redux/features/division/division.api";
+import { useGetTourTypesQuery } from "@/redux/features/tour/tour.api";
+import type { RootState } from "@/redux/store";
+import type { IDivision } from "@/types/division.type";
+import type { ITourType } from "@/types/tour.type";
+import { useEffect, useState } from "react";
+import { useForm, type FieldValues } from "react-hook-form";
 import { FaStar } from "react-icons/fa6";
 import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { RiSearch2Line } from "react-icons/ri";
+import { useSelector } from "react-redux";
+import { useSearchParams } from "react-router";
 
 interface Props {
     className?: string
 }
 
-const tourTypes = [
-    "Adventure Tours",
-    "Cultural Tours",
-    "Wildlife Safaris",
-    "Beach Holidays",
-    "Mountain Treks",
-    "City Sightseeing",
-    "Cruise Trips",
-    "Historical Tours",
-    "Food & Wine Tours",
-    "Family Vacations",
-];
-
-const bangladeshDivisions = [
-    "Dhaka",
-    "Chattogram",
-    "Khulna",
-    "Rajshahi",
-    "Barishal",
-    "Sylhet",
-    "Rangpur",
-    "Mymensingh",
-];
-
 const TourSideFilter = ({ className }: Props) => {
+    const { tourMaxPrice, isLoading } = useSelector((state: RootState) => state.price);
+    const { data: tourTypes, isLoading: isTourTypesLoading } = useGetTourTypesQuery(undefined);
+    const tourTypeList = Array.isArray(tourTypes?.data) ? tourTypes.data : [];
+    const { data: divisions, isLoading: isDivisionsLoading } = useGetDivisionsQuery(undefined);
+
+    const [searchParams, setSearchParams] = useSearchParams();
     const form = useForm();
-    const [priceRange, setPriceRange] = useState([0, 800]);
+    const [priceRange, setPriceRange] = useState([0, 0]);
+    useEffect(() => {
+        if (tourMaxPrice > 0) {
+            setPriceRange([0, tourMaxPrice]);
+        }
+    }, [tourMaxPrice]);
     const [selectedReviewSet, setSelectedReviewSet] = useState<Set<number>>(new Set());
 
     const [selectedTourTypeSet, setSelectedTourTypeSet] = useState<Set<string>>(new Set());
@@ -59,43 +54,48 @@ const TourSideFilter = ({ className }: Props) => {
         });
     };
 
+    const handlePriceChange = (value: number[]) => {
+        setPriceRange(value);
+        searchParams.set("minPrice", String(value[0]));
+        searchParams.set("maxPrice", String(value[1]));
+        setSearchParams(searchParams);
+    };
+
     const toggleSelection = (type: string, checked: boolean) => {
-        setSelectedTourTypeSet((prev) => {
-            const next = new Set(prev);
-            if (checked) next.add(type);
-            else next.delete(type);
-            return next;
-        });
+        const next = new Set(selectedTourTypeSet);
+
+        if (checked) next.add(type);
+        else next.delete(type);
+
+        setSelectedTourTypeSet(next);
+
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set("tourType", Array.from(next).join(","));
+        setSearchParams(newParams);
     };
 
-    const toggleDivisionSelection = (type: string, checked: boolean) => {
-        setSelectedDivisionSet((prev) => {
-            const next = new Set(prev);
-            if (checked) next.add(type);
-            else next.delete(type);
-            return next;
-        });
+    const toggleDivisionSelection = (division: string, checked: boolean) => {
+        const next = new Set(selectedDivisionSet);
+
+        if (checked) next.add(division);
+        else next.delete(division);
+
+        setSelectedDivisionSet(next);
+
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set("division", Array.from(next).join(","));
+        setSearchParams(newParams);
     };
 
-    const onSubmit: SubmitHandler<FieldValues> = async (data) => {
-        try {
-            // setIsLoginBtnLoading(true);
-            console.log("Form Data:", data);
-            // setFromSuccessMassage("Thank you for reaching out to triPlan. Our team will get back to you shortly.");
-            form.reset();
-
-        } catch (error) {
-            console.error("Subscription error:", error);
-            // setFromErrorMassage("Something went wrong. Please try again.");
-        } finally {
-            // setIsLoginBtnLoading(false);
-        }
+    const onSubmit = (data: FieldValues) => {
+        searchParams.set("search", data.search || "");
+        setSearchParams(searchParams);
     };
 
     const searchValue = form.getValues("search") || "";
     const isResetDisabled =
         priceRange[0] === 0 &&
-        priceRange[1] === 800 &&
+        priceRange[1] === tourMaxPrice &&
         selectedTourTypeSet.size === 0 &&
         selectedDivisionSet.size === 0 &&
         selectedReviewSet.size === 0 &&
@@ -108,12 +108,19 @@ const TourSideFilter = ({ className }: Props) => {
                 <button
                     onClick={() => {
                         form.reset();
-                        setPriceRange([0, 800]);
+                        setPriceRange([0, tourMaxPrice]);
                         setSelectedTourTypeSet(new Set());
-                        setShowAllTourType(false);
                         setSelectedDivisionSet(new Set());
-                        setShowAllDivision(false);
                         setSelectedReviewSet(new Set());
+
+                        searchParams.delete("minPrice");
+                        searchParams.delete("maxPrice");
+                        searchParams.delete("tourType");
+                        searchParams.delete("division");
+                        searchParams.delete("rating");
+                        searchParams.delete("search");
+
+                        setSearchParams(searchParams);
                     }}
                     disabled={isResetDisabled}
                     className={`text-sm font-semibold px-3 py-1 rounded-full ${isResetDisabled ? "text-gray-400 pointer-events-none bg-gray-200" : "text-white bg-primary-500 hover:bg-primary-700 duration-300"}`}
@@ -130,7 +137,7 @@ const TourSideFilter = ({ className }: Props) => {
                             render={({ field }) => (
                                 <FormItem>
                                     <Label className="text-sm font-semibold text-gray-600">
-                                        Search by Tour Type
+                                        Search by Tour Name
                                     </Label>
 
                                     <div className="relative">
@@ -163,18 +170,31 @@ const TourSideFilter = ({ className }: Props) => {
                             <Label htmlFor="priceRange" className="text-base font-semibold text-gray-800 cursor-pointer">Price Range</Label>
                         </AccordionTrigger>
                         <AccordionContent className="p-0">
-                            <Slider
-                                className="mt-3"
-                                id="priceRange"
-                                max={1000}
-                                min={0}
-                                onValueChange={setPriceRange}
-                                value={priceRange}
-                            />
-                            <div className="flex items-center justify-between text-muted-foreground font-medium mt-2">
-                                <span>${priceRange[0]}</span>
-                                <span>${priceRange[1]}</span>
-                            </div>
+                            {isLoading ? (
+                                <div className="mt-3">
+                                    <Skeleton className="h-4 w-full" />
+                                    <div className="flex justify-between mt-2">
+                                        <Skeleton className="h-4 w-8" />
+                                        <Skeleton className="h-4 w-8" />
+                                    </div>
+                                </div>
+                            ) : (
+                                <>
+                                    <Slider
+                                        className="mt-3"
+                                        id="priceRange"
+                                        min={0}
+                                        max={tourMaxPrice || 0}
+                                        value={priceRange}
+                                        onValueChange={handlePriceChange}
+                                    />
+
+                                    <div className="flex items-center justify-between text-muted-foreground font-medium mt-2">
+                                        <span>৳{priceRange[0]}</span>
+                                        <span>৳{priceRange[1]}</span>
+                                    </div>
+                                </>
+                            )}
                         </AccordionContent>
                     </div>
                 </AccordionItem>
@@ -187,26 +207,35 @@ const TourSideFilter = ({ className }: Props) => {
 
                         <AccordionContent className="p-0">
                             <div className="flex flex-col gap-3 mt-5">
-                                {(showAllTourType ? tourTypes : tourTypes.slice(0, 5)).map((type) => {
-                                    const id = `tour-type-${type.replace(/\s+/g, "-").toLowerCase()}`;
-                                    const checked = selectedTourTypeSet.has(type);
+                                {
+                                    isTourTypesLoading
+                                        ? Array.from({ length: 5 }).map((_, i) => (
+                                            <div key={i} className="flex items-center gap-1 w-full h-full">
+                                                <Skeleton className="h-4 w-4" />
+                                                <Skeleton className="h-4 w-[140px]" />
+                                            </div>
+                                        ))
+                                        : (showAllTourType ? tourTypeList : tourTypeList.slice(0, 5)).map((type: ITourType) => {
+                                            const id = `tour-type-${type?.name?.replace(/\s+/g, "-").toLowerCase()}`;
+                                            const checked = selectedTourTypeSet.has(type?.name);
 
-                                    return (
-                                        <div key={type} className="flex items-center gap-3">
-                                            <Checkbox
-                                                id={id}
-                                                checked={checked}
-                                                onCheckedChange={(val: boolean | "indeterminate") =>
-                                                    toggleSelection(type, Boolean(val))
-                                                }
-                                            />
-                                            <Label className="cursor-pointer text-gray-600" htmlFor={id}>{type}</Label>
-                                        </div>
-                                    );
-                                })}
+                                            return (
+                                                <div key={type?._id} className="flex items-center gap-3">
+                                                    <Checkbox
+                                                        id={id}
+                                                        checked={checked}
+                                                        onCheckedChange={(val) => toggleSelection(
+                                                            type?.name,
+                                                            val === true
+                                                        )}
+                                                    />
+                                                    <Label className="cursor-pointer text-gray-600" htmlFor={id}>{type?.name}</Label>
+                                                </div>
+                                            );
+                                        })}
                             </div>
 
-                            {tourTypes.length > 5 && (
+                            {!isTourTypesLoading && tourTypeList.length > 5 && (
                                 <button
                                     onClick={() => setShowAllTourType((s) => !s)}
                                     className="text-primary-500 hover:text-primary-600 duration-300 text-sm font-semibold mt-3 underline underline-offset-2 flex items-center gap-1"
@@ -229,26 +258,37 @@ const TourSideFilter = ({ className }: Props) => {
 
                         <AccordionContent className="p-0">
                             <div className="flex flex-col gap-3 mt-5">
-                                {(showAllDivision ? bangladeshDivisions : bangladeshDivisions.slice(0, 5)).map((type) => {
-                                    const id = `tour-type-${type.replace(/\s+/g, "-").toLowerCase()}`;
-                                    const checked = selectedDivisionSet.has(type);
+                                {
+                                    isDivisionsLoading
+                                        ? Array.from({ length: 5 }).map((_, i) => (
+                                            <div key={i} className="flex items-center gap-1 w-full h-full">
+                                                <Skeleton className="h-4 w-4" />
+                                                <Skeleton className="h-4 w-[140px]" />
+                                            </div>
+                                        ))
+                                        : (showAllDivision ? (divisions ?? []) : (divisions?.slice(0, 5) ?? [])).map((division: IDivision) => {
+                                            const id = `division-${division?.name.replace(/\s+/g, "-").toLowerCase()}`;
+                                            const checked = selectedDivisionSet.has(division?.name);
 
-                                    return (
-                                        <div key={type} className="flex items-center gap-3">
-                                            <Checkbox
-                                                id={id}
-                                                checked={checked}
-                                                onCheckedChange={(val: boolean | "indeterminate") =>
-                                                    toggleDivisionSelection(type, Boolean(val))
-                                                }
-                                            />
-                                            <Label className="cursor-pointer text-gray-600" htmlFor={id}>{type}</Label>
-                                        </div>
-                                    );
-                                })}
+                                            return (
+                                                <div key={division?._id} className="flex items-center gap-3">
+                                                    <Checkbox
+                                                        id={id}
+                                                        checked={checked}
+                                                        onCheckedChange={(val) =>
+                                                            toggleDivisionSelection(division.name, val === true)
+                                                        }
+                                                    />
+                                                    <Label className="cursor-pointer text-gray-600" htmlFor={id}>
+                                                        {division?.name}
+                                                    </Label>
+                                                </div>
+                                            );
+                                        })
+                                }
                             </div>
 
-                            {tourTypes.length > 5 && (
+                            {!isDivisionsLoading && Array.isArray(divisions) && divisions.length > 5 && (
                                 <button
                                     onClick={() => setShowAllDivision((s) => !s)}
                                     className="text-primary-500 hover:text-primary-600 duration-300 text-sm font-semibold mt-3 underline underline-offset-2 flex items-center gap-1"
