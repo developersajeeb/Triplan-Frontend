@@ -22,6 +22,7 @@ import ContactUs from "@/pages/contact-us";
 
 const AboutUs = lazy(() => import("@/pages/about"));
 const Tours = lazy(() => import("@/pages/tours"));
+const DestinationsPage = lazy(() => import("@/pages/destinations"));
 
 export const router = createBrowserRouter([
   {
@@ -43,6 +44,10 @@ export const router = createBrowserRouter([
       {
         Component: TourDetails,
         path: "tours/:slug",
+      },
+      {
+        Component: DestinationsPage,
+        path: "destinations",
       },
       {
         Component: withAuth(Booking),

@@ -4,8 +4,13 @@ import styles from "./style/destination_slider.module.scss";
 import { Link } from "react-router";
 import WhiteSvgIcon from "@/components/shared/blocks/WhiteSvgIcon";
 import { useEffect, useRef } from "react";
+import { useGetDivisionsQuery } from "@/redux/features/division/division.api";
+import type { IDivision } from "@/types/division.type";
+import { Skeleton } from "@/components/ui/skeleton";
+import DestinationCard from "@/components/modules/destination/DestinationCard";
 
 const DestinationSlider = () => {
+  const { data: divisions, isLoading } = useGetDivisionsQuery(undefined);
   const sliderRef = useRef<HTMLDivElement | null>(null);
   const dragTextRef = useRef<HTMLSpanElement | null>(null);
 
@@ -62,39 +67,6 @@ const DestinationSlider = () => {
       document.removeEventListener("mousemove", handleMove);
     };
   }, []);
-
-  const sliderData = [
-    {
-      image:
-        "https://images.unsplash.com/photo-1587222318667-31212ce2828d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1170",
-      city: "Cox’s Bazar",
-      totalListings: 320,
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1639330484340-38edb3d8ee9d?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=735",
-      city: "Sajek Valley",
-      totalListings: 180,
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1624635451380-2711aabe6460?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=1170",
-      city: "Sylhet",
-      totalListings: 250,
-    },
-    {
-      image:
-        "https://images.unsplash.com/photo-1683491184388-7e8ebb14ac31?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&q=80&w=764",
-      city: "Saint Martin’s Island",
-      totalListings: 95,
-    },
-    {
-      image:
-        "https://plus.unsplash.com/premium_photo-1668611366479-cd5d2440d6a8?ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MXx8QmFuZGFyYmFufGVufDB8fDB8fHww&auto=format&fit=crop&q=60&w=600",
-      city: "Bandarban",
-      totalListings: 210,
-    },
-  ];
 
   return (
     <section className="overflow-hidden">
@@ -155,32 +127,19 @@ const DestinationSlider = () => {
               },
             }}
           >
-            {sliderData.map((item, index) => (
-              <SwiperSlide
-                className="bg-no-repeat bg-cover p-5 rounded-2xl gap-2 justify-between !flex !flex-col relative overflow-hidden !h-[420px]"
-                key={index}
-                style={{ backgroundImage: `url(${item?.image})` }}
-              >
-                <div className="absolute top-0 right-0 left-0 bottom-0 inset-0 bg-black/30 z-0"></div>
-                <div className="z-10">
-                  <p className="text-white font-medium">
-                    {item?.totalListings} Listings
-                  </p>
-                  <p className="text-2xl text-white font-semibold">
-                    {item?.city}
-                  </p>
-                </div>
-                <div className="z-10">
-                  <Link
-                    to="/#"
-                    className="group tp-transparent-white-btn !text-sm !px-6 !py-3 inline-flex items-center gap-3"
-                  >
-                    Explore
-                    <WhiteSvgIcon className="group-hover:stroke-primary-400 w-4 md:w-auto h-4 md:h-auto" />
-                  </Link>
-                </div>
-              </SwiperSlide>
-            ))}
+            {isLoading ? (
+              [...Array(3)].map((_, index) => (
+                <SwiperSlide key={index}>
+                  <Skeleton className="h-[420px] rounded-2xl"></Skeleton>
+                </SwiperSlide>
+              ))
+            ) : (
+               divisions?.map((item: IDivision) => (
+                <SwiperSlide key={item?._id} >
+                  <DestinationCard item={item} />
+                </SwiperSlide>
+              ))
+            )}
           </Swiper>
 
           <span

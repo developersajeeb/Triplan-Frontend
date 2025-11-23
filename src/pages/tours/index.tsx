@@ -17,6 +17,7 @@ import PaginationComponent from '@/components/ui/PaginationComponent';
 import TourCardLoader from '@/components/shared/blocks/TourCardLoader';
 import { useAppDispatch } from '@/redux/hook';
 import { setMaxPrice } from '@/redux/features/tour/priceSlice';
+import { DialogTitle } from '@/components/ui/dialog';
 
 
 const Tours = () => {
@@ -47,7 +48,6 @@ const Tours = () => {
     if (sort) queryParams.sort = sort;
 
     const { data: tours, isLoading, isFetching } = useGetAllToursQuery({ ...queryParams });
-    console.log(tours);
 
     const toursData = tours?.data?.map((item) => ({
         ...item,
@@ -91,7 +91,8 @@ const Tours = () => {
                                     <Button className='bg-transparent hover:bg-primary-100 rounded-full border border-gray-400 shadow-none text-gray-700 lg:hidden'>Filter <span><IoFilter size={18} /></span></Button>
                                 </DrawerTrigger>
                                 <DrawerContent className='max-w-[300px] h-full rounded-none overflow-y-auto'>
-                                    <div className='text-end px-4 pb-4'>
+                                    <DialogTitle className='sr-only'>Filter Drawer</DialogTitle>
+                                    <div className='text-end px-4 py-4 sticky top-0 w-full bg-white shadow z-50'>
                                         <DrawerClose asChild>
                                             <button className='inline-flex items-center gap-1 text-gray-600 font-semibold border border-gray-400 max-w-[100px] py-2 px-4 rounded-full'>Close <IoClose size={22} /></button>
                                         </DrawerClose>

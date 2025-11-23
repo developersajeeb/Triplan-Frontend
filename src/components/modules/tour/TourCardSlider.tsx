@@ -10,10 +10,10 @@ import React from "react";
 import TourCardLoader from "@/components/shared/blocks/TourCardLoader";
 
 const TourCardSlider = () => {
-    const { data: tours, isLoading } = useGetAllToursQuery(undefined);
+    const { data: tours, isLoading } = useGetAllToursQuery({});
     const { data: tourTypes } = useGetTourTypesQuery(undefined);
     const { data: divisions } = useGetDivisionsQuery(undefined);
-    const toursData = tours?.map((item) => ({
+    const toursData = tours?.data?.map((item) => ({
         ...item,
         tourTypeName: tourTypes?.data?.find((tt: { _id: string; }) => tt._id === item.tourType)?.name || "Unknown",
         divisionName: Array.isArray(divisions)

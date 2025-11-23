@@ -1,11 +1,3 @@
-export interface IDivision {
-    _id: string;
-    name: string;
-    slug: string;
-    thumbnail?: string;
-    description?: string
-}
-
 export interface ITourType {
     _id: string;
     name: string;

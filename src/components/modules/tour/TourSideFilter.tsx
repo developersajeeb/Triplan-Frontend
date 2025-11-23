@@ -30,13 +30,17 @@ const TourSideFilter = ({ className }: Props) => {
     const { data: divisions, isLoading: isDivisionsLoading } = useGetDivisionsQuery(undefined);
 
     const [searchParams, setSearchParams] = useSearchParams();
+    const hasQueryParams = searchParams.toString().length > 0;
     const form = useForm();
     const [priceRange, setPriceRange] = useState([0, 0]);
     useEffect(() => {
+        const minP = Number(searchParams.get("minPrice")) || 0;
+        const maxP = Number(searchParams.get("maxPrice")) || tourMaxPrice;
+
         if (tourMaxPrice > 0) {
-            setPriceRange([0, tourMaxPrice]);
+            setPriceRange([minP, maxP]);
         }
-    }, [tourMaxPrice]);
+    }, [tourMaxPrice, searchParams]);
     const [selectedReviewSet, setSelectedReviewSet] = useState<Set<number>>(new Set());
 
     const [selectedTourTypeSet, setSelectedTourTypeSet] = useState<Set<string>>(new Set());
@@ -99,7 +103,8 @@ const TourSideFilter = ({ className }: Props) => {
         selectedTourTypeSet.size === 0 &&
         selectedDivisionSet.size === 0 &&
         selectedReviewSet.size === 0 &&
-        searchValue.trim() === "";
+        searchValue.trim() === "" &&
+        !hasQueryParams;
 
     return (
         <aside className={`${className || ""} w-full lg:w-[350px] bg-white rounded-xl border border-gray-200 shadow-[0px_4px_24px_0px_rgba(194, 194, 194, 0.25)]`}>
