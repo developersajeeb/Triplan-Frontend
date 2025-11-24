@@ -5,7 +5,7 @@ import WhyUs from "./WhyUs";
 import RecentGallery from "./RecentGallery";
 import TourCardSlider from "@/components/modules/tour/TourCardSlider";
 import CustomerReview from "@/components/shared/sections/CustomerReview";
-import TourGuide from "@/components/shared/sections/TourGuide";
+import TourGuide from "@/components/modules/tourGuide/TourGuide";
 import PartnerLogos from "@/components/shared/sections/PartnerLogos";
 import NewsArticles from "./NewsArticles";
 import HomeAccordion from "./HomeAccordion";

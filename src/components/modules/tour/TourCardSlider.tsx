@@ -24,8 +24,8 @@ const TourCardSlider = () => {
     return (
         <section className="tp-container py-12 md:py-16 lg:py-20">
             <h4 className="section-sub-title text-primary-950 text-center">Best Recommended Places</h4>
-            <h2 className="section-title text-primary-950 mb-2 text-center">Best Destinations For Everyone</h2>
-            <p className="section-heading-paragraph mb-6 sm:mb-8 text-center max-w-3xl mx-auto">Discover handpicked destinations — from vibrant cities to serene natural wonders — blending adventure, culture, and relaxation for every traveler.</p>
+            <h2 className="section-title text-primary-950 mb-2 text-center">Best Tour For Everyone</h2>
+            <p className="section-heading-paragraph mb-6 sm:mb-8 text-center max-w-3xl mx-auto">Discover handpicked Tour — from vibrant cities to serene natural wonders — blending adventure, culture, and relaxation for every traveler.</p>
 
             <div>
                 <Swiper
@@ -73,9 +73,9 @@ const TourCardSlider = () => {
                 <div className="text-center mt-2">
                     <Link
                         className="tp-primary-btn inline-flex items-center gap-3"
-                        to="/destinations"
+                        to="/tours"
                     >
-                        All Destination
+                        All Tours
                         <WhiteSvgIcon className="w-4 md:w-auto h-4 md:h-auto" />
                     </Link>
                 </div>

@@ -34,20 +34,46 @@ const TourSideFilter = ({ className }: Props) => {
     const form = useForm();
     const [priceRange, setPriceRange] = useState([0, 0]);
     useEffect(() => {
-        const minP = Number(searchParams.get("minPrice")) || 0;
-        const maxP = Number(searchParams.get("maxPrice")) || tourMaxPrice;
+        if (!tourMaxPrice) return;
 
-        if (tourMaxPrice > 0) {
-            setPriceRange([minP, maxP]);
-        }
-    }, [tourMaxPrice, searchParams]);
+        const min = Number(searchParams.get("minPrice") ?? 0);
+        const max = Number(searchParams.get("maxPrice") ?? tourMaxPrice);
+
+        setPriceRange([min, max]);
+    }, [searchParams, tourMaxPrice]);
     const [selectedReviewSet, setSelectedReviewSet] = useState<Set<number>>(new Set());
 
     const [selectedTourTypeSet, setSelectedTourTypeSet] = useState<Set<string>>(new Set());
     const [showAllTourType, setShowAllTourType] = useState<boolean>(false);
+    useEffect(() => {
+        const params = searchParams.get("tourType");
+        if (params) {
+            setSelectedTourTypeSet(new Set(params.split(",")));
+        }
+    }, [searchParams]);
 
     const [selectedDivisionSet, setSelectedDivisionSet] = useState<Set<string>>(new Set());
     const [showAllDivision, setShowAllDivision] = useState<boolean>(false);
+    useEffect(() => {
+        const params = searchParams.get("division");
+        if (params) {
+            setSelectedDivisionSet(new Set(params.split(",")));
+        }
+    }, [searchParams]);
+
+    useEffect(() => {
+        const searchText = searchParams.get("search") || "";
+        if (searchText) {
+            form.setValue("search", searchText);
+        }
+    }, [form, searchParams]);
+
+    useEffect(() => {
+        const ratingParam = searchParams.get("rating");
+        if (ratingParam) {
+            setSelectedReviewSet(new Set(ratingParam.split(",").map(Number)));
+        }
+    }, [searchParams]);
 
     const toggleReviewSelection = (star: number, checked: boolean) => {
         setSelectedReviewSet((prev) => {
@@ -168,7 +194,7 @@ const TourSideFilter = ({ className }: Props) => {
                 </Form>
             </div>
 
-            <Accordion type="multiple" defaultValue={["price-range", "tour-types", "division", "reviews"]}>
+            <Accordion type="multiple" defaultValue={["price-range", "tour-types", "destination", "reviews"]}>
                 <AccordionItem value="price-range" className="border-0">
                     <div className="flex w-full max-w-md flex-col gap-2 px-5 py-4 border-b border-gray-200">
                         <AccordionTrigger className="p-0 hover:no-underline">
@@ -255,10 +281,10 @@ const TourSideFilter = ({ className }: Props) => {
                     </div>
                 </AccordionItem>
 
-                <AccordionItem value="division" className="border-0">
+                <AccordionItem value="destination" className="border-0">
                     <div className="px-5 py-4 border-b border-gray-200">
                         <AccordionTrigger className="p-0 hover:no-underline">
-                            <p className="text-base font-semibold text-gray-800 cursor-pointer">Division</p>
+                            <p className="text-base font-semibold text-gray-800 cursor-pointer">Destination</p>
                         </AccordionTrigger>
 
                         <AccordionContent className="p-0">

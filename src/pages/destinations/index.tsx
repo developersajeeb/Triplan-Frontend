@@ -12,6 +12,9 @@ const DestinationsPage = () => {
     return (
         <>
             <PageBanner title='Destinations' />
+            <section>
+                
+            </section>
             {isLoading ? (
                 <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 tp-container py-10 md:py-16">
                     <Skeleton className="h-[420px] rounded-2xl"></Skeleton>
