@@ -134,7 +134,7 @@ const DestinationSlider = () => {
                 </SwiperSlide>
               ))
             ) : (
-               divisions?.map((item: IDivision) => (
+               divisions?.data?.map((item: IDivision) => (
                 <SwiperSlide key={item?._id} >
                   <DestinationCard item={item} />
                 </SwiperSlide>

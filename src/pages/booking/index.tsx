@@ -8,13 +8,11 @@ export default function Booking() {
   const [guestCount, setGuestCount] = useState(1);
   const [totalAmount, setTotalAmount] = useState(0);
 
-  console.log(totalAmount);
-
   const { slug } = useParams();
-  const { data, isLoading, isError } = useGetAllToursQuery({ slug });
+  const { data: tours, isLoading, isError } = useGetAllToursQuery({ slug: slug! });
   const [createBooking] = useCreateBookingMutation();
 
-  const tourData = data?.[0];
+  const tourData = tours?.data?.[0];
   const tourId = tourData?._id;
 
   useEffect(() => {
@@ -34,7 +32,7 @@ export default function Booking() {
   const handleBooking = async () => {
     let bookingData;
 
-    if (data) {
+    if (tours?.data) {
       bookingData = {
         tour: tourId,
         guestCount: guestCount,
@@ -63,13 +61,13 @@ export default function Booking() {
         </div>
       )}
 
-      {!isLoading && data?.length === 0 && (
+      {!isLoading && tours?.data?.length === 0 && (
         <div>
           <p>No Data Found</p>{" "}
         </div>
       )}
 
-      {!isLoading && !isError && data!.length > 0 && (
+      {!isLoading && !isError && (tours?.data?.length ?? 0) > 0 && (
         <>
           {/* Left Section - Tour Summary */}
           <div className="flex-1 space-y-6">

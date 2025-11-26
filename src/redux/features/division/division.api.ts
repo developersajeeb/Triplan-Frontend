@@ -16,7 +16,12 @@ export const divisionApi = baseApi.injectEndpoints({
         method: "GET",
       }),
       providesTags: ["DIVISION"],
-      transformResponse: (response) => response.data,
+      transformResponse: (response) => {
+        return {
+          data: response.data,
+          meta: response.meta,
+        };
+      },
     }),
   }),
 });

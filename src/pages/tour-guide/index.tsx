@@ -14,7 +14,7 @@ import { FiStar } from "react-icons/fi";
 const TourGuider = () => {
   const form = useForm();
   const [searchParams, setSearchParams] = useSearchParams();
-  const sortValue = searchParams.get("sort") || "newest";
+  const sortValue = searchParams.get("sort") || undefined;
 
   const handleSortChange = (value: string) => {
     searchParams.set("sort", value);
@@ -35,9 +35,9 @@ const TourGuider = () => {
     <>
       <PageBanner title="Tour Guide" />
 
-      <section className="px-5 pt-8 tp-container flex gap-5 justify-between">
+      <section className="px-5 pt-8 tp-container flex flex-wrap gap-5 justify-between">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)}>
+          <form onSubmit={form.handleSubmit(onSubmit)} className="w-full sm:w-auto">
             <FormField
               control={form.control}
               name="search"
@@ -50,7 +50,7 @@ const TourGuider = () => {
                         {...field}
                         value={field.value || ""}
                         type="text"
-                        className="tp-input !pr-12"
+                        className="tp-input w-full sm:w-auto !pr-12"
                         placeholder="Search tour guide..."
                       />
                     </FormControl>
@@ -70,7 +70,7 @@ const TourGuider = () => {
           <p className="text-sm font-semibold text-gray-600">Short By:</p>
           <Select value={sortValue} onValueChange={handleSortChange}>
             <SelectTrigger className="w-[160px] rounded-full shadow-none h-[34px] bg-white focus:ring-0 border border-primary-200">
-              <SelectValue placeholder="Sort by" />
+              <SelectValue placeholder="Select rating" />
             </SelectTrigger>
 
             <SelectContent>

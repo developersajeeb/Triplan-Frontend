@@ -74,7 +74,7 @@ export default function AddTour() {
   const { data: tourTypeData } = useGetTourTypesQuery(undefined);
   const [addTour] = useAddTourMutation();
 
-  const divisionOptions = divisionData?.map(
+  const divisionOptions = divisionData?.data?.map(
     (item: { _id: string; name: string }) => ({
       value: item._id,
       label: item.name,

@@ -297,7 +297,7 @@ const TourSideFilter = ({ className }: Props) => {
                                                 <Skeleton className="h-4 w-[140px]" />
                                             </div>
                                         ))
-                                        : (showAllDivision ? (divisions ?? []) : (divisions?.slice(0, 5) ?? [])).map((division: IDivision) => {
+                                        : (showAllDivision ? (divisions?.data ?? []) : (divisions?.data?.slice(0, 5) ?? [])).map((division: IDivision) => {
                                             const id = `division-${division?.name.replace(/\s+/g, "-").toLowerCase()}`;
                                             const checked = selectedDivisionSet.has(division?.name);
 

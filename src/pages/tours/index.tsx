@@ -35,8 +35,8 @@ const Tours = () => {
     const search = searchParams.get("search") || "";
     const sort = searchParams.get("sort") || "newest";
 
-    const { data: tourTypes } = useGetTourTypesQuery(undefined);
-    const { data: divisions } = useGetDivisionsQuery(undefined);
+    const { data: tourTypes, isLoading: isTourTypeLoading } = useGetTourTypesQuery(undefined);
+    const { data: divisions, isLoading: isDivisionsLoading } = useGetDivisionsQuery(undefined);
     const queryParams: Record<string, string> = {};
 
     if (division?.length) queryParams.division = division.join(",");
@@ -52,8 +52,8 @@ const Tours = () => {
     const toursData = tours?.data?.map((item) => ({
         ...item,
         tourTypeName: tourTypes?.data?.find((tt: { _id: string; }) => tt._id === item.tourType)?.name || "Unknown",
-        divisionName: Array.isArray(divisions)
-            ? divisions.find(d => d._id === item.division)?.name || "Unknown"
+        divisionName: Array.isArray(divisions?.data)
+            ? divisions?.data.find(d => d._id === item.division)?.name || "Unknown"
             : "Unknown"
     }));
 
@@ -82,7 +82,6 @@ const Tours = () => {
                 {/* Filters */}
                 <TourSideFilter className='hidden lg:block' />
 
-                {/* Tour Cards */}
                 <div className='w-full'>
                     <div className='flex flex-wrap justify-between gap-2 mb-6'>
                         <div className='flex gap-2 items-end flex-wrap'>
@@ -154,7 +153,8 @@ const Tours = () => {
                         </div>
                     </div>
 
-                    {isLoading || isFetching ? (
+                    {/* Tour Cards */}
+                    {isLoading || isTourTypeLoading || isDivisionsLoading || isFetching ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                             {[...Array(3)].map((_, i) => (
                                 <React.Fragment key={i}><TourCardLoader /></React.Fragment>
