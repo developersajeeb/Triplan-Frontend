@@ -12,11 +12,11 @@ import { Input } from "@/components/ui/input";
 import { Form } from "@/components/ui/form";
 import { RiSearch2Line } from "react-icons/ri";
 import PaginationComponent from "@/components/ui/PaginationComponent";
+import { GrPowerReset } from "react-icons/gr";
 
 const DestinationsPage = () => {
     const form = useForm();
     const [searchParams, setSearchParams] = useSearchParams();
-
     const search = searchParams.get("search") || "";
     const page = searchParams.get("page") || "1";
 
@@ -24,8 +24,8 @@ const DestinationsPage = () => {
     if (search) queryParams.search = search;
     if (page) queryParams.page = page;
 
-    const { data: divisionRes, isLoading } = useGetDivisionsQuery(queryParams);
-    
+    const { data: divisionRes, isLoading, isFetching } = useGetDivisionsQuery(queryParams);
+
     const divisions = divisionRes?.data ?? [];
     const meta = divisionRes?.meta;
 
@@ -35,19 +35,27 @@ const DestinationsPage = () => {
 
     const onSubmit = (data: FieldValues) => {
         const value = data.search?.trim() ?? "";
-
-        if (value) {
-            searchParams.set("search", value);
-        } else {
-            searchParams.delete("search");
-        }
-        setSearchParams(searchParams);
+        const newParams = new URLSearchParams(searchParams);
+        if (value) newParams.set("search", value);
+        else newParams.delete("search");
+        newParams.set("page", "1");
+        setSearchParams(newParams);
     };
+
+    const handleReset = () => {
+        form.setValue("search", "");
+        const newParams = new URLSearchParams(searchParams);
+        newParams.delete("search");
+        newParams.delete("page");
+        setSearchParams(newParams);
+    };
+
+    const searchValue = form.watch("search");
 
     return (
         <>
             <PageBanner title='Destinations' />
-            <section className="px-5 pt-8 tp-container">
+            <section className="px-5 pt-8 tp-container flex gap-3">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-[250px]">
                         <FormField
@@ -63,7 +71,7 @@ const DestinationsPage = () => {
                                                 value={field.value || ""}
                                                 type="text"
                                                 className="tp-input w-full !pr-12"
-                                                placeholder="Search tour guide..."
+                                                placeholder="Search destinations..."
                                             />
                                         </FormControl>
                                         <Button type="submit" size="icon" className="h-[34px] min-w-[36px] w-[36px] rounded-md bg-gray-200 hover:bg-primary-500 text-gray-800 hover:text-white duration-300 absolute right-1 top-1">
@@ -77,20 +85,29 @@ const DestinationsPage = () => {
                         />
                     </form>
                 </Form>
+                {searchValue && searchValue.trim() !== "" && (
+                    <div>
+                        <button onClick={handleReset} type="button" className="flex items-center text-sm gap-1 font-semibold border border-red-500 hover:bg-red-500 px-4 py-[11px] text-red-500 hover:text-white duration-300 rounded-lg">Reset <span><GrPowerReset /></span></button>
+                    </div>
+                )}
             </section>
 
-            {isLoading ? (
-                <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 tp-container py-10 md:py-16">
+            {isLoading || isFetching ? (
+                <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 tp-container py-10 md:py-14">
                     <Skeleton className="h-[420px] rounded-2xl" />
                     <Skeleton className="h-[420px] rounded-2xl" />
                     <Skeleton className="h-[420px] rounded-2xl" />
                 </section>
-            ) : (
-                <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 tp-container py-10 md:py-16">
+            ) : divisions.length > 0 ? (
+                <section className="grid sm:grid-cols-2 lg:grid-cols-3 gap-5 tp-container py-10 md:py-14">
                     {divisions.map((item: IDivision) => (
                         <DestinationCard key={item._id} item={item} />
                     ))}
                 </section>
+            ) : (
+                <p className="text-center font-medium text-xl text-gray-500 py-10">
+                    No destination available.
+                </p>
             )}
 
             {meta && (
