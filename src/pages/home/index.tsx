@@ -9,10 +9,47 @@ import TourGuide from "@/components/modules/tourGuide/TourGuide";
 import PartnerLogos from "@/components/shared/sections/PartnerLogos";
 import NewsArticles from "./NewsArticles";
 import HomeAccordion from "./HomeAccordion";
+import JsonLd from "@/components/utilities/JsonLd";
+import CommonMetadata from "@/components/utilities/CommonMetadata";
 
 const Home = () => {
+  const websiteSchema = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "Triplan",
+    "url": "https://triplan.developersajeeb.com",
+    "potentialAction": {
+      "@type": "SearchAction",
+      "target": "https://triplan.developersajeeb.com/search?query={search_term_string}",
+      "query-input": "required name=search_term_string"
+    }
+  };
+
+  const organizationSchema = {
+    "@context": "https://schema.org",
+    "@type": "Organization",
+    "name": "Triplan",
+    "url": "https://triplan.developersajeeb.com",
+    "logo": "https://triplan.developersajeeb.com/logo.png",
+    "sameAs": [
+      "https://www.facebook.com/triplan",
+      "https://www.instagram.com/triplan",
+      "https://twitter.com/triplan"
+    ]
+  };
+
   return (
     <>
+      <CommonMetadata
+        title="Triplan – Your tour and travel manager"
+        description="Explore the best tours, destinations, and travel packages with Triplan."
+        featureImage="assets/seo/homepage-feature.jpg"
+        canonicalUrl="https://triplan.developersajeeb.com/"
+      />
+
+      <JsonLd data={websiteSchema} />
+      <JsonLd data={organizationSchema} />
+
       <HeroSlider />
       <CategorySlider />
       <DestinationSlider />

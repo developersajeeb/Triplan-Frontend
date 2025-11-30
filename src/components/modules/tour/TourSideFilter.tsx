@@ -150,6 +150,7 @@ const TourSideFilter = ({ className }: Props) => {
                         searchParams.delete("division");
                         searchParams.delete("rating");
                         searchParams.delete("search");
+                        searchParams.delete("sort");
 
                         setSearchParams(searchParams);
                     }}

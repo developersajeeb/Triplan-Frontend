@@ -30,7 +30,7 @@ const ContactUsForm = () => {
     };
 
     return (
-        <div className="bg-white border border-gray-200 p-6 rounded-2xl">
+        <div className="bg-gray-50 border border-gray-200 p-6 rounded-2xl">
             <h3 className="text-2xl md:text-3xl lg:text-4xl font-semibold mb-5 tracking-tight text-primary-950">Get in Touch</h3>
             <Form {...form}>
                 <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">

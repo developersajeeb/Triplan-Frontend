@@ -26,6 +26,7 @@ export interface IToursResponse {
     limit: number;
     total: number;
     totalPages: number;
+    totalListing: number;
   };
 }
 

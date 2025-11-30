@@ -23,7 +23,9 @@ import ContactUs from "@/pages/contact-us";
 const AboutUs = lazy(() => import("@/pages/about"));
 const Tours = lazy(() => import("@/pages/tours"));
 const DestinationsPage = lazy(() => import("@/pages/destinations"));
+const DestinationDetails = lazy(() => import("@/pages/destinations-details"));
 const TourGuiderPage = lazy(() => import("@/pages/tour-guide"));
+const NotFoundPage = lazy(() => import("@/pages/not-found"));
 
 export const router = createBrowserRouter([
   {
@@ -51,6 +53,10 @@ export const router = createBrowserRouter([
         path: "destinations",
       },
       {
+        Component: DestinationDetails,
+        path: "destinations/:slug",
+      },
+      {
         Component: TourGuiderPage,
         path: "tour-guide",
       },
@@ -73,6 +79,10 @@ export const router = createBrowserRouter([
       {
         Component: ContactUs,
         path: "contact-us",
+      },
+      {
+        path: "*",
+        Component: NotFoundPage,
       },
     ],
   },

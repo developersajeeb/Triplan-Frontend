@@ -24,7 +24,19 @@ export const divisionApi = baseApi.injectEndpoints({
         };
       },
     }),
+    getSingleDivisions: builder.query({
+      query: (slug) => ({
+        url: `/division/${slug}`,
+        method: "GET",
+      }),
+      providesTags: ["DIVISION"],
+      transformResponse: (response) => {
+        return {
+          data: response.data,
+        };
+      },
+    }),
   }),
 });
 
-export const { useAddDivisionMutation, useGetDivisionsQuery } = divisionApi;
+export const { useAddDivisionMutation, useGetDivisionsQuery, useGetSingleDivisionsQuery } = divisionApi;

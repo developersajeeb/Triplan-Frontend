@@ -1,7 +1,6 @@
 import { LuGrid2X2 } from 'react-icons/lu';
 import { RiListCheck2 } from 'react-icons/ri';
-import { useGetAllToursQuery, useGetTourTypesQuery } from '@/redux/features/tour/tour.api';
-import { useGetDivisionsQuery } from '@/redux/features/division/division.api';
+import { useGetAllToursQuery } from '@/redux/features/tour/tour.api';
 import TourCardBox from '@/components/modules/tour/TourCardBox';
 import { useSearchParams } from 'react-router';
 import TourSideFilter from '@/components/modules/tour/TourSideFilter';
@@ -34,9 +33,6 @@ const Tours = () => {
     const maxPrice = searchParams.get("maxPrice") || "";
     const search = searchParams.get("search") || "";
     const sort = searchParams.get("sort") || "newest";
-
-    const { data: tourTypes, isLoading: isTourTypeLoading } = useGetTourTypesQuery(undefined);
-    const { data: divisions, isLoading: isDivisionsLoading } = useGetDivisionsQuery(undefined);
     const queryParams: Record<string, string> = {};
 
     if (division?.length) queryParams.division = division.join(",");
@@ -47,23 +43,15 @@ const Tours = () => {
     if (search) queryParams.search = search;
     if (sort) queryParams.sort = sort;
 
-    const { data: tours, isLoading, isFetching } = useGetAllToursQuery({ ...queryParams });
-
-    const toursData = tours?.data?.map((item) => ({
-        ...item,
-        tourTypeName: tourTypes?.data?.find((tt: { _id: string; }) => tt._id === item.tourType)?.name || "Unknown",
-        divisionName: Array.isArray(divisions?.data)
-            ? divisions?.data.find(d => d._id === item.division)?.name || "Unknown"
-            : "Unknown"
-    }));
+    const { data: toursData, isLoading, isFetching } = useGetAllToursQuery({ ...queryParams });   
 
     useEffect(() => {
-        if (tours && Array.isArray(tours.data) && tours.data.length > 0) {
-            const prices = tours.data.map(t => t.costFrom || 0);
+        if (toursData && Array.isArray(toursData.data) && toursData.data.length > 0) {
+            const prices = toursData.data.map(t => t.costFrom || 0);
             const max = Math.max(...prices);
             dispatch(setMaxPrice(max));
         }
-    }, [dispatch, tours]);
+    }, [dispatch, toursData]);
 
     const handleSortChange = (value: string) => {
         searchParams.set("sort", value);
@@ -99,7 +87,7 @@ const Tours = () => {
                                     <TourSideFilter className='pt-0 rounded-t-none' />
                                 </DrawerContent>
                             </Drawer>
-                            <h5 className='text-gray-800 text-base font-semibold mt-1 hidden lg:block'>1920 Tours Available</h5>
+                            <h5 className='text-gray-800 text-base font-semibold mt-1 hidden lg:block'>{toursData?.meta?.totalListing || '...'} Tours Available</h5>
                         </div>
 
                         <div className='flex gap-3'>
@@ -154,23 +142,23 @@ const Tours = () => {
                     </div>
 
                     {/* Tour Cards */}
-                    {isLoading || isTourTypeLoading || isDivisionsLoading || isFetching ? (
+                    {isLoading || isFetching ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
                             {[...Array(3)].map((_, i) => (
                                 <React.Fragment key={i}><TourCardLoader /></React.Fragment>
                             ))}
                         </div>
-                    ) : (toursData ?? []).length > 0 ? (
+                    ) : (toursData?.data ?? []).length > 0 ? (
 
                         viewType === "grid" ? (
                             <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                                {(toursData ?? []).map((tour: ITourPackage) => (
+                                {(toursData?.data ?? []).map((tour: ITourPackage) => (
                                     <React.Fragment key={tour.slug}><TourCardBox tour={tour} /></React.Fragment>
                                 ))}
                             </div>
                         ) : (
                             <div className="flex flex-col gap-4">
-                                {(toursData ?? []).map((tour: ITourPackage) => (
+                                {(toursData?.data ?? []).map((tour: ITourPackage) => (
                                     <TourCardList key={tour.slug} tour={tour} />
                                 ))}
                             </div>
@@ -183,8 +171,8 @@ const Tours = () => {
                     )}
                     <div className='mt-6'>
                         <PaginationComponent
-                            currentPage={tours?.meta?.page || 1}
-                            totalPages={tours?.meta?.totalPages || 1}
+                            currentPage={toursData?.meta?.page || 1}
+                            totalPages={toursData?.meta?.totalPages || 1}
                             onPageChange={(page) => setSearchParams({ page: String(page) })}
                         />
                     </div>

@@ -1,5 +1,5 @@
-import TourBg from '../../assets/images/tour_login_bg.jpg'
-import LoginImage from '../../assets/images/login-page-img.svg'
+import TourBg from '@/assets/images/tour_login_bg.jpg'
+import LoginImage from '@/assets/images/login-page-img.svg'
 import { LoginForm } from './LoginForm';
 import { RxCross2 } from "react-icons/rx";
 import { Link } from 'react-router';

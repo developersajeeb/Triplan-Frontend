@@ -12,7 +12,7 @@ import { OtpExpireTimeInSeconds } from '@/config';
 import { useSendOtpMutation, useVerifyOtpMutation } from '@/redux/features/auth/auth.api';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
-import bgImage from '../../assets/images/varify-page-bg.svg'
+import bgImage from '@/assets/images/varify-page-bg.svg'
 
 const FormSchema = z.object({
     pin: z.string().min(4, {

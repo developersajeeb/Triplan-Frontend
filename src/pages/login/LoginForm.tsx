@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Link, useNavigate } from "react-router"
-import Logo from '../../assets/triPlan-logo.svg';
+import Logo from '@/assets/triPlan-logo.svg';
 import { useForm, type FieldValues, type SubmitHandler } from "react-hook-form"
 import { useLoginMutation } from "@/redux/features/auth/auth.api"
 import { toast } from "sonner"

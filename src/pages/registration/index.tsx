@@ -1,5 +1,5 @@
-import TourBg from '../../assets/images/tour_login_bg.jpg'
-import RegImage from '../../assets/images/reg-page-img.svg'
+import TourBg from '@/assets/images/tour_login_bg.jpg'
+import RegImage from '@/assets/images/reg-page-img.svg'
 import { RxCross2 } from "react-icons/rx";
 
 import { Link } from "react-router";

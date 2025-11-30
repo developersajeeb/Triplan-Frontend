@@ -20,7 +20,7 @@ const DestinationCard = ({item}: Props) => {
             </div>
             <div className="z-10">
                 <Link
-                    to={`/tours?division=${item?.name}`}
+                    to={`/destinations/${item?.name?.toLowerCase()}`}
                     className="group tp-transparent-white-btn !text-sm !px-6 !py-3 inline-flex items-center gap-3"
                 >
                     Explore

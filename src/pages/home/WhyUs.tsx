@@ -1,5 +1,5 @@
 import { RiVipCrownLine } from 'react-icons/ri';
-import bgImage from '../../assets/images/line-pattern.png'
+import bgImage from '@/assets/images/line-pattern.png'
 import { LuTickets } from 'react-icons/lu';
 import { TbPackages } from 'react-icons/tb';
 import { PiSealCheckBold } from 'react-icons/pi';

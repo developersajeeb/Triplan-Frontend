@@ -9,7 +9,7 @@ const ContactUs = () => {
     return (
         <>
             <PageBanner title="Contact Us" />
-            <section className="py-12 md:py-16 lg:py-20 bg-primary-50">
+            <section className="py-12 md:py-16 lg:py-20 bg-white">
                 <div className="grid md:grid-cols-2 gap-6 md:gap-8 tp-container">
                     <div><ContactUsForm /></div>
                     <div>
@@ -18,7 +18,7 @@ const ContactUs = () => {
 
                         <ul className="mt-6">
                             <li className="flex items-center gap-3">
-                                <span className="bg-gray-300 min-w-11 w-11 h-11 flex items-center justify-center rounded-full"><HiOutlineMail size={24} /></span>
+                                <span className="bg-primary-200 text-primary-600 min-w-11 w-11 h-11 flex items-center justify-center rounded-full"><HiOutlineMail size={24} /></span>
                                 <div>
                                     <p className="text-sm text-gray-500 font-medium">Email Address</p>
                                     <p className="text-base text-gray-800 hover:text-primary-500 duration-300 font-semibold"><Link to="mailto:info@triplan.com" className="break-all">info@triplan.com</Link></p>
@@ -28,7 +28,7 @@ const ContactUs = () => {
                             <div className="my-5 h-[1px] w-full bg-gray-300"></div>
 
                             <li className="flex items-center gap-3">
-                                <span className="bg-gray-300 min-w-11 w-11 h-11 flex items-center justify-center rounded-full"><FiPhoneCall size={24} /></span>
+                                <span className="bg-primary-200 text-primary-600 min-w-11 w-11 h-11 flex items-center justify-center rounded-full"><FiPhoneCall size={24} /></span>
                                 <div>
                                     <p className="text-sm text-gray-500 font-medium">Phone Number</p>
                                     <p className="text-base text-gray-800 hover:text-primary-500 duration-300 font-semibold"><Link to="tel:01743370840" className="break-all">+8801743370840</Link></p>
@@ -38,7 +38,7 @@ const ContactUs = () => {
                             <div className="my-5 h-[1px] w-full bg-gray-300"></div>
 
                             <li className="flex items-center gap-3">
-                                <span className="bg-gray-300 min-w-11 w-11 h-11 flex items-center justify-center rounded-full"><GrLocation size={24} /></span>
+                                <span className="bg-primary-200 text-primary-600 min-w-11 w-11 h-11 flex items-center justify-center rounded-full"><GrLocation size={24} /></span>
                                 <div>
                                     <p className="text-sm text-gray-500 font-medium">Location</p>
                                     <p className="text-base text-gray-800 hover:text-primary-500 duration-300 font-semibold">12 Crescent Avenue, Midtown, New York, NY 10001, USA</p>

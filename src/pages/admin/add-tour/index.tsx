@@ -172,6 +172,9 @@ export default function AddTour() {
       return;
     }
 
+    const divisionName = divisionOptions?.find((d: { value: string; }) => d.value === data.division)?.label || "";
+    const tourTypeName = tourTypeOptions?.find((t: { value: string; }) => t.value === data.tourType)?.label || "";
+
     const tourData = {
       ...data,
       costFrom: Number(data.costFrom),
@@ -195,6 +198,8 @@ export default function AddTour() {
         data.tourPlan[0].value === ""
           ? []
           : data.tourPlan.map((item: { value: string }) => item.value),
+      divisionName,
+      tourTypeName,
     };
 
     const formData = new FormData();

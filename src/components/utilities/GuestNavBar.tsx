@@ -1,4 +1,4 @@
-import Logo from '../../assets/triPlan-logo.svg';
+import Logo from '@/assets/triPlan-logo.svg';
 import { Button } from "@/components/ui/button"
 import {
   NavigationMenu,
@@ -10,7 +10,7 @@ import {
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
-import headerBg from '../../assets/images/line-pattern.png'
+import headerBg from '@/assets/images/line-pattern.png'
 import { Link } from "react-router";
 import { TiLocationOutline } from 'react-icons/ti';
 import { IoTimeOutline } from 'react-icons/io5';
