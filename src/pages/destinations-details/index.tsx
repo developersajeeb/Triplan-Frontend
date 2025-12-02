@@ -18,6 +18,9 @@ import TourCardLoader from "@/components/shared/blocks/TourCardLoader";
 import type { ITourPackage } from "@/types";
 import TourCardBox from "@/components/modules/tour/TourCardBox";
 import TourCardList from "@/components/modules/tour/TourCardList";
+import CommonMetadata from "@/components/utilities/CommonMetadata";
+import TriPlanBanner from "@/assets/images/seo/triplan-banner.webp";
+import JsonLd from "@/components/utilities/JsonLd";
 
 const DestinationDetails = () => {
     const { slug } = useParams();
@@ -83,8 +86,25 @@ const DestinationDetails = () => {
 
     const searchValue = form.watch("search");
 
+    const destinationPageSchema = {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        name: destination?.data?.name || "Destination",
+        description: destination?.data?.description || "Explore tours and packages for this destination with triplan.",
+        url: `https://triplan.developersajeeb.com/destinations/${destination?.data?.slug}`,
+        image: destination?.data?.thumbnail || TriPlanBanner
+    };
+
     return (
         <>
+            <JsonLd data={destinationPageSchema} />
+            <CommonMetadata
+                title={`${destination?.data?.name || "Destination"} – Explore Tours with triplan`}
+                description={destination?.data?.description || `Discover amazing tours and packages for ${destination?.data?.name} with triplan.`}
+                featureImage={destination?.data?.thumbnail || TriPlanBanner}
+                canonicalUrl={`https://triplan.com/destinations/${destination?.data?.slug}`}
+            />
+
             {isDestinationLoading ?
                 <div className="py-10 md:py-16 bg-gray-50">
                     <div className="max-w-4xl mx-auto px-5">
@@ -216,7 +236,7 @@ const DestinationDetails = () => {
                         </div>
                     ) : (
                         <div className="flex flex-col gap-4">
-                            {(toursData?.data  ?? []).map((tour: ITourPackage) => (
+                            {(toursData?.data ?? []).map((tour: ITourPackage) => (
                                 <TourCardList key={tour.slug} tour={tour} />
                             ))}
                         </div>

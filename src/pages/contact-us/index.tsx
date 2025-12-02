@@ -4,10 +4,28 @@ import { Link } from "react-router";
 import { HiOutlineMail } from "react-icons/hi";
 import { FiPhoneCall } from "react-icons/fi";
 import { GrLocation } from "react-icons/gr";
+import TriPlanBanner from "@/assets/images/seo/triplan-banner.webp";
+import CommonMetadata from "@/components/utilities/CommonMetadata";
+import JsonLd from "@/components/utilities/JsonLd";
 
 const ContactUs = () => {
+    const contactPageSchema = {
+        "@context": "https://schema.org",
+        "@type": "WebPage",
+        name: "Contact Us",
+        url: "https://triplan.developersajeeb.com/contact-us",
+        description: "Get in touch with triplan support team via email, phone, or visit our New York office."
+    };
     return (
         <>
+            <JsonLd data={contactPageSchema} />
+            <CommonMetadata
+                title="Contact Us – Get in Touch with triplan Support"
+                description="Have questions or need assistance? Reach out to triplan via email, phone, or visit us at our New York office. Our support team is ready to help."
+                featureImage={TriPlanBanner}
+                canonicalUrl="https://triplan.developersajeeb.com/contact"
+            />
+
             <PageBanner title="Contact Us" />
             <section className="py-12 md:py-16 lg:py-20 bg-white">
                 <div className="grid md:grid-cols-2 gap-6 md:gap-8 tp-container">

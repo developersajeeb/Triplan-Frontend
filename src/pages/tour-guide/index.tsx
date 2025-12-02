@@ -9,7 +9,9 @@ import { RiSearch2Line } from "react-icons/ri";
 import { useSearchParams } from "react-router";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { FiStar } from "react-icons/fi";
-
+import CommonMetadata from "@/components/utilities/CommonMetadata";
+import JsonLd from "@/components/utilities/JsonLd";
+import TriPlanBanner from "@/assets/images/seo/triplan-banner.webp";
 
 const TourGuider = () => {
   const form = useForm();
@@ -33,6 +35,24 @@ const TourGuider = () => {
 
   return (
     <>
+      <CommonMetadata
+        title="Tour Guides - triPlan"
+        description="Find the best tour guides for your next trip with triPlan. Browse reviews, ratings, and profiles to choose the perfect guide."
+        keywords="tour guide, travel guide, triPlan, tourism, trip planning"
+        featureImage={TriPlanBanner}
+        canonicalUrl="https://triplan.developersajeeb.com/tour-guide"
+      />
+      <JsonLd
+        data={{
+          name: "Tour Guides - triPlan",
+          description: "Find the best tour guides for your next trip with triPlan.",
+          url: "https://triplan.developersajeeb.com/tour-guide",
+          mainEntityOfPage: {
+            "@type": "WebPage",
+            "@id": "https://triplan.developersajeeb.com/tour-guide",
+          },
+        }}
+      />
       <PageBanner title="Tour Guide" />
 
       <section className="px-5 pt-8 tp-container flex flex-wrap gap-5 justify-between">

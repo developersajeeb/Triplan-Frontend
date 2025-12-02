@@ -26,6 +26,7 @@ const DestinationsPage = lazy(() => import("@/pages/destinations"));
 const DestinationDetails = lazy(() => import("@/pages/destinations-details"));
 const TourGuiderPage = lazy(() => import("@/pages/tour-guide"));
 const NotFoundPage = lazy(() => import("@/pages/not-found"));
+const BlogPage = lazy(() => import("@/pages/blog"));
 
 export const router = createBrowserRouter([
   {
@@ -75,6 +76,10 @@ export const router = createBrowserRouter([
       {
         Component: PaymentCancel,
         path: "/payment/cancel",
+      },
+      {
+        Component: BlogPage,
+        path: "blog",
       },
       {
         Component: ContactUs,

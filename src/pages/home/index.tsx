@@ -11,12 +11,13 @@ import NewsArticles from "./NewsArticles";
 import HomeAccordion from "./HomeAccordion";
 import JsonLd from "@/components/utilities/JsonLd";
 import CommonMetadata from "@/components/utilities/CommonMetadata";
+import TriPlanBanner from "@/assets/images/seo/triplan-banner.webp";
 
 const Home = () => {
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    "name": "Triplan",
+    "name": "TriPlan",
     "url": "https://triplan.developersajeeb.com",
     "potentialAction": {
       "@type": "SearchAction",
@@ -28,7 +29,7 @@ const Home = () => {
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    "name": "Triplan",
+    "name": "TriPlan",
     "url": "https://triplan.developersajeeb.com",
     "logo": "https://triplan.developersajeeb.com/logo.png",
     "sameAs": [
@@ -41,9 +42,9 @@ const Home = () => {
   return (
     <>
       <CommonMetadata
-        title="Triplan – Your tour and travel manager"
-        description="Explore the best tours, destinations, and travel packages with Triplan."
-        featureImage="assets/seo/homepage-feature.jpg"
+        title="triPlan – Your tour and travel manager"
+        description="Explore the best tours, destinations, and travel packages with triPlan."
+        featureImage={TriPlanBanner}
         canonicalUrl="https://triplan.developersajeeb.com/"
       />
 

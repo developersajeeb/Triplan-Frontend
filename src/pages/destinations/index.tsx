@@ -7,11 +7,14 @@ import { useEffect } from "react";
 import { useForm, type FieldValues } from "react-hook-form";
 import { useSearchParams } from "react-router";
 import { Button } from "@/components/ui/button";
-import {Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { RiSearch2Line } from "react-icons/ri";
 import PaginationComponent from "@/components/ui/PaginationComponent";
 import { GrPowerReset } from "react-icons/gr";
+import TriPlanBanner from "@/assets/images/seo/triplan-banner.webp";
+import CommonMetadata from "@/components/utilities/CommonMetadata";
+import JsonLd from "@/components/utilities/JsonLd";
 
 const DestinationsPage = () => {
     const form = useForm();
@@ -51,10 +54,27 @@ const DestinationsPage = () => {
 
     const searchValue = form.watch("search");
 
+    const destinationsPageSchema = {
+        "@context": "https://schema.org",
+        "@type": "CollectionPage",
+        name: "Destinations",
+        description: "Explore the best travel destinations with triplan. Search and find your perfect place to visit.",
+        url: "https://triplan.developersajeeb.com/destinations",
+        image: TriPlanBanner
+    };
+
     return (
         <>
+            <CommonMetadata
+                title="Destinations – Explore Amazing Places with triplan"
+                description="Discover top travel destinations with triplan. Search, explore, and plan your perfect trip with detailed guides, tours, and travel tips."
+                featureImage={TriPlanBanner}
+                canonicalUrl="https://triplan.com/destinations"
+            />
+            <JsonLd data={destinationsPageSchema} />
+
             <PageBanner title='Destinations' />
-            <section className="px-5 pt-8 tp-container flex gap-3">
+            <section className="pt-8 tp-container flex gap-3">
                 <Form {...form}>
                     <form onSubmit={form.handleSubmit(onSubmit)} className="w-full max-w-[250px]">
                         <FormField
