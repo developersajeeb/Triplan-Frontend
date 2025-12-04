@@ -198,7 +198,7 @@ export default function VerifyPage() {
                                 Submit
                             </Button>
                         ) : (
-                            <Button type="button" className="tp-primary-btn h-11 !px-5 !rounded-lg mt-7 pointer-events-none" disable>
+                            <Button type="button" className="tp-primary-btn h-11 !px-5 !rounded-lg mt-7 pointer-events-none opacity-60">
                                 Submit
                             </Button>
                         )}
