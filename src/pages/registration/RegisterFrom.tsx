@@ -11,6 +11,9 @@ import { useForm } from "react-hook-form"
 import { Form, FormControl, FormDescription, FormField, FormItem, FormMessage } from "@/components/ui/form"
 import { useRegisterMutation } from "@/redux/features/auth/auth.api"
 import { toast } from "sonner"
+import { FiEye, FiEyeOff } from "react-icons/fi"
+import { useState } from "react"
+import { RiLoaderLine } from "react-icons/ri"
 
 const registerSchema = z
     .object({
@@ -58,8 +61,11 @@ export function RegisterFrom({
     className,
     ...props
 }: React.ComponentProps<"div">) {
+    const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false);
     const [register] = useRegisterMutation();
     const navigate = useNavigate();
+    const [isLoading, setIsLoading] = useState<boolean>(false);
 
     const form = useForm<z.infer<typeof registerSchema>>({
         resolver: zodResolver(registerSchema),
@@ -73,8 +79,7 @@ export function RegisterFrom({
     });
 
     const onSubmit = async (data: z.infer<typeof registerSchema>) => {
-        console.log(data, 'asdasd');
-
+        setIsLoading(true);
         const userInfo = {
             name: data.name,
             email: data.email,
@@ -83,11 +88,13 @@ export function RegisterFrom({
         };
 
         try {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             const result = await register(userInfo).unwrap();
-            console.log(result);
             toast.success("Account created successfully!");
-            navigate("/verify");
+            setIsLoading(false);
+            navigate("/verify", { state: { email: data.email } });
         } catch (error: object | any) {
+            setIsLoading(false);
             toast.error(error?.data?.message || "Something went wrong. Please try again.");
             console.error(error);
         }
@@ -164,7 +171,20 @@ export function RegisterFrom({
                                     <FormItem className="space-y-1">
                                         <Label className="font-semibold text-gray-600 text-sm" htmlFor="password">Password<span className="text-destructive text-base">*</span></Label>
                                         <FormControl>
-                                            <Input type="password" className="tp-input" placeholder="Your password" {...field} />
+                                            <div className="relative">
+                                                <Input
+                                                    type={showPassword ? "text" : "password"}
+                                                    className="tp-input !pr-10"
+                                                    placeholder="Enter your password"
+                                                    {...field}
+                                                />
+                                                <span
+                                                    className="text-gray-600 absolute top-[14px] right-3 cursor-pointer"
+                                                    onClick={() => setShowPassword(!showPassword)}
+                                                >
+                                                    {showPassword ? <FiEye size={16} /> : <FiEyeOff size={16} />}
+                                                </span>
+                                            </div>
                                         </FormControl>
                                         <FormDescription className="sr-only">
                                             This is your password for authentication.
@@ -180,7 +200,20 @@ export function RegisterFrom({
                                     <FormItem className="space-y-1">
                                         <Label className="font-semibold text-gray-600 text-sm" htmlFor="confirmPassword">Confirm Password<span className="text-destructive text-base">*</span></Label>
                                         <FormControl>
-                                            <Input type="password" className="tp-input" placeholder="Re-type password" {...field} />
+                                            <div className="relative">
+                                                <Input
+                                                    type={showConfirmPassword ? "text" : "password"}
+                                                    className="tp-input !pr-10"
+                                                    placeholder="Re-type password"
+                                                    {...field}
+                                                />
+                                                <span
+                                                    className="text-gray-600 absolute top-[14px] right-3 cursor-pointer"
+                                                    onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                                >
+                                                    {showConfirmPassword ? <FiEye size={16} /> : <FiEyeOff size={16} />}
+                                                </span>
+                                            </div>
                                         </FormControl>
                                         <FormDescription className="sr-only">
                                             This is your re enter password for authentication.
@@ -190,8 +223,8 @@ export function RegisterFrom({
                                 )}
                             />
                         </div>
-                        <Button type="submit" className="tp-primary-btn h-11 !rounded-lg mt-4">
-                            Sign Up
+                        <Button disabled={isLoading} type="submit" className={`tp-primary-btn h-11 !rounded-lg mt-3 ${isLoading && 'pointer-events-none'}`}>
+                            {isLoading && <RiLoaderLine className="w-4 h-4 animate-spin" />} Sign Up
                         </Button>
                         <div className="my-3 after:border-border relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-gray-300">
                             <span className="font-semibold bg-primary-50 text-muted-foreground relative z-10 px-2">

@@ -152,19 +152,20 @@ const FormMessage = React.forwardRef<
   }
 
   return (
-    <p
+    <span
       ref={ref}
       id={formMessageId}
       className={cn("text-[0.8rem] font-medium text-destructive", className)}
       {...props}
     >
       {body}
-    </p>
+    </span>
   )
 })
 FormMessage.displayName = "FormMessage"
 
 export {
+  // eslint-disable-next-line react-refresh/only-export-components
   useFormField,
   Form,
   FormItem,

@@ -11,11 +11,13 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { config } from "@/config"
 import { useState } from "react"
 import { RiLoaderLine } from "react-icons/ri";
+import { FiEye, FiEyeOff } from "react-icons/fi"
 
 export function LoginForm({
     className,
     ...props
 }: React.ComponentProps<"div">) {
+    const [showPassword, setShowPassword] = useState<boolean>(false);
     const navigate = useNavigate();
     const form = useForm();
     const [login] = useLoginMutation();
@@ -30,15 +32,20 @@ export function LoginForm({
             navigate('/')
             setIsLoginBtnLoading(false);
         } catch (err) {
+            setIsLoginBtnLoading(false);
             console.error(err);
             const error = err as { data: { message: string }; };
+            console.log(error);
+            
 
             if (error.data.message === "Password does not match") {
                 toast.error("Invalid credentials");
+                return;
             }
 
             if (error.data.message === "User does not exist") {
                 toast.error("User does not exist");
+                return;
             }
 
             if (error.data.message === "User is not verified") {
@@ -95,12 +102,21 @@ export function LoginForm({
                                         </Link>
                                     </div>
                                     <FormControl>
-                                        <Input
-                                            className="tp-input"
-                                            placeholder="Enter your password"
-                                            {...field}
-                                            value={field.value || ""}
-                                        />
+                                        <div className="relative">
+                                            <Input
+                                                type={showPassword ? "text" : "password"}
+                                                className="tp-input !pr-10"
+                                                placeholder="Enter your password"
+                                                {...field}
+                                                value={field.value || ""}
+                                            />
+                                            <span
+                                                className="text-gray-600 absolute top-[14px] right-3 cursor-pointer"
+                                                onClick={() => setShowPassword(!showPassword)}
+                                            >
+                                                {showPassword ? <FiEye size={16} /> : <FiEyeOff size={16} />}
+                                            </span>
+                                        </div>
                                     </FormControl>
                                     <FormMessage />
                                 </FormItem>

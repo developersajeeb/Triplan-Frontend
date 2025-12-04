@@ -23,7 +23,7 @@ const FormSchema = z.object({
 export default function VerifyPage() {
     const location = useLocation();
     const navigate = useNavigate();
-    const [email] = useState(location.state);
+    const [email] = useState(() => location.state?.email || location.state || "");
     const [active, setActive] = useState<boolean>(true);
     const id = useId()
     const [seconds, setSeconds] = useState(OtpExpireTimeInSeconds);
@@ -48,6 +48,7 @@ export default function VerifyPage() {
             if (remaining === 0) {
                 setActive(false);
                 localStorage.removeItem("otp_expiry");
+                localStorage.removeItem("otp_sent");
                 if (timerId.current) {
                     clearInterval(timerId.current);
                 }
@@ -57,7 +58,8 @@ export default function VerifyPage() {
 
     useEffect(() => {
         if (!email) {
-            navigate("/");
+            toast.error("Invalid request. Please register again.");
+            navigate("/registration");
             return;
         }
 
@@ -79,20 +81,20 @@ export default function VerifyPage() {
             handleSendOtp();
         }
 
-        return () => {
-            if (performance.navigation.type !== performance.navigation.TYPE_RELOAD) {
-                localStorage.removeItem("otp_expiry");
-                localStorage.removeItem("otp_sent");
-                setSeconds(OtpExpireTimeInSeconds);
-                setActive(false);
+        // return () => {
+        //     if (performance.navigation.type !== performance.navigation.TYPE_RELOAD) {
+        //         localStorage.removeItem("otp_expiry");
+        //         localStorage.removeItem("otp_sent");
+        //         setSeconds(OtpExpireTimeInSeconds);
+        //         setActive(false);
 
-                if (!otpSent || otpSent !== "true") {
-                    if (!isOtpSendingRef.current) {
-                        handleSendOtp();
-                    }
-                }
-            }
-        };
+        //         if (!otpSent || otpSent !== "true") {
+        //             if (!isOtpSendingRef.current) {
+        //                 handleSendOtp();
+        //             }
+        //         }
+        //     }
+        // };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [email]);
 
@@ -156,7 +158,7 @@ export default function VerifyPage() {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="p-5 bg-cover bg-center bg-no-repeat" style={{backgroundImage: `url(${bgImage})`}}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="p-5 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${bgImage})` }}>
                 <div className="flex items-center justify-center h-screen text-center">
                     <div className='border border-gray-200 bg-gray-50 px-7 py-9 max-w-[450px] w-full rounded-xl'>
                         <span className='inline-flex items-center justify-center mb-5 bg-primary-200 border-[15px] border-primary-100 p-4 rounded-full text-primary-400'><FaShieldAlt size={40} /></span>
@@ -191,10 +193,15 @@ export default function VerifyPage() {
                                 </FormItem>
                             )}
                         />
-
-                        <Button type="submit" className="tp-primary-btn h-11 !px-5 !rounded-lg mt-7">
-                            Submit
-                        </Button>
+                        {active ? (
+                            <Button type="submit" className="tp-primary-btn h-11 !px-5 !rounded-lg mt-7">
+                                Submit
+                            </Button>
+                        ) : (
+                            <Button type="button" className="tp-primary-btn h-11 !px-5 !rounded-lg mt-7 pointer-events-none" disable>
+                                Submit
+                            </Button>
+                        )}
 
                         <div className='mt-5'>
                             {isSendingOtp ? (
