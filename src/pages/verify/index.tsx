@@ -12,7 +12,6 @@ import { OtpExpireTimeInSeconds } from '@/config';
 import { useSendOtpMutation, useVerifyOtpMutation } from '@/redux/features/auth/auth.api';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
-import bgImage from '@/assets/images/varify-page-bg.svg'
 
 const FormSchema = z.object({
     pin: z.string().min(4, {
@@ -32,6 +31,7 @@ export default function VerifyPage() {
     const [verifyOtp] = useVerifyOtpMutation();
     const timerId = useRef<NodeJS.Timeout | null>(null);
     const isOtpSendingRef = useRef(false);
+    const effectRan = useRef(false);
 
     const startTimer = (expiryTime: number) => {
         setActive(true);
@@ -57,8 +57,11 @@ export default function VerifyPage() {
     };
 
     useEffect(() => {
+        if (effectRan.current) return;
+        effectRan.current = true;
+
         if (!email) {
-            toast.error("Invalid request. Please register again.");
+            toast.error("Invalid request. Please try again.");
             navigate("/registration");
             return;
         }
@@ -81,20 +84,6 @@ export default function VerifyPage() {
             handleSendOtp();
         }
 
-        // return () => {
-        //     if (performance.navigation.type !== performance.navigation.TYPE_RELOAD) {
-        //         localStorage.removeItem("otp_expiry");
-        //         localStorage.removeItem("otp_sent");
-        //         setSeconds(OtpExpireTimeInSeconds);
-        //         setActive(false);
-
-        //         if (!otpSent || otpSent !== "true") {
-        //             if (!isOtpSendingRef.current) {
-        //                 handleSendOtp();
-        //             }
-        //         }
-        //     }
-        // };
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [email]);
 
@@ -158,12 +147,12 @@ export default function VerifyPage() {
 
     return (
         <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="p-5 bg-cover bg-center bg-no-repeat" style={{ backgroundImage: `url(${bgImage})` }}>
-                <div className="flex items-center justify-center h-screen text-center">
-                    <div className='border border-gray-200 bg-gray-50 px-7 py-9 max-w-[450px] w-full rounded-xl'>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="p-5 bg-cover bg-center bg-no-repeat h-screen bg-primary-50">
+                <div className="flex items-center justify-center h-full min-h-full text-center z-10 relative">
+                    <div className='max-w-[400px] w-full'>
                         <span className='inline-flex items-center justify-center mb-5 bg-primary-200 border-[15px] border-primary-100 p-4 rounded-full text-primary-400'><FaShieldAlt size={40} /></span>
-                        <h1 className='text-2xl font-bold text-gray-800 mb-1'>Verify your account</h1>
-                        <p className='word-break text-gray-500 mb-8'>Please enter the OTP sent to <span className='font-semibold break-all'>{email}</span> to verify your account</p>
+                        <h1 className='text-2xl font-bold text-gray-800 mb-3'>Verify your account</h1>
+                        <p className='word-break text-gray-600 mb-6'>We’ve sent a verification code to <span className='font-semibold break-all block'>{email}</span> Please enter the code below.</p>
 
                         <FormField
                             control={form.control}
