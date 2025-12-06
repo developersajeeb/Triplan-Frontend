@@ -100,6 +100,7 @@ const Footer = () => {
                                     <li><Link to="/contact" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">Contact</Link></li>
                                     <li><Link to="/privacy-policy" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">Privacy Policy</Link></li>
                                     <li><Link to="/data-deletion" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">Data Deletion</Link></li>
+                                    <li><Link to="/terms-of-service" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">Terms Of Service</Link></li>
                                 </ul>
                             </div>
                             <div>
