@@ -28,7 +28,6 @@ const TourGuiderPage = lazy(() => import("@/pages/tour-guide"));
 const NotFoundPage = lazy(() => import("@/pages/not-found"));
 const BlogPage = lazy(() => import("@/pages/blog"));
 const PrivacyPolicyPage = lazy(() => import("@/pages/privacy-policy"));
-const DataDeletion = lazy(() => import("@/pages/data-deletion"));
 const TermsOfService = lazy(() => import("@/pages/terms-of-service"));
 
 export const router = createBrowserRouter([
@@ -95,10 +94,6 @@ export const router = createBrowserRouter([
       {
         Component: TermsOfService,
         path: "terms-of-service",
-      },
-      {
-        Component: DataDeletion,
-        path: "data-deletion",
       },
       {
         path: "*",
