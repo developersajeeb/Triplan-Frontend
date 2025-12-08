@@ -34,7 +34,7 @@ export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
   };
 
   return (
-    <Sidebar {...props} className="relative rounded-lg border border-gray-200 min-w-[305px] w-[305px]">
+    <Sidebar {...props} className="relative rounded-xl border border-gray-200 min-w-[305px] w-[305px] h-auto">
       <div className="p-5 border-b border-gray-200 flex gap-2">
         {isMenuLoading ? (
           <Skeleton className="h-12 w-full rounded-xl" />

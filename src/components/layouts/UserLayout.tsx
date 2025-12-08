@@ -8,9 +8,9 @@ const UserLayout = () => {
     return (
         <>
             <GuestNavBar />
-            <div className='max-w-[1320px] mx-auto py-16'>
+            <div className='tp-container py-2 md:py-8 lg:py-16'>
                 <SidebarProvider className='gap-6'>
-                    <div><UserSidebar /></div>
+                    <div className='hidden lg:block'><UserSidebar /></div>
                     <SidebarInset>
                         <Outlet />
                     </SidebarInset>
