@@ -10,7 +10,7 @@ import React from "react";
 import TourCardLoader from "@/components/shared/blocks/TourCardLoader";
 
 const TourCardSlider = () => {
-    const { data: tours, isLoading } = useGetAllToursQuery({ limit: "10" });
+    const { data: tours, isLoading } = useGetAllToursQuery({ limit: "8" });
     const { data: tourTypes } = useGetTourTypesQuery(undefined);
     const { data: divisions } = useGetDivisionsQuery(undefined);
     const toursData = tours?.data?.map((item) => ({
@@ -43,9 +43,6 @@ const TourCardSlider = () => {
                         },
                         1024: {
                             slidesPerView: 3,
-                        },
-                        1200: {
-                            slidesPerView: 4,
                         },
                     }}
                 >

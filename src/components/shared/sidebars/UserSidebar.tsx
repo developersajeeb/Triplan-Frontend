@@ -45,7 +45,7 @@ export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
               <h5 className="text-base font-semibold text-gray-800 tracking-tight">{userData?.data?.name}</h5>
               <p className="text-sm text-gray-600 break-all tracking-tight">{userData?.data?.email}</p>
             </div>
-            <span className="inline-flex justify-center items-center rounded-full min-w-6 w-6 h-6 bg-gray-200 text-gray-500 hover:text-white hover:bg-primary-500 duration-300 cursor-pointer"><TbPencilMinus size={16} /></span>
+            <Link to='/user/settings' className="inline-flex justify-center items-center rounded-full min-w-6 w-6 h-6 bg-gray-200 text-gray-500 hover:text-white hover:bg-primary-500 duration-300 cursor-pointer"><TbPencilMinus size={16} /></Link>
           </>
         )}
       </div>
