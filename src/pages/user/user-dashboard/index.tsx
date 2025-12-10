@@ -1,5 +1,5 @@
 import { IoCalendarOutline, IoHeartHalfOutline } from "react-icons/io5";
-import { LuFolderOpen, LuNotepadText, LuTimer } from "react-icons/lu";
+import { LuFolderOpen, LuTimer } from "react-icons/lu";
 import { TbLocationPin } from "react-icons/tb";
 import { Link } from "react-router";
 import ImageWaterMark from '@/assets/images/image-watermark.webp'
@@ -39,15 +39,16 @@ const UserDashboard = () => {
                 </div>
 
                 <div className="border flex items-center gap-3 border-gray-200 rounded-xl p-3 md:p-4 mt-5">
-                    <img className="rounded-xl h-[100px] object-cover max-w-40" src={ImageWaterMark} alt="Tour Image" />
-                    <div className="">
-                        <p className='text-sm text-gray-800 font-semibold flex gap-1'><LuNotepadText className='text-primary-500 pt-[2px]' size={18} /> Type name</p>
-                        <h2 className='mt-1 mb-2'><Link to={`/tours/#`} className='text-gray-800 hover:text-primary-500 text-xl font-bold cursor-pointer duration-300'>Tour name</Link></h2>
+                    <img className="rounded-xl h-[130px] object-cover max-w-48" src={ImageWaterMark} alt="Tour Image" />
+                    <div>
+                        <span className="inline-block text-xs font-medium bg-blue-500 text-white px-3 py-[3px] rounded-full">Upcoming</span>
+                        <h2 className='my-1'><Link to={`/tours/#`} className='text-gray-800 hover:text-primary-500 text-xl font-bold cursor-pointer duration-300'>Tour name</Link></h2>
 
                         <div>
                             <p className='text-sm text-gray-500 font-medium inline-flex gap-1 pr-3'><span><FaLocationDot size={14} className="mt-1" /></span> asdasdasd</p>
                             <p className='text-sm text-gray-500 font-medium inline-flex gap-1'><span><LuTimer size={16} className='mt-[2px]' /></span> Start: 09:30 AM</p>
                         </div>
+                        <Link to={`/tours/#`} className='mt-2 text-[14px] text-center inline-block font-semibold bg-primary-900 hover:bg-primary-400 text-white hover:text-white px-4 py-[6px] rounded-full transition-all duration-300;'>View Details</Link>
                     </div>
                 </div>
             </section>

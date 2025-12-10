@@ -36,7 +36,7 @@ const TourCardList = ({ tour }: Props) => {
                     <p className='text-sm text-gray-700 font-semibold flex gap-1 mt-3'><TbCalendarClock className='pt-[1px] mr-[2px]' size={19} /> 4 Day, 3 Night</p>
                 </div>
                 <div className='w-full xl:w-[1px] h-[1px] xl:h-full bg-gray-300 my-4 xl:my-0 xl:mr-3'></div>
-                <div className=''>
+                <div>
                     <p className='text-gray-600 font-medium mb-4'>Starts From <br /> <span className='text-primary-400 font-bold text-xl'><span className='text-base'>৳</span>{tour?.costFrom}</span> <span className='text-gray-500 font-bold text-xl line-through'>$789</span></p>
                     <div><Link to={`/tours/${tour?.slug}`} className='text-[14px] text-center inline-block font-semibold bg-primary-900 hover:bg-primary-400 text-white hover:text-white px-5 py-2 rounded-full transition-all duration-300;'>View Details</Link></div>
                 </div>
