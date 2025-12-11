@@ -8,7 +8,7 @@ const UserLayout = () => {
     return (
         <>
             <GuestNavBar />
-            <div className='tp-container py-2 md:py-8 lg:py-16'>
+            <div className='tp-container pt-2 pb-8 md:py-8 lg:py-16'>
                 <SidebarProvider className='gap-6'>
                     <div className='hidden lg:block'><UserSidebar /></div>
                     <SidebarInset>
