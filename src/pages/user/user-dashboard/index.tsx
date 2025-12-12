@@ -1,9 +1,9 @@
 import { IoCalendarOutline, IoHeartHalfOutline, IoNotificationsOutline } from "react-icons/io5";
-import { LuFolderOpen, LuTentTree, LuTimer } from "react-icons/lu";
+import { LuFolderOpen, LuTentTree, LuTicket, LuTimer } from "react-icons/lu";
 import { TbLocationPin, TbMapPin2 } from "react-icons/tb";
 import { Link } from "react-router";
 import ImageWaterMark from '@/assets/images/image-watermark.webp'
-import { FaLocationDot } from "react-icons/fa6";
+import { FaLocationDot, FaRegFilePdf } from "react-icons/fa6";
 import { BiSupport } from "react-icons/bi";
 
 const UserDashboard = () => {
@@ -48,7 +48,11 @@ const UserDashboard = () => {
                             <p className='text-sm text-gray-500 font-medium inline-flex gap-1 pr-3'><span><FaLocationDot size={14} className="mt-1" /></span> asdasdasd</p>
                             <p className='text-sm text-gray-500 font-medium inline-flex gap-1'><span><LuTimer size={16} className='mt-[2px]' /></span> Start: 09:30 AM</p>
                         </div>
-                        <Link to={`/tours/#`} className='mt-2 text-[14px] text-center inline-block font-semibold bg-primary-900 hover:bg-primary-400 text-white hover:text-white px-4 pt-[6px] pb-2 rounded-full transition-all duration-300;'>View Details</Link>
+                        <div className="flex gap-2 flex-wrap">
+                            <Link to={`/tours/#`} className='mt-2 text-[14px] text-center inline-block font-semibold bg-primary-900 hover:bg-primary-400 text-white hover:text-white px-4 pt-[6px] pb-2 rounded-full transition-all duration-300'>View Details</Link>
+                            <Link to={`/tours/#`} className='mt-2 text-[14px] text-center font-semibold bg-red-500 hover:bg-red-700 text-white hover:text-white px-4 pt-[6px] pb-2 rounded-full transition-all duration-300 inline-flex items-center gap-2'>PDF <span><FaRegFilePdf size={15} /></span></Link>
+                            <Link to={`/tours/#`} className='mt-2 text-[14px] text-center font-semibold bg-purple-500 hover:bg-purple-700 text-white hover:text-white px-4 pt-[6px] pb-2 rounded-full transition-all duration-300 inline-flex items-center gap-2'>Ticket <span><LuTicket /></span></Link>
+                        </div>
                     </div>
                 </div>
             </section>
