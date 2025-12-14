@@ -20,6 +20,7 @@ import { DialogTitle } from '@/components/ui/dialog';
 import CommonMetadata from '@/components/utilities/CommonMetadata';
 import JsonLd from '@/components/utilities/JsonLd';
 import TriPlanBanner from "@/assets/images/seo/triplan-banner.webp";
+import TourListTypeLoader from '@/components/shared/blocks/TourListTypeLoader';
 
 const Tours = () => {
     const dispatch = useAppDispatch();
@@ -178,11 +179,19 @@ const Tours = () => {
 
                         {/* Tour Cards */}
                         {isLoading || isFetching ? (
-                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-                                {[...Array(3)].map((_, i) => (
-                                    <React.Fragment key={i}><TourCardLoader /></React.Fragment>
-                                ))}
-                            </div>
+                            viewType === "grid" ? (
+                                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                                    {[...Array(6)].map((_, i) => (
+                                        <TourCardLoader key={i} />
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="flex flex-col gap-4">
+                                    {[...Array(3)].map((_, i) => (
+                                        <TourListTypeLoader key={i} />
+                                    ))}
+                                </div>
+                            )
                         ) : (toursData?.data ?? []).length > 0 ? (
 
                             viewType === "grid" ? (
