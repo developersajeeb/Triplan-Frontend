@@ -4,26 +4,33 @@ import { Input } from "@/components/ui/input";
 import { useEffect } from "react";
 import { useForm, type FieldValues } from "react-hook-form";
 import { GrPowerReset } from "react-icons/gr";
-import { RiSearch2Line } from "react-icons/ri";
 import { useSearchParams } from "react-router";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { ChevronDownIcon } from "lucide-react";
 import { Calendar } from "@/components/ui/calendar";
+import { FiSearch } from "react-icons/fi";
 
 const TableFilter = () => {
     const form = useForm();
     const [searchParams, setSearchParams] = useSearchParams();
-    const search = searchParams.get("search") || "";
     const searchValue = form.watch("search");
+    const paymentDateValue = form.watch("payment_date");
     const sortValue = searchParams.get("sort") || "";
+    const search = searchParams.get("search") || "";
+    const paymentDate = searchParams.get("payment_date");
 
     const queryParams: Record<string, string> = {};
     if (search) queryParams.search = search;
 
     useEffect(() => {
         form.setValue("search", search);
-    }, [search, form]);
+        if (paymentDate) {
+            form.setValue("payment_date", new Date(paymentDate));
+        } else {
+            form.setValue("payment_date", undefined);
+        }
+    }, [search, paymentDate, form]);
 
     const onSubmit = (data: FieldValues) => {
         const value = data.search?.trim() ?? "";
@@ -44,32 +51,33 @@ const TableFilter = () => {
     const handleResetSort = () => {
         const params = new URLSearchParams(searchParams);
         params.delete("sort");
-        params.set("page", "1");
+        params.delete("page");
         setSearchParams(params);
     };
 
     const handleReset = () => {
         form.setValue("search", "");
+        form.setValue("payment_date", undefined);
         const newParams = new URLSearchParams(searchParams);
         newParams.delete("search");
+        newParams.delete("payment_date");
         newParams.delete("page");
         setSearchParams(newParams);
     };
 
     return (
-        <section className="flex justify-between gap-5 p-5">
-            <div className="flex gap-3">
+        <section className="flex flex-wrap justify-between gap-5 p-5 pb-8">
+            <div className="flex flex-wrap gap-3">
                 <Form {...form}>
                     <form
                         onSubmit={form.handleSubmit(onSubmit)}
-                        className="w-full space-y-3 flex gap-2"
+                        className="space-y-3 flex flex-wrap gap-3"
                     >
 
                         {/* Search Field */}
                         <FormField
                             control={form.control}
                             name="search"
-                            rules={{ required: "Please enter a search term" }}
                             render={({ field }) => (
                                 <FormItem className="!mt-0">
                                     <div className="relative">
@@ -77,18 +85,10 @@ const TableFilter = () => {
                                             <Input
                                                 {...field}
                                                 type="text"
-                                                className="tp-input w-full !pr-12"
+                                                className="tp-input !w-[212px]"
                                                 placeholder="Search by tour name..."
                                             />
                                         </FormControl>
-
-                                        <Button
-                                            type="submit"
-                                            size="icon"
-                                            className="h-[34px] min-w-[36px] w-[36px] rounded-md bg-gray-200 hover:bg-primary-500 text-gray-800 hover:text-white duration-300 absolute right-1 top-1"
-                                        >
-                                            <RiSearch2Line className="!h-[18px] !w-[18px]" />
-                                        </Button>
                                     </div>
 
                                     <FormMessage className="!mt-1" />
@@ -100,42 +100,46 @@ const TableFilter = () => {
                         <FormField
                             control={form.control}
                             name="payment_date"
-                            rules={{ required: "Please select payment date" }}
                             render={({ field }) => (
                                 <FormItem className="!mt-0">
-                                    <Popover>
-                                        <PopoverTrigger asChild>
-                                            <Button
-                                                variant="outline"
-                                                className="w-full justify-between font-normal"
-                                            >
-                                                {field.value
-                                                    ? new Date(field.value).toLocaleDateString()
-                                                    : "Select date"}
-                                                <ChevronDownIcon />
-                                            </Button>
-                                        </PopoverTrigger>
+                                    <div>
+                                        <Popover>
+                                            <PopoverTrigger asChild>
+                                                <Button
+                                                    variant="outline"
+                                                    className="w-[212px] h-11 hover:bg-white hover:border-primary-400 justify-between font-normal"
+                                                >
+                                                    {field.value
+                                                        ? new Date(field.value).toLocaleDateString()
+                                                        : "Select date"}
+                                                    <ChevronDownIcon />
+                                                </Button>
+                                            </PopoverTrigger>
 
-                                        <PopoverContent className="w-auto p-0" align="start">
-                                            <Calendar
-                                                mode="single"
-                                                selected={field.value}
-                                                onSelect={field.onChange}
-                                                captionLayout="dropdown"
-                                            />
-                                        </PopoverContent>
-                                    </Popover>
+                                            <PopoverContent className="w-full p-0" align="start">
+                                                <Calendar
+                                                    mode="single"
+                                                    selected={field.value}
+                                                    onSelect={field.onChange}
+                                                    captionLayout="dropdown"
+                                                />
+                                            </PopoverContent>
+                                        </Popover>
+                                    </div>
 
                                     <FormMessage className="!mt-1" />
                                 </FormItem>
                             )}
                         />
 
+                        <div className="inline-block !mt-0">
+                            <button type="submit" className="inline-flex items-center text-sm gap-1 font-semibold border border-primary-500 bg-primary-500 hover:bg-primary-600 px-4 py-[11px] text-white duration-300 rounded-lg">Search <span><FiSearch /></span></button>
+                        </div>
                     </form>
                 </Form>
-                {searchValue && searchValue.trim() !== "" && (
-                    <div>
-                        <button onClick={handleReset} type="button" className="flex items-center text-sm gap-1 font-semibold border border-red-500 hover:bg-red-500 px-4 py-[11px] text-red-500 hover:text-white duration-300 rounded-lg">Reset <span><GrPowerReset /></span></button>
+                {(searchValue?.trim() || paymentDateValue) && (
+                    <div className="inline-block">
+                        <button onClick={handleReset} type="button" className="inline-flex items-center text-sm gap-1 font-semibold border border-red-500 hover:bg-red-500 px-4 py-[11px] text-red-500 hover:text-white duration-300 rounded-lg">Reset <span><GrPowerReset /></span></button>
                     </div>
                 )}
             </div>

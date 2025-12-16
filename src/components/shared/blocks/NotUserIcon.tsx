@@ -5,11 +5,12 @@ interface Props {
     width?: string
     height?: string
     iconSize?: number
+    className?: string
 }
 
-const NotUserIcon = ({minWidth, width, height, iconSize}: Props) => {
+const NotUserIcon = ({minWidth, width, height, iconSize, className}: Props) => {
     return (
-        <span className={`text-gray-500 flex items-center justify-center rounded-full bg-gray-200 ${minWidth || 'min-w-16'} ${width || 'w-16'} ${height || 'h-16'}`}><LuUserRound size={iconSize || 35} /></span>
+        <span className={`${className} text-gray-500 flex items-center justify-center rounded-full bg-gray-200 ${minWidth || 'min-w-16'} ${width || 'w-16'} ${height || 'h-16'}`}><LuUserRound size={iconSize || 35} /></span>
     );
 };
 
