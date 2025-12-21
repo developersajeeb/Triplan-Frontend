@@ -42,7 +42,7 @@ const typeSchema = z.object({
         .max(500, { message: "Description cannot exceed 100 characters." }),
 });
 
-export function AddDivisionModal() {
+export function AddDestinationModal() {
     const [addDivision] = useAddDivisionMutation();
     const [image, setImage] = useState<File | null>(null);
     const [open, setOpen] = useState<boolean>(false);

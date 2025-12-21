@@ -3,6 +3,7 @@ import { SidebarInset, SidebarProvider } from '../ui/sidebar';
 import { UserSidebar } from '../shared/sidebars/UserSidebar';
 import Footer from '../utilities/Footer';
 import GuestNavBar from '../utilities/GuestNavBar';
+import ScrollToTop from '../utilities/ScrollToTop';
 
 const UserLayout = () => {
     return (
@@ -12,6 +13,7 @@ const UserLayout = () => {
                 <SidebarProvider className='gap-6'>
                     <div className='hidden lg:block sticky top-24 h-fit'><UserSidebar /></div>
                     <SidebarInset className='flex-1'>
+                        <ScrollToTop />
                         <Outlet />
                     </SidebarInset>
                 </SidebarProvider>

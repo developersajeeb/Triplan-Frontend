@@ -12,11 +12,12 @@ import {
 import { Link, useLocation } from "react-router"
 import { getSidebarMenus } from "@/utils/getSidebarMenus"
 import NotUserIcon from "../blocks/NotUserIcon"
-import { authApi, useLogoutMutation, useUserInfoQuery } from "@/redux/features/auth/auth.api"
+import { authApi, useLogoutMutation } from "@/redux/features/auth/auth.api"
 import { TbPencilMinus } from "react-icons/tb"
 import { Skeleton } from "@/components/ui/skeleton"
 import { RiLogoutCircleLine } from "react-icons/ri"
 import { useAppDispatch } from "@/redux/hook"
+import { useUserInfoQuery } from "@/redux/features/user/user.api"
 
 const menuItems = {
   navMain: getSidebarMenus("USER"),

@@ -22,7 +22,7 @@ export default function SingleImageUploader({ onChange }: Props) {
       getInputProps,
     },
   ] = useFileUpload({
-    accept: "image/svg+xml,image/png,image/jpeg,image/jpg,image/gif",
+    accept: "image/svg+xml,image/png,image/jpeg,image/jpg,image/webp",
     maxSize,
   })
 
@@ -76,7 +76,7 @@ export default function SingleImageUploader({ onChange }: Props) {
               </div>
               <p className="mb-1.5 text-sm font-semibold">Drop your image here</p>
               <p className="text-muted-foreground text-xs">
-                SVG, PNG, JPG or GIF (max. {maxSizeMB}MB)
+                SVG, PNG, JPG or WEBP (max. {maxSizeMB}MB)
               </p>
               <span
                 className="mt-4 bg-gray-300 flex items-center gap-1 rounded-md font-medium text-sm px-4 py-2 cursor-pointer"

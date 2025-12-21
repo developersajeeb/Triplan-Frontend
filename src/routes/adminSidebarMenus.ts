@@ -6,7 +6,7 @@ import Settings from "@/pages/admin/settings";
 import TourGuides from "@/pages/admin/tour-guides";
 import TourListing from "@/pages/admin/tour-listing";
 import TourTypes from "@/pages/admin/tour-type";
-import Division from "@/pages/admin/division";
+import Destination from "@/pages/admin/destination";
 import AddTour from "@/pages/admin/add-tour";
 import type { ISidebarItem } from "@/types";
 import { lazy } from "react";
@@ -58,9 +58,9 @@ export const adminSidebarMenus: ISidebarItem[] = [
                 icon: VscTypeHierarchySuper,
             },
             {
-                title: "Division",
-                url: "/admin/division",
-                component: Division,
+                title: "Destinations",
+                url: "/admin/destinations",
+                component: Destination,
                 icon: PiMapPinArea,
             },
             {

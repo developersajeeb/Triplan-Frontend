@@ -24,17 +24,19 @@ const TourCardBox = ({ tour }: Props) => {
                 <img src={tour?.images[0] || ImageWaterMark} className='h-[200px] lg:h-[260px] overflow-hidden duration-300 group-hover:scale-110 w-full rounded-t-[10px] object-cover' alt="Tour Slider" />
             </div>
 
-            <div className='p-5'>
-                <p className='text-sm text-gray-600 font-medium mb-1'><span className='bg-[#FFCA18] text-[13px] text-gray-900 px-2 pt-[1px] pb-[2px] font-semibold rounded mr-[2px]'>4.8</span> <span className='hover:underline cursor-pointer duration-300'>(180 Reviews)</span></p>
-                <p className='text-sm text-gray-800 font-semibold flex gap-1'><LuNotepadText className='text-primary-500 pt-[2px]' size={18} /> {tour?.tourTypeName}</p>
+            <div className='p-5 flex flex-col h-[calc(100%-200px)] xl:h-[calc(100%-260px)]'>
+                <div className="flex-1">
+                    <p className='text-sm text-gray-600 font-medium mb-1'><span className='bg-[#FFCA18] text-[13px] text-gray-900 px-2 pt-[1px] pb-[2px] font-semibold rounded mr-[2px]'>4.8</span> <span className='hover:underline cursor-pointer duration-300'>(180 Reviews)</span></p>
+                    <p className='text-sm text-gray-800 font-semibold flex gap-1'><LuNotepadText className='text-primary-500 pt-[2px]' size={18} /> {tour?.tourTypeName}</p>
 
-                <h2 className='mt-2 mb-2'><Link to={`/tours/${tour?.slug}`} className='text-gray-800 hover:text-primary-500 text-xl font-bold cursor-pointer duration-300'>{tour?.title}</Link></h2>
-                <div>
-                    <p className='text-sm text-gray-500 font-medium inline-flex gap-1 pr-3'><span><FaLocationDot size={14} className="mt-1" /></span> {tour?.arrivalLocation + ", " + tour?.divisionName}</p>
-                    <p className='text-sm text-gray-500 font-medium inline-flex gap-1'><span><HiOutlineUsers size={16} className='mt-[2px]' /></span> {tour?.maxGuest} Guests</p>
+                    <h2 className='mt-2 mb-2'><Link to={`/tours/${tour?.slug}`} className='text-gray-800 hover:text-primary-500 text-xl font-bold cursor-pointer duration-300'>{tour?.title}</Link></h2>
+                    <div>
+                        <p className='text-sm text-gray-500 font-medium inline-flex gap-1 pr-3'><span><FaLocationDot size={14} className="mt-1" /></span> {tour?.arrivalLocation + ", " + tour?.divisionName}</p>
+                        <p className='text-sm text-gray-500 font-medium inline-flex gap-1'><span><HiOutlineUsers size={16} className='mt-[2px]' /></span> {tour?.maxGuest} Guests</p>
+                    </div>
+
+                    <p className='text-gray-600 font-semibold mt-3'>Starts From <span className='text-primary-400 font-bold text-xl'><span className='text-base'>৳</span>{tour?.costFrom}</span> <span className='text-gray-500 font-bold text-xl line-through'>$789</span></p>
                 </div>
-
-                <p className='text-gray-600 font-semibold mt-3'>Starts From <span className='text-primary-400 font-bold text-xl'><span className='text-base'>৳</span>{tour?.costFrom}</span> <span className='text-gray-500 font-bold text-xl line-through'>$789</span></p>
 
                 <div className='w-full h-[1px] bg-gray-300 my-3'></div>
 

@@ -17,7 +17,7 @@ import { IoTimeOutline } from 'react-icons/io5';
 import { IoMdLogIn, IoMdLogOut } from 'react-icons/io';
 import { AiOutlineUserAdd } from 'react-icons/ai';
 import { useEffect, useRef, useState } from 'react';
-import { authApi, useLogoutMutation, useUserInfoQuery } from '@/redux/features/auth/auth.api';
+import { authApi, useLogoutMutation } from '@/redux/features/auth/auth.api';
 import { TbLayoutDashboard } from "react-icons/tb";
 import { useAppDispatch } from '@/redux/hook';
 import { role } from '@/constants/role';
@@ -25,6 +25,7 @@ import WhiteSvgIcon from '../shared/blocks/WhiteSvgIcon';
 import { getSidebarMenus } from '@/utils/getSidebarMenus';
 import { Skeleton } from '../ui/skeleton';
 import { RiLogoutCircleLine } from 'react-icons/ri';
+import { useUserInfoQuery } from '@/redux/features/user/user.api';
 
 const navigationLinks = [
   { url: "/", label: "Home", submenu: false, type: "", items: [] },
@@ -154,7 +155,7 @@ export default function GuestNavBar() {
                         <NavigationMenuItem key={index} className="w-full">
                           <Link to={link.url}
                             onClick={() => setOpen(false)}
-                            className={`${isActive ? "text-primary-600" : "text-gray-700"} duration-300 transition-all hover:text-primary-600`}
+                            className={`${isActive ? "text-primary-600" : "text-gray-700"} font-medium duration-300 transition-all hover:text-primary-600`}
                           >
                             {link.label}
                           </Link>
@@ -211,13 +212,17 @@ export default function GuestNavBar() {
               {/* Navigation menu */}
               <NavigationMenu viewport={false} className="max-lg:hidden w-full max-w-full">
                 <NavigationMenuList className="gap-2 xl:gap-6">
-                  {navigationLinks.map((link, index) => (
-                    <NavigationMenuItem key={index}>
-                      <Link to={link.url} className='text-muted-foreground py-1.5 px-2 text-base font-semibold text-gray-700 hover:text-primary-600'>
-                        {link.label}
-                      </Link>
-                    </NavigationMenuItem>
-                  ))}
+                  {navigationLinks.map((link, index) => {
+                    const isActive = location.pathname === link.url;
+
+                    return (
+                      <NavigationMenuItem key={index}>
+                        <Link to={link.url} className={`${isActive ? "text-primary-500" : "text-gray-700"} text-muted-foreground py-1.5 px-2 text-base font-semibold hover:text-primary-500`}>
+                          {link.label}
+                        </Link>
+                      </NavigationMenuItem>
+                    )
+                  })}
                 </NavigationMenuList>
               </NavigationMenu>
             </div>
