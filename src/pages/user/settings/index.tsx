@@ -328,8 +328,7 @@ const Settings = () => {
                                     return (
                                         (
                                             <li key={index} className="border border-gray-200 bg-gray-50 rounded-lg p-4">
-                                                <p className="font-medium text-gray-600">Provider: <span className="font-semibold capitalize">{auth?.provider}</span></p>
-                                                <span className="inline-block mt-2 text-sm px-3 py-1 rounded-full bg-green-100 font-medium text-green-700">Current</span>
+                                                <p className="font-medium text-gray-600">Login & Register with: <span className="font-bold capitalize text-primary-500">{auth?.provider}</span></p>
                                             </li>
                                         )
                                     )

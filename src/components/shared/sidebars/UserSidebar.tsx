@@ -27,7 +27,7 @@ export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
   const location = useLocation();
   const [logout] = useLogoutMutation();
   const dispatch = useAppDispatch();
-  const { data: userData, isLoading: isMenuLoading } = useUserInfoQuery(undefined);
+  const { data: userData, isLoading } = useUserInfoQuery(undefined);
 
   const handleLogout = async () => {
     await logout(undefined);
@@ -37,11 +37,15 @@ export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
   return (
     <Sidebar {...props} className="relative rounded-xl border border-gray-200 min-w-[305px] w-[305px] h-auto">
       <div className="p-5 border-b border-gray-200 flex gap-2">
-        {isMenuLoading ? (
+        {isLoading ? (
           <Skeleton className="h-12 w-full rounded-xl" />
         ) : (
           <>
-            <NotUserIcon minWidth="min-w-11" width="w-11" height="h-11" iconSize={28} />
+            {userData?.data?.picture ? (
+              <img className="min-w-11 w-11 h-11 rounded-full" src={userData?.data?.picture} alt="User profile photo" />
+            ) : (
+              <NotUserIcon minWidth="min-w-11" width="w-11" height="h-11" iconSize={28} />
+            )}
             <div>
               <h5 className="text-base font-semibold text-gray-800 tracking-tight">{userData?.data?.name}</h5>
               <p className="text-sm text-gray-600 break-all tracking-tight">{userData?.data?.email}</p>
