@@ -118,9 +118,9 @@ const Settings = () => {
                 toast.error("Something went wrong", { id: toastId });
             }
 
-        } catch (error) {
-            console.error("Profile update error:", error);
-            toast.error("Something went wrong", { id: toastId });
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        } catch (error: object | any) {
+            toast.error(error?.data?.message || "Something went wrong", { id: toastId });
         } finally {
             setIsLoginBtnLoading(false);
         }

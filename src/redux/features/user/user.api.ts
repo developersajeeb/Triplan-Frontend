@@ -17,10 +17,18 @@ export const authApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ["USER"],
         }),
+        toggleWishlist: builder.mutation({
+            query: (tourId: string) => ({
+                url: `/user/wishlist/${tourId}`,
+                method: "POST",
+            }),
+            invalidatesTags: ["USER"],
+        }),
     }),
 });
 
 export const {
     useUserInfoQuery,
     useUpdateUserInfoMutation,
+    useToggleWishlistMutation,
 } = authApi;
