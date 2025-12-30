@@ -18,12 +18,14 @@ import Logo from '@/assets/triPlan-logo.svg';
 import { RiLogoutCircleLine } from "react-icons/ri";
 import { authApi, useLogoutMutation } from "@/redux/features/auth/auth.api";
 import { useAppDispatch } from "@/redux/hook";
+import { useWishlist } from "@/hooks/useWishlist";
 
 const menuItems = {
   navMain: getSidebarMenus("ADMIN"),
 }
 
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { onLogoutCleanup } = useWishlist();
   const location = useLocation();
   const [logout] = useLogoutMutation();
   const dispatch = useAppDispatch();
@@ -31,6 +33,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
   const handleLogout = async () => {
     await logout(undefined);
     dispatch(authApi.util.resetApiState());
+    onLogoutCleanup();
   };
 
   return (

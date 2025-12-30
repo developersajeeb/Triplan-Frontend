@@ -18,12 +18,14 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { RiLogoutCircleLine } from "react-icons/ri"
 import { useAppDispatch } from "@/redux/hook"
 import { useUserInfoQuery } from "@/redux/features/user/user.api"
+import { useWishlist } from "@/hooks/useWishlist"
 
 const menuItems = {
   navMain: getSidebarMenus("USER"),
 }
 
 export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { onLogoutCleanup } = useWishlist();
   const location = useLocation();
   const [logout] = useLogoutMutation();
   const dispatch = useAppDispatch();
@@ -32,6 +34,7 @@ export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) 
   const handleLogout = async () => {
     await logout(undefined);
     dispatch(authApi.util.resetApiState());
+    onLogoutCleanup();
   };
 
   return (

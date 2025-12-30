@@ -4,58 +4,23 @@ import { FaLocationDot } from "react-icons/fa6";
 import { HiOutlineUsers } from "react-icons/hi2";
 import { LuNotepadText } from "react-icons/lu";
 import { TbCalendarClock } from "react-icons/tb";
-import { Link, useNavigate } from "react-router";
+import { Link } from "react-router";
 import type { ITourPackage } from "@/types";
 import ImageWaterMark from '@/assets/images/image-watermark.webp'
-import { useToggleWishlistMutation, useUserInfoQuery } from "@/redux/features/user/user.api";
-import { canAddMoreGuestWishlist, getGuestWishlist, setGuestWishlist } from "@/components/utilities/guestWishlist";
-import { useGuestWishlist } from "@/hooks/useGuestWishlist";
+import { useWishlist } from "@/hooks/useWishlist";
 
 interface Props {
     tour: ITourPackage;
 }
 
 const TourCardBox = ({ tour }: Props) => {
-    const navigate = useNavigate();
-    const { data: userData } = useUserInfoQuery(undefined);
-    const [toggleWishlist] = useToggleWishlistMutation();
-    const { wishlist: guestWishlist, refreshWishlist } = useGuestWishlist();
-    console.log(userData?.data?.wishlist);
-
-    const isLoggedIn = Boolean(userData?.data?._id);
-    const isInWishlist = guestWishlist.includes(tour._id);
-
-    const handleWishlistClick = async () => {
-        let wishlist = getGuestWishlist();
-        const exists = wishlist.includes(tour._id);
-
-        if (exists) {
-            wishlist = wishlist.filter(id => id !== tour._id);
-        } else {
-            if (!canAddMoreGuestWishlist()) {
-                navigate("/login");
-                return;
-            }
-            wishlist.push(tour._id);
-        }
-
-        setGuestWishlist(wishlist);
-        refreshWishlist();
-
-        if (isLoggedIn) {
-            try {
-                await toggleWishlist(tour._id).unwrap();
-            } catch (err) {
-                console.error(err);
-            }
-        }
-    };
+    const { isInWishlist, toggle } = useWishlist();
 
     return (
         <div className='group rounded-[10px] border border-gray-200 overflow-hidden bg-white shadow-[0px_4px_24px_0px_rgba(194, 194, 194, 0.25)]'>
             <div className='relative h-[200px] xl:h-[260px] overflow-hidden'>
                 <ul className='flex gap-2 justify-between absolute left-3 top-3 right-3 z-10'>
-                    <li onClick={handleWishlistClick} className='bg-white shadow w-6 h-6 rounded-full flex justify-center items-center cursor-pointer'><FaHeart className={`transition-colors duration-300 ${isInWishlist ? "text-red-500" : "text-gray-400"}`} size={14} /></li>
+                    <li onClick={() => toggle(tour._id)} className='bg-white shadow w-6 h-6 rounded-full flex justify-center items-center cursor-pointer'><FaHeart className={`transition-colors duration-300 ${isInWishlist(tour._id) ? "text-red-500" : "text-gray-400"}`} size={14} /></li>
                     <li className='text-xs text-white font-medium bg-primary-500 px-2 pr-3 py-1 rounded-full inline-flex items-center gap-1'><BiSolidHot size={14} /> Trending</li>
                 </ul>
                 <img src={tour?.images[0] || ImageWaterMark} className='h-[200px] lg:h-[260px] overflow-hidden duration-300 group-hover:scale-110 w-full rounded-t-[10px] object-cover' alt="Tour Slider" />

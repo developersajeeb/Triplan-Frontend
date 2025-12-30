@@ -26,6 +26,7 @@ import { getSidebarMenus } from '@/utils/getSidebarMenus';
 import { Skeleton } from '../ui/skeleton';
 import { RiLogoutCircleLine } from 'react-icons/ri';
 import { useUserInfoQuery } from '@/redux/features/user/user.api';
+import { useWishlist } from '@/hooks/useWishlist';
 
 const navigationLinks = [
   { url: "/", label: "Home", submenu: false, type: "", items: [] },
@@ -42,6 +43,7 @@ const userMenuItems = {
 }
 
 export default function GuestNavBar() {
+  const { onLogoutCleanup } = useWishlist();
   const location = useLocation();
   const { data: userData, isLoading: isMenuLoading } = useUserInfoQuery(undefined);
   const [isShowStickyHeader, setShowStickyHeader] = useState<boolean>(false);
@@ -70,6 +72,7 @@ export default function GuestNavBar() {
   const handleLogout = async () => {
     await logout(undefined);
     dispatch(authApi.util.resetApiState());
+    onLogoutCleanup();
   };
 
   return (
