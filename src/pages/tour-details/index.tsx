@@ -1,30 +1,131 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Button } from "@/components/ui/button";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import CommonMetadata from "@/components/utilities/CommonMetadata";
 import JsonLd from "@/components/utilities/JsonLd";
-import { useGetDivisionsQuery } from "@/redux/features/division/division.api";
-import { useGetAllToursQuery } from "@/redux/features/tour/tour.api";
-import { format } from "date-fns";
+import useFancyBox from "@/hooks/useFancybox";
+import { useWishlist } from "@/hooks/useWishlist";
+import { useGetSingleTourQuery } from "@/redux/features/tour/tour.api";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { FaFacebook, FaHeart, FaInstagram, FaLocationDot, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
+import { FiLink } from "react-icons/fi";
+import { GoShareAndroid } from "react-icons/go";
+import { LuCheck, LuImages, LuNotepadText } from "react-icons/lu";
 import { Link, useParams } from "react-router";
+import { toast } from "sonner";
+import { Pagination } from "swiper/modules";
+import { Swiper, SwiperSlide } from "swiper/react";
+import ImageWaterMark from "@/assets/images/image-watermark.webp";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Fancybox, type FancyboxOptions } from "@fancyapps/ui/dist/fancybox";
+import { MdOutlineWatchLater } from "react-icons/md";
+import { TbUsers } from "react-icons/tb";
+import { GrLocation } from "react-icons/gr";
+import { PiSealCheck } from "react-icons/pi";
+import { RxCross2 } from "react-icons/rx";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 export default function TourDetails() {
   const { slug } = useParams();
-  const { data: tour, isLoading } = useGetAllToursQuery({ slug: slug! });
-
-  const { data: divisionData } = useGetDivisionsQuery(
-    {
-      _id: tour?.data?.[0]?.division,
-      fields: "name",
-    },
-    {
-      skip: !tour?.data,
-    }
+  const { data: tourData, isLoading } = useGetSingleTourQuery(slug!);
+  console.log(tourData);
+  const { isInWishlist, toggle } = useWishlist();
+  const fancyBoxOptions: Partial<FancyboxOptions> = useMemo(
+    () => ({
+      Hash: false,
+      placeFocusBack: false,
+      dragToClose: true,
+    }),
+    []
   );
+  const [desktopFancyBoxRef] = useFancyBox(fancyBoxOptions);
+  const [mobileFancyBoxRef] = useFancyBox(fancyBoxOptions);
 
-  const tourData = tour?.data?.[0];
+  const shareUrl = `https://triplan.developersajeeb.com/tours/${tourData?.slug}`;
+  const shareText = encodeURIComponent(tourData?.title ?? "");
+  const [copied, setCopied] = useState<boolean>(false);
+
+  const limit = 350;
+  const text = tourData?.description ?? "";
+  const [isExpanded, setIsExpanded] = useState(false);
+  const [needsReadMore, setNeedsReadMore] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setNeedsReadMore(text.length > limit);
+  }, [text, limit]);
 
   if (isLoading) {
     return <p>Loading...</p>;
   }
+
+  const handleCopy = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+
+      setTimeout(() => {
+        setCopied(false);
+      }, 2000);
+    } catch (error) {
+      toast.error("Copy failed");
+    }
+  };
+
+  const handleImageError = (
+    e: React.SyntheticEvent<HTMLImageElement, Event>
+  ) => {
+    e.currentTarget.src = ImageWaterMark;
+    e.currentTarget.onerror = null;
+  };
+
+  const openGalleryFromStart = () => {
+    if (!tourData?.images?.length) return;
+
+    Fancybox.show(
+      tourData.images.map((img) => ({
+        src: img || ImageWaterMark,
+        type: "image",
+      })),
+      {
+        startIndex: 0,
+        placeFocusBack: false,
+      }
+    );
+  };
+
+  const getTotalDays = (startDate: string, endDate: string): number => {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    const diffTime = end.getTime() - start.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    return diffDays;
+  };
+
+  const faqItems = [
+    {
+      question: "What services does TripPlan offer?",
+      answer: "TripPlan offers complete travel management — including tour packages, hotel bookings, transport, adventure trips, and custom itinerary planning to make your journey hassle-free.",
+    },
+    {
+      question: "Can I customize my tour package?",
+      answer: "Yes! You can fully personalize your trip by choosing destinations, activities, and travel dates that match your preferences and budget.",
+    },
+    {
+      question: "Do you offer group discounts?",
+      answer: "Absolutely. We have special offers for group bookings, families, and corporate travelers. Contact our team for the best available deals.",
+    },
+    {
+      question: "How do I book a trip with TripPlan?",
+      answer: "Simply browse your desired destination, select a package, and click “Book Now.” You can also reach out to our travel experts for personalized guidance.",
+    },
+    {
+      question: "Is TripPlan a trusted tour operator?",
+      answer: "Yes — we work with verified global partners and provide transparent pricing, secure payments, and 24/7 support to ensure a reliable travel experience.",
+    },
+  ];
 
   return (
     <>
@@ -57,15 +158,285 @@ export default function TourDetails() {
             position: index + 1,
             item: step,
           })),
-          areaServed: divisionData?.data?.[0]?.name,
+          areaServed: tourData?.divisionName,
           departureLocation: tourData?.departureLocation,
           arrivalLocation: tourData?.arrivalLocation,
         }}
       />
 
-      <div className="container mx-auto p-6">
+      <div className="pt-6 pb-20">
         {/* Header */}
-        <div className="flex justify-between items-center  mb-8">
+        <section className="tp-container flex gap-4 mb-6">
+          <div className="flex-1">
+            <h1 className="text-3xl tracking-tight font-bold mb-3 text-gray-900">{tourData?.title}</h1>
+            <ul className="flex flex-wrap gap-4">
+              <li className='text-sm text-gray-600 font-medium mb-1'><span className='bg-[#FFCA18] text-[13px] text-gray-900 px-2 pt-[1px] pb-[2px] font-semibold rounded mr-[2px]'>4.8</span> <span className='hover:underline cursor-pointer duration-300'>(180 Reviews)</span></li>
+              <li className='text-sm text-gray-600 font-semibold flex gap-1'><LuNotepadText className='pt-[2px]' size={18} /> {tourData?.tourTypeName}</li>
+              <li className='text-sm text-gray-600 font-medium inline-flex gap-1 pr-3'><span><FaLocationDot size={14} className="mt-1" /></span> {tourData?.arrivalLocation + ", " + tourData?.divisionName}<span className="font-semibold text-primary-500 cursor-pointer">(View Map)</span></li>
+            </ul>
+          </div>
+
+          <div className="flex gap-2 fixed justify-between md:justify-normal md:relative bg-white md:bg-transparent left-0 right-0 bottom-0 p-3 md:p-0 shadow-[0px_0px_10px_0px_#00000012] md:shadow-none z-30">
+            <div className="md:hidden w-full sm:w-auto"><button type="button" className="tp-primary-btn w-full sm:w-auto h-11 !py-2">Check availability</button></div>
+            <div className="flex gap-2">
+              <Popover>
+                <PopoverTrigger asChild>
+                  <div className="bg-white border border-gray-200 hover:bg-gray-100 duration-300 w-11 h-11 rounded-full flex justify-center items-center cursor-pointer text-gray-500"><GoShareAndroid size={22} /></div>
+                </PopoverTrigger>
+                <PopoverContent className="w-auto focus-visible:outline-none">
+                  <div className="space-y-4">
+                    <Link to={`https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(shareUrl)}`}
+                      target="_blank"
+                      rel="noopener noreferrer" className="flex items-center gap-2 font-semibold text-sm text-gray-600 hover:text-primary-500 duration-300" ><span><FaFacebook size={18} /></span> Facebook
+                    </Link>
+                    <Link
+                      to="https://www.instagram.com/"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 font-semibold text-sm text-gray-600 hover:text-primary-500 duration-300" ><span><FaInstagram size={18} /></span> Instagram
+                    </Link>
+                    <Link to={`https://twitter.com/intent/tweet?url=${encodeURIComponent(
+                      shareUrl
+                    )}&text=${shareText}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 font-semibold text-sm text-gray-600 hover:text-primary-500 duration-300" ><span><FaXTwitter size={18} /></span> Twitter
+                    </Link>
+                    <Link to={`https://wa.me/?text=${encodeURIComponent(
+                      `${tourData?.title} - ${shareUrl}`
+                    )}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2 font-semibold text-sm text-gray-600 hover:text-primary-500 duration-300" ><span><FaWhatsapp size={18} /></span> Whatsapp
+                    </Link>
+                    <p onClick={handleCopy} className={`flex items-center gap-2 font-semibold text-sm ${copied ? 'text-primary-500' : 'text-gray-600'} hover:text-primary-500 duration-300 cursor-pointer`}><span><FiLink size={18} /></span> {copied ? "Copied!" : "Copy"}</p>
+                  </div>
+                </PopoverContent>
+              </Popover>
+              {tourData?._id && (
+                <div
+                  onClick={() => toggle(tourData._id)}
+                  className="bg-white border border-gray-200 w-11 h-11 rounded-full flex justify-center items-center cursor-pointer"
+                >
+                  <FaHeart
+                    size={20}
+                    className={`transition-colors duration-300 ${isInWishlist(tourData._id) ? "text-red-500" : "text-gray-400"
+                      }`}
+                  />
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+
+        {/* Gallery */}
+        <section>
+          <div ref={desktopFancyBoxRef} className="tp-container hidden md:grid grid-cols-12 gap-4">
+            {tourData?.images?.[0] && (
+              <a className="col-span-7 block" href={tourData.images[0] || ImageWaterMark} data-fancybox="gallery">
+                <img
+                  src={tourData.images[0] || ImageWaterMark}
+                  onError={handleImageError}
+                  className="w-full h-[360px] lg:h-[465px] object-cover rounded-xl"
+                  alt="Tour gallery image one"
+                />
+              </a>
+            )}
+            <div className="col-span-5 space-y-4">
+              {tourData?.images?.[1] && (
+                <a className="block" href={tourData.images[1] || ImageWaterMark} data-fancybox="gallery">
+                  <img
+                    src={tourData.images[1] || ImageWaterMark}
+                    onError={handleImageError}
+                    className="w-full h-[172px] lg:h-[224px] object-cover rounded-xl"
+                    alt="Tour gallery image two"
+                  />
+                </a>
+              )}
+              {tourData?.images?.[2] && (
+                <div className="relative">
+                  <a className="block" href={tourData.images[2] || ImageWaterMark} data-fancybox="gallery">
+                    <img
+                      src={tourData.images[2] || ImageWaterMark}
+                      onError={handleImageError}
+                      className="w-full h-[172px] lg:h-[224px] object-cover rounded-xl"
+                      alt="Tour gallery image three"
+                    />
+                  </a>
+                  {tourData.images.length > 3 && (
+                    <span onClick={openGalleryFromStart} className="cursor-pointer inline-flex items-center gap-1 text-base font-medium text-gray-600 bg-white bg-opacity-90 py-2 px-4 rounded-full absolute right-3 bottom-3"><LuImages size={20} /> All photos</span>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div ref={mobileFancyBoxRef} className="md:hidden">
+            <Swiper
+              className="swiper-pagination-dot !pb-[42px]"
+              pagination={{ clickable: true }}
+              loop
+              autoplay={{ delay: 2500, disableOnInteraction: false }}
+              slidesPerView={1}
+              spaceBetween={2}
+              modules={[Pagination]}
+              grabCursor={true}
+              breakpoints={{
+                640: {
+                  slidesPerView: 2,
+                },
+              }}
+            >
+              {isLoading
+                ? [...Array(3)].map((_, i) => (
+                  <SwiperSlide key={i}>
+                    <Skeleton className="w-full h-[260px]" />
+                  </SwiperSlide>
+                ))
+                : ((tourData?.images ?? []).length) > 0
+                  ? tourData?.images.map((galleryImg, index) => (
+                    <SwiperSlide key={index}>
+                      <a href={galleryImg || ImageWaterMark} data-fancybox="gallery">
+                        <img
+                          src={galleryImg || ImageWaterMark}
+                          onError={handleImageError}
+                          className="w-full h-[260px] object-cover"
+                          alt={`Tour gallery image ${index + 1}`}
+                        />
+                      </a>
+                    </SwiperSlide>
+                  ))
+                  : (
+                    <SwiperSlide>
+                      <p className="text-center font-medium text-xl text-gray-500 pt-5">
+                        No image available.
+                      </p>
+                    </SwiperSlide>
+                  )
+              }
+            </Swiper>
+          </div>
+        </section>
+
+        {/* Tour Details and booking card */}
+        <section className="tp-container mt-8">
+          {/* Content Side */}
+          <div>
+            <h3 className="text-2xl font-semibold text-gray-800 mb-6">Overview</h3>
+            <ul className="grid sm:grid-cols-2 gap-4 content-between">
+              <li className="flex gap-2 text-gray-600 font-medium">
+                <span className="text-primary-600"><MdOutlineWatchLater size={22} /></span> Duration:{" "}
+                <span className="font-semibold">
+                  {tourData?.startDate && tourData?.endDate ? (
+                    `${getTotalDays(tourData.startDate, tourData.endDate)} Days`
+                  ) : (
+                    "N/A"
+                  )}
+                </span>
+              </li>
+              <li className="flex gap-2 text-gray-600 font-medium">
+                <span className="text-primary-600"><LuNotepadText size={22} /></span> Tour Type:{" "}
+                <span className="font-semibold">{tourData?.tourTypeName || "N/A"}</span>
+              </li>
+              <li className="flex gap-2 text-gray-600 font-medium">
+                <span className="text-primary-600"><TbUsers size={22} /></span> On every tour:{" "}
+                <span className="font-semibold">{tourData?.maxGuest || "N/A"} guests (max)</span>
+              </li>
+              <li className="flex gap-2 text-gray-600 font-medium">
+                <span className="text-primary-600"><GrLocation size={22} /></span> Location:{" "}
+                <span className="font-semibold">{tourData?.location || "N/A"}</span>
+              </li>
+            </ul>
+
+            {tourData?.description && (
+              <div className="mt-6">
+                <div
+                  ref={contentRef}
+                  style={{
+                    maxHeight: isExpanded ? `${contentRef.current?.scrollHeight}px` : "150px",
+                    overflow: "hidden",
+                    transition: "max-height 0.5s ease",
+                  }}
+                >
+                  <p className="text-gray-600 font-medium">{tourData.description}</p>
+                </div>
+
+                {needsReadMore && (
+                  <button
+                    onClick={() => setIsExpanded(!isExpanded)}
+                    className="mt-2 text-blue-500 font-semibold"
+                  >
+                    {isExpanded ? "Read Less" : "Read More"}
+                  </button>
+                )}
+              </div>
+            )}
+
+            <div className="h-[1px] w-full bg-gray-200 my-8"></div>
+
+            {tourData?.amenities && (
+              <>
+                <h3 className="text-2xl font-semibold text-gray-800 mb-5">Amenities</h3>
+                <ul className="space-y-2">
+                  {tourData?.amenities.map((amenitiesItem, index) =>
+                    <li key={index} className="flex gap-2 text-gray-600 font-medium"><span className="text-primary-500 mt-[1px]"><PiSealCheck size={22} /></span> {amenitiesItem}</li>
+                  )}
+                </ul>
+
+                <div className="h-[1px] w-full bg-gray-200 my-8"></div>
+              </>
+            )}
+
+            {((tourData?.included && tourData.included.length > 0) ||
+              (tourData?.excluded && tourData.excluded.length > 0)) && (
+                <>
+                  <h3 className="text-2xl font-semibold text-gray-800 mb-5">Includes/Excludes</h3>
+
+                  <div className="grid sm:grid-cols-2 gap-4">
+                    <ul className="space-y-2">
+                      {tourData?.included.map((includedItem, index) =>
+                        <li key={index} className="flex gap-2 text-gray-800 font-medium"><span className="text-primary-500 mt-[1px]"><LuCheck size={20} /></span> {includedItem}</li>
+                      )}
+                    </ul>
+                    <ul className="space-y-2">
+                      {tourData?.excluded.map((excludedItem, index) =>
+                        <li key={index} className="flex gap-2 text-gray-800 font-medium"><span className="text-red-500 mt-[1px]"><RxCross2 size={20} /></span> {excludedItem}</li>
+                      )}
+                    </ul>
+                  </div>
+
+                  <div className="h-[0.5px] w-full bg-gray-200 my-8"></div>
+                </>
+              )}
+
+            <h3 className="text-2xl font-semibold text-gray-800 mb-5">Cancellation policy</h3>
+            <p className="text-gray-600 font-medium">You can cancel up to 24 hours in advance of the experience for a full refund.</p>
+
+            <div className="h-[1px] w-full bg-gray-200 my-8"></div>
+
+            <h3 className="text-2xl font-semibold text-gray-800 mb-5">Frequently asked questions</h3>
+            <Accordion type="single" collapsible className="w-full space-y-3" defaultValue={String(0)}>
+              {faqItems.map((item, index) => (
+                <AccordionItem value={String(index)} key={index} className="py-2 px-4 border border-gray-100 rounded-lg">
+                  <AccordionTrigger className="py-2 text-lg text-primary-950 leading-6 hover:no-underline">
+                    {item.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="pb-2 text-base font-medium text-gray-600">
+                    {item.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+            <div className="h-[1px] w-full bg-gray-200 my-8"></div>
+
+            <h3 className="text-2xl font-semibold text-gray-800 mb-5">Customer reviews</h3>
+          </div>
+
+          {/* Availability Check */}
+          <div></div>
+        </section>
+
+        {/* <div className="flex justify-between items-center  mb-8">
           <div>
             <h1 className="text-3xl font-bold mb-2">{tourData?.title}</h1>
             <div className="flex gap-4 text-gray-600 mb-4">
@@ -79,116 +450,7 @@ export default function TourDetails() {
               <Link to={`/booking/${tourData?.slug}`}>Book Now</Link>
             </Button>
           </div>
-        </div>
-
-        {/* Images */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
-          {tourData?.images?.map((image, index) => (
-            <img
-              key={index}
-              src={image}
-              alt={`${tourData?.title} ${index + 1}`}
-              className="w-full h-48 object-cover rounded-lg"
-            />
-          ))}
-        </div>
-
-        {/* Tour Info */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Tour Details</h2>
-            <div className="space-y-2">
-              <p>
-                <strong>Dates:</strong>{" "}
-                {format(
-                  new Date(
-                    tourData?.startDate ? tourData?.startDate : new Date()
-                  ),
-                  "PP"
-                )}{" "}
-                -{" "}
-                {format(
-                  new Date(tourData?.endDate ? tourData?.endDate : new Date()),
-                  "PP"
-                )}
-              </p>
-              <p>
-                <strong>Departure:</strong> {tourData?.departureLocation}
-              </p>
-              <p>
-                <strong>Arrival:</strong> {tourData?.arrivalLocation}
-              </p>
-              <p>
-                <strong>Division:</strong> {divisionData?.data?.[0]?.name}
-              </p>
-              <p>
-                <strong>Tour Type:</strong> {tourData?.tourType}
-              </p>
-              <p>
-                <strong>Min Age:</strong> {tourData?.minAge} years
-              </p>
-            </div>
-          </div>
-
-          <div>
-            <h2 className="text-xl font-semibold mb-4">Description</h2>
-            <p className="text-muted-foreground">{tourData?.description}</p>
-          </div>
-        </div>
-
-        {/* Amenities & Inclusions */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8">
-          <div>
-            <h3 className="text-lg font-semibold mb-3">Amenities</h3>
-            <ul className="space-y-1">
-              {tourData?.amenities?.map((amenity, index) => (
-                <li key={index} className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  {amenity}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold mb-3">Included</h3>
-            <ul className="space-y-1">
-              {tourData?.included?.map((item, index) => (
-                <li key={index} className="flex items-center">
-                  <span className="text-green-500 mr-2">✓</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-
-          <div>
-            <h3 className="text-lg font-semibold mb-3">Excluded</h3>
-            <ul className="space-y-1">
-              {tourData?.excluded?.map((item, index) => (
-                <li key={index} className="flex items-center">
-                  <span className="text-red-500 mr-2">✗</span>
-                  {item}
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Tour Plan */}
-        <div className="mb-8">
-          <h3 className="text-lg font-semibold mb-3">Tour Plan</h3>
-          <ol className="space-y-2">
-            {tourData?.tourPlan?.map((plan, index) => (
-              <li key={index} className="flex">
-                <span className="bg-blue-500 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm mr-3 mt-0.5">
-                  {index + 1}
-                </span>
-                {plan}
-              </li>
-            ))}
-          </ol>
-        </div>
+        </div> */}
       </div>
     </>
   );

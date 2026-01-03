@@ -14,11 +14,10 @@ import headerBg from '@/assets/images/line-pattern.png'
 import { Link, useLocation } from "react-router";
 import { TiLocationOutline } from 'react-icons/ti';
 import { IoTimeOutline } from 'react-icons/io5';
-import { IoMdLogIn, IoMdLogOut } from 'react-icons/io';
+import { IoMdLogIn } from 'react-icons/io';
 import { AiOutlineUserAdd } from 'react-icons/ai';
 import { useEffect, useRef, useState } from 'react';
 import { authApi, useLogoutMutation } from '@/redux/features/auth/auth.api';
-import { TbLayoutDashboard } from "react-icons/tb";
 import { useAppDispatch } from '@/redux/hook';
 import { role } from '@/constants/role';
 import WhiteSvgIcon from '../shared/blocks/WhiteSvgIcon';
@@ -27,6 +26,7 @@ import { Skeleton } from '../ui/skeleton';
 import { RiLogoutCircleLine } from 'react-icons/ri';
 import { useUserInfoQuery } from '@/redux/features/user/user.api';
 import { useWishlist } from '@/hooks/useWishlist';
+import NotUserIcon from '../shared/blocks/NotUserIcon';
 
 const navigationLinks = [
   { url: "/", label: "Home", submenu: false, type: "", items: [] },
@@ -85,23 +85,10 @@ export default function GuestNavBar() {
             <p className='flex items-center gap-1 text-sm font-semibold text-gray-600'><IoTimeOutline size={20} /> Sun to Friday: 8.00 am - 7.00 pm, Austria</p>
           </div>
 
-          <div className='flex items-center gap-4'>
-            {userData?.data?.email && (
-              <>
-                <Link to={`${userData?.data?.role === role.user && '/user' || userData?.data?.role === role.superAdmin && '/admin'}`} className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-500 duration-300'><TbLayoutDashboard size={16} /> My Dashboard</Link>
-                <span className='w-[2px] h-3 bg-gray-400 block'></span>
-                <button className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-white hover:bg-primary-500 hover:border-primary-500 border border-primary-600 px-3 py-1 rounded-full duration-300' onClick={handleLogout}>Log Out <IoMdLogOut size={16} /></button>
-              </>
-
-            )}
-            {!userData?.data?.email && (
-              <>
-                <Link to='/login' className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-500 duration-300'><IoMdLogIn size={20} /> Login</Link>
-                <span className='w-[2px] h-3 bg-gray-400 block'></span>
-                <Link to='/registration' className='flex items-center gap-1 text-sm font-semibold text-primary-700 hover:text-primary-500 duration-300'><AiOutlineUserAdd size={20} /> Registration</Link>
-              </>
-            )}
-          </div>
+          <ul className="flex gap-2 flex-wrap text-gray-600 mx-auto md:mx-0">
+            <li><Link to="/privacy-policy" className="hover:text-primary-400 duration-300 text-sm font-semibold">Privacy Policy</Link></li>{" "}|{" "}
+            <li><Link to="/terms-of-service" className="hover:text-primary-400 duration-300 text-sm font-semibold">Terms of Service</Link></li>
+          </ul>
         </div>
       </section>
       {isShowStickyHeader && <div style={{ height: headerHeight }}></div>}
@@ -208,10 +195,12 @@ export default function GuestNavBar() {
             </Popover>
 
             {/* Main nav */}
-            <div className="flex items-center gap-6 flex-1 w-full">
-              <Link to="/" className={`w-full inline-block ${isShowStickyHeader ? "max-w-[150px]" : "max-w-[150px] md:max-w-[160px] xl:max-w-[200px]"}`}>
-                <img src={Logo} alt="logo" />
-              </Link>
+            <div className="flex items-center gap-6 flex-1 w-full justify-between">
+              <div className='lg:w-[15%]'>
+                <Link to="/" className={`w-full inline-block ${isShowStickyHeader ? "max-w-[150px]" : "max-w-[140px] md:max-w-[160px]"}`}>
+                  <img src={Logo} alt="logo" />
+                </Link>
+              </div>
               {/* Navigation menu */}
               <NavigationMenu viewport={false} className="max-lg:hidden w-full max-w-full">
                 <NavigationMenuList className="gap-2 xl:gap-6">
@@ -228,14 +217,65 @@ export default function GuestNavBar() {
                   })}
                 </NavigationMenuList>
               </NavigationMenu>
+              {/* Right side */}
+              <div className="flex justify-end lg:w-[15%]">
+                {isMenuLoading ? (
+                  <Skeleton className="h-14 w-14 rounded-full" />
+                ) : (
+                  <>
+                    {userData?.data?.email && userData?.data?.role === role.user && (
+                      <Link to="/user/dashboard">
+                        {userData?.data?.picture ? (
+                          <img
+                            className="min-w-12 w-12 h-12 rounded-full border-4 border-primary-100"
+                            src={userData?.data?.picture}
+                            alt="User profile photo"
+                          />
+                        ) : (
+                          <NotUserIcon
+                            className="border-4 border-primary-100"
+                            minWidth="min-w-12"
+                            width="w-12"
+                            height="h-12"
+                            iconSize={26}
+                          />
+                        )}
+                      </Link>
+                    )}
+
+                    {userData?.data?.email && userData?.data?.role === role.superAdmin && (
+                      <Link to="/admin/dashboard">
+                        {userData?.data?.picture ? (
+                          <img
+                            className="min-w-12 w-12 h-12 rounded-full border-4 border-primary-100"
+                            src={userData?.data?.picture}
+                            alt="User profile photo"
+                          />
+                        ) : (
+                          <NotUserIcon
+                            className="border-4 border-primary-100"
+                            minWidth="min-w-12"
+                            width="w-12"
+                            height="h-12"
+                            iconSize={26}
+                          />
+                        )}
+                      </Link>
+                    )}
+
+                    {!userData?.data?.email && (
+                      <Link
+                        to="/login"
+                        className="tp-primary-btn flex items-center gap-3 !px-5 !py-3 md:!py-4 md:!px-9"
+                      >
+                        <span className="whitespace-nowrap">Login</span>
+                        <WhiteSvgIcon className="w-4 md:w-auto h-4 md:h-auto" />
+                      </Link>
+                    )}
+                  </>
+                )}
+              </div>
             </div>
-          </div>
-          {/* Right side */}
-          <div className="flex items-center">
-            <Link to={`${userData?.data?.email ? `/tours` : `/login`}`} className="tp-primary-btn flex items-center gap-3 !px-5 !py-3 md:!py-4 md:!px-9">
-              <span className="whitespace-nowrap">Book Now</span>
-              <WhiteSvgIcon className="w-4 md:w-auto h-4 md:h-auto" />
-            </Link>
           </div>
         </div>
       </header>

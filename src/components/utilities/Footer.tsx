@@ -86,8 +86,7 @@ const Footer = () => {
                                 <h4 className="text-white text-xl font-semibold mb-3">Company</h4>
                                 <ul className="space-y-2">
                                     <li><Link to="/" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">Home</Link></li>
-                                    <li><Link to="/about" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">About</Link></li>
-                                    <li><Link to="/services" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">Services</Link></li>
+                                    <li><Link to="/about-us" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">About</Link></li>
                                     <li><Link to="/blog" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">Blog</Link></li>
                                 </ul>
                             </div>
@@ -96,10 +95,8 @@ const Footer = () => {
                                 <ul className="space-y-2">
                                     <li><Link to="/tours" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">Tours</Link></li>
                                     <li><Link to="/destinations" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">Destinations</Link></li>
-                                    <li><Link to="/tour-guider" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">Tour Guider</Link></li>
-                                    <li><Link to="/contact" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">Contact</Link></li>
-                                    <li><Link to="/privacy-policy" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">Privacy Policy</Link></li>
-                                    <li><Link to="/terms-of-service" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">Terms Of Service</Link></li>
+                                    <li><Link to="/tour-guide" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">Tour Guider</Link></li>
+                                    <li><Link to="/contact-us" className="text-gray-300 hover:text-primary-300 duration-300 text-base font-medium">Contact</Link></li>
                                 </ul>
                             </div>
                             <div>

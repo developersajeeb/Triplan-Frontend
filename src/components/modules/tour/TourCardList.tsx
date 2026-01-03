@@ -7,21 +7,22 @@ import { TbCalendarClock } from "react-icons/tb";
 import { Link } from "react-router";
 import type { ITourPackage } from "@/types";
 import ImageWaterMark from '@/assets/images/image-watermark.webp'
+import { useWishlist } from "@/hooks/useWishlist";
 
 interface Props {
     tour: ITourPackage;
 }
 
 const TourCardList = ({ tour }: Props) => {
+    const { isInWishlist, toggle } = useWishlist();
+
     return (
         <div className='sm:flex sm:items-stretch group rounded-[10px] border border-gray-200 overflow-hidden bg-white shadow-[0px_4px_24px_0px_rgba(194,194,194,0.25)]'>
 
             {/* Image Section */}
             <div className='relative w-full h-[200px] sm:h-auto sm:max-w-[300px] sm:min-w-[300px] overflow-hidden'>
                 <ul className='flex gap-2 justify-between absolute left-3 top-3 right-3 z-10'>
-                    <li className='bg-white shadow w-6 h-6 rounded-full flex justify-center items-center cursor-pointer'>
-                        <FaHeart className='text-gray-400' size={14} />
-                    </li>
+                    <li onClick={() => toggle(tour._id)} className='bg-white shadow w-6 h-6 rounded-full flex justify-center items-center cursor-pointer'><FaHeart className={`transition-colors duration-300 ${isInWishlist(tour._id) ? "text-red-500" : "text-gray-400"}`} size={14} /></li>
                     <li className='text-xs text-white font-medium bg-primary-500 px-2 pr-3 py-1 rounded-full inline-flex items-center gap-1'>
                         <BiSolidHot size={14} /> Trending
                     </li>
