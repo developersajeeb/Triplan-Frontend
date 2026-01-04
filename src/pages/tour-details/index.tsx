@@ -1,5 +1,4 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
-import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import CommonMetadata from "@/components/utilities/CommonMetadata";
 import JsonLd from "@/components/utilities/JsonLd";
@@ -24,6 +23,8 @@ import { GrLocation } from "react-icons/gr";
 import { PiSealCheck } from "react-icons/pi";
 import { RxCross2 } from "react-icons/rx";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { TiStarFullOutline } from "react-icons/ti";
+import { Progress } from "@/components/ui/progress";
 
 export default function TourDetails() {
   const { slug } = useParams();
@@ -54,6 +55,13 @@ export default function TourDetails() {
   useEffect(() => {
     setNeedsReadMore(text.length > limit);
   }, [text, limit]);
+
+  const [progress, setProgress] = useState<number>(13);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setProgress(66), 500);
+    return () => clearTimeout(timer);
+  }, []);
 
   if (isLoading) {
     return <p>Loading...</p>;
@@ -319,32 +327,35 @@ export default function TourDetails() {
         </section>
 
         {/* Tour Details and booking card */}
-        <section className="tp-container mt-8">
+        <section className="tp-container mt-8 flex flex-col-reverse lg:flex-row gap-8">
           {/* Content Side */}
           <div>
             <h3 className="text-2xl font-semibold text-gray-800 mb-6">Overview</h3>
             <ul className="grid sm:grid-cols-2 gap-4 content-between">
               <li className="flex gap-2 text-gray-600 font-medium">
-                <span className="text-primary-600"><MdOutlineWatchLater size={22} /></span> Duration:{" "}
-                <span className="font-semibold">
-                  {tourData?.startDate && tourData?.endDate ? (
-                    `${getTotalDays(tourData.startDate, tourData.endDate)} Days`
-                  ) : (
-                    "N/A"
-                  )}
-                </span>
+                <span className="text-primary-600"><MdOutlineWatchLater size={22} /></span>
+                <p>
+                  Duration:{" "}
+                  <span className="font-semibold">
+                    {tourData?.startDate && tourData?.endDate ? (
+                      `${getTotalDays(tourData.startDate, tourData.endDate)} Days`
+                    ) : (
+                      "N/A"
+                    )}
+                  </span>
+                </p>
               </li>
               <li className="flex gap-2 text-gray-600 font-medium">
-                <span className="text-primary-600"><LuNotepadText size={22} /></span> Tour Type:{" "}
-                <span className="font-semibold">{tourData?.tourTypeName || "N/A"}</span>
+                <span className="text-primary-600"><LuNotepadText size={22} /></span>
+                <p>Tour Type:{" "}<span className="font-semibold">{tourData?.tourTypeName || "N/A"}</span></p>
               </li>
               <li className="flex gap-2 text-gray-600 font-medium">
-                <span className="text-primary-600"><TbUsers size={22} /></span> On every tour:{" "}
-                <span className="font-semibold">{tourData?.maxGuest || "N/A"} guests (max)</span>
+                <span className="text-primary-600"><TbUsers size={22} /></span>
+                <p>On every tour:{" "}<span className="font-semibold">{tourData?.maxGuest || "N/A"} guests (max)</span></p>
               </li>
               <li className="flex gap-2 text-gray-600 font-medium">
-                <span className="text-primary-600"><GrLocation size={22} /></span> Location:{" "}
-                <span className="font-semibold">{tourData?.location || "N/A"}</span>
+                <span className="text-primary-600"><GrLocation size={22} /></span> 
+                <p>Location:{" "}<span className="font-semibold">{tourData?.location || "N/A"}</span></p>
               </li>
             </ul>
 
@@ -427,13 +438,42 @@ export default function TourDetails() {
                 </AccordionItem>
               ))}
             </Accordion>
+
             <div className="h-[1px] w-full bg-gray-200 my-8"></div>
 
             <h3 className="text-2xl font-semibold text-gray-800 mb-5">Customer reviews</h3>
+            <div className="border border-gray-100 rounded-xl flex flex-col md:flex-row">
+              <div className="md:w-[180px] p-5 border-b md:border-r border-gray-100">
+                <h6 className="text-xl font-semibold text-gray-800 mb-2">Overall rating</h6>
+                <p className="tracking-tighter flex items-center"><span className="text-primary-500 text-3xl font-semibold inline-flex items-center gap-1"><TiStarFullOutline size={28} /> 5.0</span><span className="font-semibold text-lg text-gray-800 -mb-1">/5</span></p>
+                <p className="mt-1 text-gray-700">(1 review)</p>
+              </div>
+              <div className="p-5 flex-1">
+                <p className="text-lg font-semibold mb-4">Review summary</p>
+                <div className="grid sm:grid-cols-2 gap-x-5 md:gap-x-14 gap-y-3 sm:gap-y-5">
+                  <div>
+                    <p className="flex justify-between gap-2 text-gray-600 text-sm font-medium mb-1"><span>Guide</span> <span>5.0/5</span></p>
+                    <Progress value={progress} className="w-full bg-primary-500" />
+                  </div>
+                  <div>
+                    <p className="flex justify-between gap-2 text-gray-600 text-sm font-medium mb-1"><span>Service</span> <span>5.0/5</span></p>
+                    <Progress value={progress} className="w-full bg-primary-500" />
+                  </div>
+                  <div>
+                    <p className="flex justify-between gap-2 text-gray-600 text-sm font-medium mb-1"><span>Transportation</span> <span>5.0/5</span></p>
+                    <Progress value={progress} className="w-full bg-primary-500" />
+                  </div>
+                  <div>
+                    <p className="flex justify-between gap-2 text-gray-600 text-sm font-medium mb-1"><span>Organization</span> <span>5.0/5</span></p>
+                    <Progress value={progress} className="w-full bg-primary-500" />
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Availability Check */}
-          <div></div>
+          <div className="lg:min-w-[395px] lg:w-[395px] bg-red-100 p-5"></div>
         </section>
 
         {/* <div className="flex justify-between items-center  mb-8">
