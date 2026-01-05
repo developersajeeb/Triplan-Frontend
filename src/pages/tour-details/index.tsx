@@ -6,7 +6,7 @@ import useFancyBox from "@/hooks/useFancybox";
 import { useWishlist } from "@/hooks/useWishlist";
 import { useGetSingleTourQuery } from "@/redux/features/tour/tour.api";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FaFacebook, FaHeart, FaInstagram, FaLocationDot, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
+import { FaFacebook, FaHeart, FaInstagram, FaLocationDot, FaStar, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
 import { FiLink } from "react-icons/fi";
 import { GoShareAndroid } from "react-icons/go";
 import { LuCheck, LuImages, LuNotepadText } from "react-icons/lu";
@@ -25,22 +25,29 @@ import { RxCross2 } from "react-icons/rx";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { TiStarFullOutline } from "react-icons/ti";
 import { Progress } from "@/components/ui/progress";
+import NotUserIcon from "@/components/shared/blocks/NotUserIcon";
 
 export default function TourDetails() {
   const { slug } = useParams();
   const { data: tourData, isLoading } = useGetSingleTourQuery(slug!);
   console.log(tourData);
   const { isInWishlist, toggle } = useWishlist();
-  const fancyBoxOptions: Partial<FancyboxOptions> = useMemo(
-    () => ({
-      Hash: false,
-      placeFocusBack: false,
-      dragToClose: true,
-    }),
-    []
-  );
+  const fancyBoxOptions = {
+    Hash: false,
+    placeFocusBack: false,
+    dragToClose: true,
+
+    Toolbar: {
+      display: {
+        left: [],
+        middle: [],
+        right: ["close"],
+      },
+    },
+  } as unknown as FancyboxOptions;
   const [desktopFancyBoxRef] = useFancyBox(fancyBoxOptions);
   const [mobileFancyBoxRef] = useFancyBox(fancyBoxOptions);
+  const [reviewImageFancyBoxRef] = useFancyBox(fancyBoxOptions);
 
   const shareUrl = `https://triplan.developersajeeb.com/tours/${tourData?.slug}`;
   const shareText = encodeURIComponent(tourData?.title ?? "");
@@ -132,6 +139,25 @@ export default function TourDetails() {
     {
       question: "Is TripPlan a trusted tour operator?",
       answer: "Yes — we work with verified global partners and provide transparent pricing, secure payments, and 24/7 support to ensure a reliable travel experience.",
+    },
+  ];
+
+  const reviews = [
+    {
+      name: "Sajeeb Debnath",
+      date: "July 9, 2025",
+      rating: 5,
+      comment:
+        "Entire journey on the river cruise was amazing. This is the first such cruise dinner for my family.",
+      images: [ImageWaterMark, ImageWaterMark],
+    },
+    {
+      name: "Sajeeb Debnath",
+      date: "July 9, 2025",
+      rating: 5,
+      comment:
+        "We loved everything, right from table organising, food, music and the hospitality.",
+      images: [ImageWaterMark, ImageWaterMark],
     },
   ];
 
@@ -354,7 +380,7 @@ export default function TourDetails() {
                 <p>On every tour:{" "}<span className="font-semibold">{tourData?.maxGuest || "N/A"} guests (max)</span></p>
               </li>
               <li className="flex gap-2 text-gray-600 font-medium">
-                <span className="text-primary-600"><GrLocation size={22} /></span> 
+                <span className="text-primary-600"><GrLocation size={22} /></span>
                 <p>Location:{" "}<span className="font-semibold">{tourData?.location || "N/A"}</span></p>
               </li>
             </ul>
@@ -470,10 +496,58 @@ export default function TourDetails() {
                 </div>
               </div>
             </div>
+
+            {/* User Review */}
+            <div ref={reviewImageFancyBoxRef} className="mt-5 space-y-7">
+              {reviews.map((review, reviewIndex) => (
+                <div key={reviewIndex}>
+                  <div className="flex gap-2 items-center">
+                    <NotUserIcon minWidth="w-14" width="w-14" height="h-14" iconSize={30} />
+                    <div>
+                      <p className="font-semibold text-gray-800 text-lg">
+                        {review.name}
+                      </p>
+                      <p className="text-sm text-gray-600">{review.date}</p>
+                    </div>
+                  </div>
+
+                  <ul className="flex gap-1 mt-4 mb-3">
+                    {[...Array(review.rating)].map((_, i) => (
+                      <li key={i}>
+                        <FaStar size={20} className="text-primary-500" />
+                      </li>
+                    ))}
+                  </ul>
+
+                  <p className="mt-3 mb-4 text-gray-600 font-medium">
+                    {review.comment}
+                  </p>
+
+                  <div className="flex flex-wrap gap-3">
+                    {review.images.map((img, imgIndex) => (
+                      <a
+                        key={imgIndex}
+                        href={img}
+                        data-fancybox={`review-${reviewIndex}`}
+                        className="min-w-20 w-20 h-20"
+                      >
+                        <img
+                          src={img}
+                          alt="Review image"
+                          className="w-full h-full object-cover rounded-lg"
+                        />
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Availability Check */}
-          <div className="lg:min-w-[395px] lg:w-[395px] bg-red-100 p-5"></div>
+          <div className="lg:min-w-[395px] lg:w-[395px]">
+              <div className="shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] p-6 rounded-2xl border border-gray-200"></div>
+          </div>
         </section>
 
         {/* <div className="flex justify-between items-center  mb-8">
