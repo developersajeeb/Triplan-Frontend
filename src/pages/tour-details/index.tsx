@@ -5,11 +5,11 @@ import JsonLd from "@/components/utilities/JsonLd";
 import useFancyBox from "@/hooks/useFancybox";
 import { useWishlist } from "@/hooks/useWishlist";
 import { useGetSingleTourQuery } from "@/redux/features/tour/tour.api";
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { FaFacebook, FaHeart, FaInstagram, FaLocationDot, FaStar, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
 import { FiLink } from "react-icons/fi";
 import { GoShareAndroid } from "react-icons/go";
-import { LuCheck, LuImages, LuNotepadText } from "react-icons/lu";
+import { LuCalendarFold, LuCheck, LuImages, LuNotepadText } from "react-icons/lu";
 import { Link, useParams } from "react-router";
 import { toast } from "sonner";
 import { Pagination } from "swiper/modules";
@@ -26,10 +26,13 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { TiStarFullOutline } from "react-icons/ti";
 import { Progress } from "@/components/ui/progress";
 import NotUserIcon from "@/components/shared/blocks/NotUserIcon";
+import { Button } from "@/components/ui/button";
+import { Calendar } from "@/components/ui/calendar";
+import { format } from "date-fns";
 
 export default function TourDetails() {
   const { slug } = useParams();
-  const { data: tourData, isLoading } = useGetSingleTourQuery(slug!);
+  const { data: tourData, isLoading, isError } = useGetSingleTourQuery(slug!);
   console.log(tourData);
   const { isInWishlist, toggle } = useWishlist();
   const fancyBoxOptions = {
@@ -48,6 +51,10 @@ export default function TourDetails() {
   const [desktopFancyBoxRef] = useFancyBox(fancyBoxOptions);
   const [mobileFancyBoxRef] = useFancyBox(fancyBoxOptions);
   const [reviewImageFancyBoxRef] = useFancyBox(fancyBoxOptions);
+  const [guestCount, setGuestCount] = useState<number>(1);
+  const [totalAmount, setTotalAmount] = useState<number>(0);
+  const [openCalendar, setOpenCalendar] = useState<boolean>(false)
+  const [date, setDate] = useState<Date | undefined>(undefined)
 
   const shareUrl = `https://triplan.developersajeeb.com/tours/${tourData?.slug}`;
   const shareText = encodeURIComponent(tourData?.title ?? "");
@@ -58,6 +65,22 @@ export default function TourDetails() {
   const [isExpanded, setIsExpanded] = useState(false);
   const [needsReadMore, setNeedsReadMore] = useState(false);
   const contentRef = useRef<HTMLDivElement>(null);
+  const today = new Date();
+  const currentYear = today.getFullYear();
+
+  useEffect(() => {
+    if (!isLoading && !isError) {
+      setTotalAmount(guestCount * tourData!.costFrom);
+    }
+  }, [guestCount, totalAmount, isLoading, isError, tourData]);
+
+  // const incrementGuest = () => {
+  //   setGuestCount((prv) => prv + 1);
+  // };
+
+  // const decrementGuest = () => {
+  //   setGuestCount((prv) => prv - 1);
+  // };
 
   useEffect(() => {
     setNeedsReadMore(text.length > limit);
@@ -355,7 +378,7 @@ export default function TourDetails() {
         {/* Tour Details and booking card */}
         <section className="tp-container mt-8 flex flex-col-reverse lg:flex-row gap-8">
           {/* Content Side */}
-          <div>
+          <div className="flex-1">
             <h3 className="text-2xl font-semibold text-gray-800 mb-6">Overview</h3>
             <ul className="grid sm:grid-cols-2 gap-4 content-between">
               <li className="flex gap-2 text-gray-600 font-medium">
@@ -409,7 +432,7 @@ export default function TourDetails() {
               </div>
             )}
 
-            <div className="h-[1px] w-full bg-gray-200 my-8"></div>
+            <div className="border-b w-full border-gray-200 my-8"></div>
 
             {tourData?.amenities && (
               <>
@@ -420,7 +443,7 @@ export default function TourDetails() {
                   )}
                 </ul>
 
-                <div className="h-[1px] w-full bg-gray-200 my-8"></div>
+                <div className="border-b w-full border-gray-200 my-8"></div>
               </>
             )}
 
@@ -442,19 +465,14 @@ export default function TourDetails() {
                     </ul>
                   </div>
 
-                  <div className="h-[0.5px] w-full bg-gray-200 my-8"></div>
+                  <div className="border-b w-full border-gray-200 my-8"></div>
                 </>
               )}
-
-            <h3 className="text-2xl font-semibold text-gray-800 mb-5">Cancellation policy</h3>
-            <p className="text-gray-600 font-medium">You can cancel up to 24 hours in advance of the experience for a full refund.</p>
-
-            <div className="h-[1px] w-full bg-gray-200 my-8"></div>
 
             <h3 className="text-2xl font-semibold text-gray-800 mb-5">Frequently asked questions</h3>
             <Accordion type="single" collapsible className="w-full space-y-3" defaultValue={String(0)}>
               {faqItems.map((item, index) => (
-                <AccordionItem value={String(index)} key={index} className="py-2 px-4 border border-gray-100 rounded-lg">
+                <AccordionItem value={String(index)} key={index} className="py-2 px-4 border bg-gray-50 rounded-lg">
                   <AccordionTrigger className="py-2 text-lg text-primary-950 leading-6 hover:no-underline">
                     {item.question}
                   </AccordionTrigger>
@@ -465,7 +483,12 @@ export default function TourDetails() {
               ))}
             </Accordion>
 
-            <div className="h-[1px] w-full bg-gray-200 my-8"></div>
+            <div className="border-b w-full border-gray-200 my-8"></div>
+
+            <h3 className="text-2xl font-semibold text-gray-800 mb-5">Cancellation policy</h3>
+            <p className="text-gray-600 font-medium">You can cancel up to 24 hours in advance of the experience for a full refund.</p>
+
+            <div className="border-b w-full border-gray-200 my-8"></div>
 
             <h3 className="text-2xl font-semibold text-gray-800 mb-5">Customer reviews</h3>
             <div className="border border-gray-100 rounded-xl flex flex-col md:flex-row">
@@ -546,7 +569,42 @@ export default function TourDetails() {
 
           {/* Availability Check */}
           <div className="lg:min-w-[395px] lg:w-[395px]">
-              <div className="shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] p-6 rounded-2xl border border-gray-200"></div>
+            <div className="shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] p-6 rounded-2xl border border-gray-200">
+              <p className="text-base text-gray-700 font-medium flex justify-between"><span>from</span> <span className="inline-block px-3 py-1 bg-green-500 text-white text-sm rounded-full font-semibold">-5%</span></p>
+              <p className="text-primary-500"><span className="text-[24px] font-semibold tracking-tighter">৳{tourData?.costFrom}</span><span className="text-base font-medium">/person</span></p>
+              <p className="text-base text-gray-500 font-semibold line-through tracking-tighter -mt-1">৳30000</p>
+
+              <ul>
+                <li className="flex justify-between gap-2 border-t border-b border-gray-200 py-3 mt-4">
+                  <span className="font-semibold text-gray-700">Date</span>
+                  <Popover open={openCalendar} onOpenChange={setOpenCalendar}>
+                    <PopoverTrigger asChild>
+                      <Button
+                        type="button"
+                        id="date"
+                        className="flex gap-2 w-auto h-auto text-left text-gray-700 font-semibold text-base tracking-tighter bg-transparent p-0 shadow-none hover:bg-transparent"
+                      >
+                        <span><LuCalendarFold size={22} /></span>
+                        {date ? format(date, "MMM dd, yyyy") : "Select date"}
+                      </Button>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                      <Calendar
+                        mode="single"
+                        selected={date}
+                        startMonth={new Date(currentYear, today.getMonth())}
+                        endMonth={new Date(currentYear + 10, 11)}
+                        disabled={{ before: today }}
+                        onSelect={(date) => {
+                          setDate(date);
+                          setOpenCalendar(false);
+                        }}
+                      />
+                    </PopoverContent>
+                  </Popover>
+                </li>
+              </ul>
+            </div>
           </div>
         </section>
 
