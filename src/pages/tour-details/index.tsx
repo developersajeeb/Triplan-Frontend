@@ -9,7 +9,7 @@ import { useEffect, useRef, useState } from "react";
 import { FaFacebook, FaHeart, FaInstagram, FaLocationDot, FaStar, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
 import { FiLink } from "react-icons/fi";
 import { GoShareAndroid } from "react-icons/go";
-import { LuCalendarFold, LuCheck, LuImages, LuNotepadText } from "react-icons/lu";
+import { LuCalendarFold, LuCheck, LuImages, LuNotepadText, LuSend } from "react-icons/lu";
 import { Link, useParams } from "react-router";
 import { toast } from "sonner";
 import { Pagination } from "swiper/modules";
@@ -29,11 +29,34 @@ import NotUserIcon from "@/components/shared/blocks/NotUserIcon";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
+import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
+import z from "zod";
+import { useForm, type FieldValues, type SubmitHandler } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { HiOutlineLocationMarker } from "react-icons/hi";
+import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import { RiLoaderLine } from "react-icons/ri";
+import { Textarea } from "@/components/ui/textarea";
+
+const bookingSchema = z.object({
+  date: z.any().refine((val) => val instanceof Date, {
+    message: "Please select a date",
+  }),
+  adult: z.number().min(1, "At least 1 adult is required"),
+  children: z.number().min(0),
+  infant: z.number().min(0),
+});
+
+type BookingFormValues = z.infer<typeof bookingSchema>;
 
 export default function TourDetails() {
   const { slug } = useParams();
-  const { data: tourData, isLoading, isError } = useGetSingleTourQuery(slug!);
-  console.log(tourData);
+  const { data: tourData, isLoading } = useGetSingleTourQuery(slug!);
+  // console.log(tourData);
+
   const { isInWishlist, toggle } = useWishlist();
   const fancyBoxOptions = {
     Hash: false,
@@ -51,8 +74,6 @@ export default function TourDetails() {
   const [desktopFancyBoxRef] = useFancyBox(fancyBoxOptions);
   const [mobileFancyBoxRef] = useFancyBox(fancyBoxOptions);
   const [reviewImageFancyBoxRef] = useFancyBox(fancyBoxOptions);
-  const [guestCount, setGuestCount] = useState<number>(1);
-  const [totalAmount, setTotalAmount] = useState<number>(0);
   const [openCalendar, setOpenCalendar] = useState<boolean>(false)
   const [date, setDate] = useState<Date | undefined>(undefined)
 
@@ -62,25 +83,59 @@ export default function TourDetails() {
 
   const limit = 350;
   const text = tourData?.description ?? "";
-  const [isExpanded, setIsExpanded] = useState(false);
-  const [needsReadMore, setNeedsReadMore] = useState(false);
+  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [needsReadMore, setNeedsReadMore] = useState<boolean>(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const today = new Date();
-  const currentYear = today.getFullYear();
+  const [month, setMonth] = useState<Date>(date ?? today);
+  const enquiryForm = useForm({
+    mode: "onSubmit",
+  });
+  const [isLoginBtnLoading, setIsLoginBtnLoading] = useState<boolean>(false);
+  const [openEnquiry, setOpenEnquiry] = useState<boolean>(false);
+
+  const enquiryOnSubmit: SubmitHandler<FieldValues> = async (data) => {
+    try {
+      setIsLoginBtnLoading(true);
+      console.log("Form Data:", data);
+      toast.success("Thank you for reaching out. We will get back to you shortly.");
+      enquiryForm.reset();
+      setOpenEnquiry(false);
+    } catch (error) {
+      console.error("Subscription error:", error);
+      toast.error("Something went wrong. Please try again.");
+    } finally {
+      setIsLoginBtnLoading(false);
+    }
+  };
+
+  const {
+    watch,
+    setValue,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<BookingFormValues>({
+    resolver: zodResolver(bookingSchema),
+    defaultValues: {
+      date: undefined,
+      adult: 1,
+      children: 0,
+      infant: 0,
+    },
+  });
+  const selectedDate = watch("date");
+  const adult = watch("adult");
+  const children = watch("children");
+  const infant = watch("infant");
+  const allErrors = Object.values(errors)
+    .map((e) => e?.message)
+    .filter((msg): msg is string => typeof msg === "string");
 
   useEffect(() => {
-    if (!isLoading && !isError) {
-      setTotalAmount(guestCount * tourData!.costFrom);
+    if (date) {
+      setMonth(date);
     }
-  }, [guestCount, totalAmount, isLoading, isError, tourData]);
-
-  // const incrementGuest = () => {
-  //   setGuestCount((prv) => prv + 1);
-  // };
-
-  // const decrementGuest = () => {
-  //   setGuestCount((prv) => prv - 1);
-  // };
+  }, [date]);
 
   useEffect(() => {
     setNeedsReadMore(text.length > limit);
@@ -140,6 +195,47 @@ export default function TourDetails() {
     const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 
     return diffDays;
+  };
+
+  const Counter = ({
+    label,
+    ageInfo,
+    value,
+    min,
+    onChange,
+  }: {
+    label: string;
+    ageInfo: string;
+    value: number;
+    min: number;
+    onChange: (val: number) => void;
+  }) => (
+    <li className="flex justify-between border-b py-3 last-of-type:border-none">
+      <p className="font-semibold text-gray-700">{label} <span className="text-sm">{ageInfo}</span></p>
+      <div className="flex items-center">
+        <button
+          className="text-gray-600 hover:bg-primary-950 hover:text-white rounded-full duration-300 disabled:opacity-35 disabled:pointer-events-none"
+          type="button"
+          disabled={value <= min}
+          onClick={() => onChange(Math.max(min, value - 1))}
+        >
+          <CiCircleMinus size={24} />
+        </button>
+        <span className="w-8 text-center font-medium">{value}</span>
+        <button
+          className="text-gray-600 hover:bg-primary-950 hover:text-white rounded-full duration-300"
+          type="button"
+          onClick={() => onChange(value + 1)}
+        >
+          <CiCirclePlus size={24} />
+        </button>
+      </div>
+    </li>
+  );
+
+  const onSubmit = (data: BookingFormValues) => {
+    console.log(data);
+    // date, adult, children, infant — all validated
   };
 
   const faqItems = [
@@ -229,7 +325,7 @@ export default function TourDetails() {
             <ul className="flex flex-wrap gap-4">
               <li className='text-sm text-gray-600 font-medium mb-1'><span className='bg-[#FFCA18] text-[13px] text-gray-900 px-2 pt-[1px] pb-[2px] font-semibold rounded mr-[2px]'>4.8</span> <span className='hover:underline cursor-pointer duration-300'>(180 Reviews)</span></li>
               <li className='text-sm text-gray-600 font-semibold flex gap-1'><LuNotepadText className='pt-[2px]' size={18} /> {tourData?.tourTypeName}</li>
-              <li className='text-sm text-gray-600 font-medium inline-flex gap-1 pr-3'><span><FaLocationDot size={14} className="mt-1" /></span> {tourData?.arrivalLocation + ", " + tourData?.divisionName}<span className="font-semibold text-primary-500 cursor-pointer">(View Map)</span></li>
+              <li className='text-sm text-gray-600 font-medium inline-flex gap-1 pr-3'><span><HiOutlineLocationMarker size={18} /></span> {tourData?.arrivalLocation + ", " + tourData?.divisionName}<span className="font-semibold text-primary-500 cursor-pointer">(View Map)</span></li>
             </ul>
           </div>
 
@@ -575,7 +671,7 @@ export default function TourDetails() {
               <p className="text-base text-gray-500 font-semibold line-through tracking-tighter -mt-1">৳30000</p>
 
               <ul>
-                <li className="flex justify-between gap-2 border-t border-b border-gray-200 py-3 mt-4">
+                <li className="flex justify-between gap-2 border-b border-gray-200 py-3 mt-4">
                   <span className="font-semibold text-gray-700">Date</span>
                   <Popover open={openCalendar} onOpenChange={setOpenCalendar}>
                     <PopoverTrigger asChild>
@@ -585,25 +681,212 @@ export default function TourDetails() {
                         className="flex gap-2 w-auto h-auto text-left text-gray-700 font-semibold text-base tracking-tighter bg-transparent p-0 shadow-none hover:bg-transparent"
                       >
                         <span><LuCalendarFold size={22} /></span>
-                        {date ? format(date, "MMM dd, yyyy") : "Select date"}
+                        {selectedDate ? format(selectedDate, "MMM dd, yyyy") : "Select date"}
                       </Button>
                     </PopoverTrigger>
-                    <PopoverContent className="w-auto overflow-hidden p-0" align="start">
+                    <PopoverContent className="w-auto overflow-hidden p-0" align="end">
                       <Calendar
                         mode="single"
-                        selected={date}
-                        startMonth={new Date(currentYear, today.getMonth())}
-                        endMonth={new Date(currentYear + 10, 11)}
+                        selected={selectedDate}
+                        month={month}
+                        onMonthChange={setMonth}
                         disabled={{ before: today }}
-                        onSelect={(date) => {
-                          setDate(date);
+                        onSelect={(d) => {
+                          setValue("date", d!, { shouldValidate: true });
                           setOpenCalendar(false);
                         }}
                       />
                     </PopoverContent>
                   </Popover>
                 </li>
+                <Counter
+                  label="Adult"
+                  ageInfo="(Age 13+)"
+                  value={adult}
+                  min={1}
+                  onChange={(v) => setValue("adult", v, { shouldValidate: true })}
+                />
+                <Counter
+                  label="Children"
+                  ageInfo="(Age 3 - 12)"
+                  value={children}
+                  min={0}
+                  onChange={(v) => setValue("children", v)}
+                />
+                <Counter
+                  label="Infant"
+                  ageInfo="(Age 0 - 2)"
+                  value={infant}
+                  min={0}
+                  onChange={(v) => setValue("infant", v)}
+                />
               </ul>
+              {allErrors.length > 0 && (
+                <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3">
+                  <ul className="list-disc list-inside space-y-1 text-sm text-red-600 font-medium">
+                    {allErrors.map((msg, i) => (
+                      <li key={i}>{msg}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              <Button onClick={handleSubmit(onSubmit)} className="tp-primary-btn h-12 w-full mt-5">Check Availability</Button>
+              <Dialog
+                open={openEnquiry}
+                onOpenChange={(open) => {
+                  setOpenEnquiry(open);
+
+                  if (!open) {
+                    enquiryForm.reset();
+                  }
+                }}>
+                <DialogTrigger asChild>
+                  <Button type="button" className="tp-transparent-black-btn h-12 w-full mt-3">Make enquiry</Button>
+                </DialogTrigger>
+                <DialogContent className="max-w-[550px]">
+                  <DialogHeader>
+                    <DialogTitle>Make enquiry</DialogTitle>
+                    <DialogDescription>
+                      Have a question before booking? Message us to learn more.
+                    </DialogDescription>
+                  </DialogHeader>
+                  <form onSubmit={enquiryForm.handleSubmit(enquiryOnSubmit)}>
+                    <Form {...enquiryForm}>
+                      <div className="grid sm:grid-cols-2 gap-5 mt-5 mb-4">
+                        <FormField
+                          control={enquiryForm.control}
+                          name="name"
+                          rules={{ required: "Name is required" }}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <div>
+                                  <Label className="font-semibold text-gray-600 text-sm">
+                                    Name<span className="text-destructive text-base">*</span>
+                                  </Label>
+                                  <Input
+                                    className="tp-input w-full mt-1"
+                                    placeholder="Your full name"
+                                    {...field}
+                                    value={field.value || ""}
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+
+                        <FormField
+                          control={enquiryForm.control}
+                          name="email"
+                          rules={{
+                            required: "Email is required",
+                            pattern: {
+                              value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
+                              message: "Enter a valid email address",
+                            },
+                          }}
+                          render={({ field }) => (
+                            <FormItem>
+                              <FormControl>
+                                <div>
+                                  <Label className="font-semibold text-gray-600 text-sm">
+                                    Email<span className="text-destructive text-base">*</span>
+                                  </Label>
+                                  <Input
+                                    className="tp-input w-full mt-1"
+                                    placeholder="example@gmail.com"
+                                    {...field}
+                                    value={field.value || ""}
+                                  />
+                                </div>
+                              </FormControl>
+                              <FormMessage />
+                            </FormItem>
+                          )}
+                        />
+                      </div>
+                      <FormField
+                        control={enquiryForm.control}
+                        name="phone"
+                        rules={{
+                          required: "Phone number is required",
+                          pattern: {
+                            value: /^[0-9+\-\s()]{8,20}$/,
+                            message: "Enter a valid phone number",
+                          },
+                        }}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormControl>
+                              <div>
+                                <Label className="font-semibold text-gray-600 text-sm">
+                                  Phone<span className="text-destructive text-base">*</span>
+                                </Label>
+                                <Input
+                                  className="tp-input w-full mt-1"
+                                  placeholder="+880 1234 567 890"
+                                  {...field}
+                                  value={field.value || ""}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+
+                      <FormField
+                        control={enquiryForm.control}
+                        name="message"
+                        rules={{ required: "Message is required" }}
+                        render={({ field }) => (
+                          <FormItem className="mt-4">
+                            <FormControl>
+                              <div>
+                                <Label className="font-semibold text-gray-600 text-sm">
+                                  How can we help?<span className="text-destructive text-base">*</span>
+                                </Label>
+                                <Textarea
+                                  className="tp-input !py-3 w-full mt-1 min-h-[120px]"
+                                  placeholder="Write your message..."
+                                  {...field}
+                                  value={field.value || ""}
+                                />
+                              </div>
+                            </FormControl>
+                            <FormMessage />
+                          </FormItem>
+                        )}
+                      />
+                    </Form>
+                    <DialogFooter className="mt-4 flex-row justify-end space-x-1">
+                      <DialogClose asChild>
+                        <Button type="button" className="tp-cancel-btn !py-[18px] !px-5 !rounded-full">
+                          Cancel
+                        </Button>
+                      </DialogClose>
+
+                      <Button
+                        disabled={isLoginBtnLoading}
+                        type="submit"
+                        className={`tp-primary-btn-light !py-5 !px-5 ${isLoginBtnLoading && "pointer-events-none"}`}
+                      >
+                        {isLoginBtnLoading ? (
+                          <>
+                            Sending <RiLoaderLine className="ml-2 w-4 h-4 animate-spin" />
+                          </>
+                        ) : (
+                          <>
+                            Send <LuSend size={20} className="ml-2" />
+                          </>
+                        )}
+                      </Button>
+                    </DialogFooter>
+                  </form>
+                </DialogContent>
+              </Dialog>
             </div>
           </div>
         </section>
