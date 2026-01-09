@@ -6,7 +6,7 @@ import useFancyBox from "@/hooks/useFancybox";
 import { useWishlist } from "@/hooks/useWishlist";
 import { useGetSingleTourQuery } from "@/redux/features/tour/tour.api";
 import { useEffect, useRef, useState } from "react";
-import { FaFacebook, FaHeart, FaInstagram, FaLocationDot, FaStar, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
+import { FaFacebook, FaHeart, FaInstagram, FaStar, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
 import { FiLink } from "react-icons/fi";
 import { GoShareAndroid } from "react-icons/go";
 import { LuCalendarFold, LuCheck, LuImages, LuNotepadText, LuSend } from "react-icons/lu";
@@ -75,7 +75,6 @@ export default function TourDetails() {
   const [mobileFancyBoxRef] = useFancyBox(fancyBoxOptions);
   const [reviewImageFancyBoxRef] = useFancyBox(fancyBoxOptions);
   const [openCalendar, setOpenCalendar] = useState<boolean>(false)
-  const [date, setDate] = useState<Date | undefined>(undefined)
 
   const shareUrl = `https://triplan.developersajeeb.com/tours/${tourData?.slug}`;
   const shareText = encodeURIComponent(tourData?.title ?? "");
@@ -87,7 +86,7 @@ export default function TourDetails() {
   const [needsReadMore, setNeedsReadMore] = useState<boolean>(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const today = new Date();
-  const [month, setMonth] = useState<Date>(date ?? today);
+  const [month, setMonth] = useState<Date>(today);
   const enquiryForm = useForm({
     mode: "onSubmit",
   });
@@ -130,12 +129,6 @@ export default function TourDetails() {
   const allErrors = Object.values(errors)
     .map((e) => e?.message)
     .filter((msg): msg is string => typeof msg === "string");
-
-  useEffect(() => {
-    if (date) {
-      setMonth(date);
-    }
-  }, [date]);
 
   useEffect(() => {
     setNeedsReadMore(text.length > limit);
@@ -733,7 +726,7 @@ export default function TourDetails() {
               <Button onClick={handleSubmit(onSubmit)} className="tp-primary-btn h-12 w-full mt-5">Check Availability</Button>
               <Dialog
                 open={openEnquiry}
-                onOpenChange={(open) => {
+                onOpenChange={(open: boolean | ((prevState: boolean) => boolean)) => {
                   setOpenEnquiry(open);
 
                   if (!open) {
@@ -890,22 +883,6 @@ export default function TourDetails() {
             </div>
           </div>
         </section>
-
-        {/* <div className="flex justify-between items-center  mb-8">
-          <div>
-            <h1 className="text-3xl font-bold mb-2">{tourData?.title}</h1>
-            <div className="flex gap-4 text-gray-600 mb-4">
-              <span>📍 {tourData?.location}</span>
-              <span>💰 From ${tourData?.costFrom}</span>
-              <span>👥 Max {tourData?.maxGuest} guests</span>
-            </div>
-          </div>
-          <div>
-            <Button asChild className="tp-primary-btn h-12">
-              <Link to={`/booking/${tourData?.slug}`}>Book Now</Link>
-            </Button>
-          </div>
-        </div> */}
       </div>
     </>
   );
