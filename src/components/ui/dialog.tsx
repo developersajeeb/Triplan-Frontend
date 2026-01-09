@@ -41,7 +41,7 @@ const DialogContent = React.forwardRef<
       )}
       {...props}
     >
-      <div className="border bg-background p-6 shadow-lg rounded-lg">
+      <div className="border bg-background p-6 shadow-lg rounded-lg overflow-y-auto max-h-screen">
         {children}
       </div>
       <DialogPrimitive.Close className="bg-gray-100 hover:bg-red-500 hover:text-white duration-300 transition-all w-7 h-7 flex justify-center items-center rounded-full absolute right-8 top-4 opacity-70 hover:opacity-100 focus:outline-none disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-muted-foreground">
