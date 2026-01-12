@@ -60,7 +60,7 @@ export default function HeroSlider() {
                 data-swiper-parallax="300"
               >
                 <h4 className="section-sub-title text-white">{slide.subtitle}</h4>
-                <h2 className="mb-8 text-white font-bold leading-[1.1] whitespace-pre-line text-[34px] sm:text-[58px] md:text-[75px]">
+                <h2 className="mb-8 text-white font-bold leading-[1.1] whitespace-pre-line text-[34px] sm:text-[58px] md:text-[75px] tracking-tighter">
                   {slide.title}
                 </h2>
                 <div

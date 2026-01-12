@@ -39,23 +39,27 @@ import { Form, FormControl, FormField, FormItem, FormMessage } from "@/component
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RiLoaderLine } from "react-icons/ri";
+import { GiCheckMark } from "react-icons/gi";
 import { Textarea } from "@/components/ui/textarea";
-
-const bookingSchema = z.object({
-  date: z.any().refine((val) => val instanceof Date, {
-    message: "Please select a date",
-  }),
-  adult: z.number().min(1, "At least 1 adult is required"),
-  children: z.number().min(0),
-  infant: z.number().min(0),
-});
+import { FaRegDotCircle } from "react-icons/fa";
+import { getTotalDays } from "@/helper/CommonHelper";
 
 type BookingFormValues = z.infer<typeof bookingSchema>;
+
+const bookingSchema = z.object({
+  date: z
+    .any()
+    .refine((val) => val instanceof Date, { message: "Please select a valid date" }),
+  guest: z
+    .number()
+    .min(1, { message: "At least 1 guest is required" })
+    .max(20, { message: "Cannot book more than 20 guests" }),
+});
 
 export default function TourDetails() {
   const { slug } = useParams();
   const { data: tourData, isLoading } = useGetSingleTourQuery(slug!);
-  // console.log(tourData);
+  console.log(tourData);
 
   const { isInWishlist, toggle } = useWishlist();
   const fancyBoxOptions = {
@@ -117,15 +121,11 @@ export default function TourDetails() {
     resolver: zodResolver(bookingSchema),
     defaultValues: {
       date: undefined,
-      adult: 1,
-      children: 0,
-      infant: 0,
+      guest: 1,
     },
   });
   const selectedDate = watch("date");
-  const adult = watch("adult");
-  const children = watch("children");
-  const infant = watch("infant");
+  const guest = watch("guest");
   const allErrors = Object.values(errors)
     .map((e) => e?.message)
     .filter((msg): msg is string => typeof msg === "string");
@@ -133,8 +133,8 @@ export default function TourDetails() {
   useEffect(() => {
     setNeedsReadMore(text.length > limit);
   }, [text, limit]);
-
   const [progress, setProgress] = useState<number>(13);
+  // const totalPrice = (tourData?.costFrom || 0) * Math.max(1, guest);
 
   useEffect(() => {
     const timer = setTimeout(() => setProgress(66), 500);
@@ -176,31 +176,19 @@ export default function TourDetails() {
     );
   };
 
-  const getTotalDays = (startDate: string, endDate: string): number => {
-    const start = new Date(startDate);
-    const end = new Date(endDate);
-
-    const diffTime = end.getTime() - start.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    return diffDays;
-  };
-
   const Counter = ({
     label,
-    ageInfo,
     value,
     min,
     onChange,
   }: {
     label: string;
-    ageInfo: string;
     value: number;
     min: number;
     onChange: (val: number) => void;
   }) => (
     <li className="flex justify-between border-b py-3 last-of-type:border-none">
-      <p className="font-semibold text-gray-700">{label} <span className="text-sm">{ageInfo}</span></p>
+      <p className="font-semibold text-gray-700">{label}</p>
       <div className="flex items-center">
         <button
           className="text-gray-600 hover:bg-primary-950 hover:text-white rounded-full duration-300 disabled:opacity-35 disabled:pointer-events-none"
@@ -222,9 +210,8 @@ export default function TourDetails() {
     </li>
   );
 
-  const onSubmit = (data: BookingFormValues) => {
+  const onSubmit: SubmitHandler<BookingFormValues> = (data) => {
     console.log(data);
-    // date, adult, children, infant — all validated
   };
 
   const faqItems = [
@@ -306,7 +293,7 @@ export default function TourDetails() {
         }}
       />
 
-      <div className="pt-6 pb-20">
+      <div className="pt-3 md:pt-6 pb-20">
         {/* Header */}
         <section className="tp-container flex gap-4 mb-6">
           {isLoading ? (
@@ -317,10 +304,10 @@ export default function TourDetails() {
           ) : (
             <>
               <div className="flex-1">
-                <h1 className="text-3xl tracking-tight font-bold mb-3 text-gray-900">
+                <h1 className="text-2xl md:text-3xl tracking-tight font-bold mb-3 text-gray-900">
                   {tourData?.title}
                 </h1>
-                <ul className="flex flex-wrap gap-4">
+                <ul className="flex flex-wrap gap-2 md:gap-4">
                   <li className="text-sm text-gray-600 font-medium mb-1">
                     <span className="bg-[#FFCA18] text-[13px] text-gray-900 px-2 pt-[1px] pb-[2px] font-semibold rounded mr-[2px]">
                       4.8
@@ -582,6 +569,61 @@ export default function TourDetails() {
             </div>
           ) : (
             <div className="flex-1">
+              {/* Available Book box */}
+              <div className="border border-primary-400 rounded-2xl p-5 shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white mb-6">
+                <p className="bg-green-500 text-white px-3 py-2 text-lg rounded-xl font-semibold flex items-center gap-2"><span><GiCheckMark /></span> Available</p>
+
+                <div className="flex flex-col sm:flex-row gap-4 mt-5">
+                  <div className="flex-1">
+                    <h1 className="text-base tracking-tight font-semibold text-gray-700 flex gap-1"><FaRegDotCircle className="text-primary-500 pt-1" size={22} /> {tourData?.title}</h1>
+                    {tourData?.startDate && (
+                      <div className="flex gap-1 text-sm text-gray-600 font-medium mt-5 sm:pl-6">
+                        <span>
+                          <LuCalendarFold size={20} />
+                        </span>
+                        <p>
+                          Start Date:{" "}
+                          <span className="font-semibold">
+                            {format(new Date(tourData.startDate), "MMM dd, yyyy")}
+                          </span>
+                        </p>
+                      </div>
+                    )}
+                    {tourData?.arrivalLocation && (
+                      <div className="flex text-sm gap-1 items-center text-gray-600 font-medium mt-3 sm:pl-6">
+                        <span>
+                          <GrLocation size={20} />
+                        </span>
+                        <p>
+                          Starting Location:{" "}
+                          <span className="font-semibold">
+                            {tourData?.departureLocation || "N/A"}
+                          </span>
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                  <div>
+                    <p className="mb-1 text-sm font-medium text-gray-500 space-y-1 sm:text-end">Total guests: 2</p>
+                    <p className="text-lg font-semibold sm:text-end">
+                      <span className="font-medium text-gray-600 tracking-tighter">Total: </span>
+                      <span className="text-primary-500">
+                        ৳{tourData?.costFrom}
+                      </span>
+                    </p>
+
+                    <div className="sm:text-end mt-5">
+                      <Link
+                        to={`/booking/${tourData?.slug}`}
+                        className="tp-primary-btn h-12 w-auto !py-3 inline-block"
+                      >
+                        Book Now
+                      </Link>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <h3 className="text-2xl font-semibold text-gray-800 mb-6">
                 Overview
               </h3>
@@ -883,10 +925,10 @@ export default function TourDetails() {
 
           {/* Availability Check */}
           {isLoading ? (
-            <Skeleton className="my-2 w-full lg:min-w-[395px] lg:w-[395px] h-[500px] rounded-2xl" />
+            <Skeleton className="my-2 w-full lg:min-w-[395px] lg:w-[395px] h-[500px] rounded-2xl sticky top-24" />
           ) : (
-            <div className="w-full lg:min-w-[395px] lg:w-[395px]">
-              <div className="shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] p-6 rounded-2xl border border-gray-200">
+            <div className="w-full lg:min-w-[395px] lg:w-[395px] lg:sticky top-24 h-fit">
+              <div className="shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white p-6 rounded-2xl border border-gray-200">
                 <p className="text-base text-gray-700 font-medium flex justify-between">
                   <span>from</span>{" "}
                   <span className="inline-block px-3 py-1 bg-green-500 text-white text-sm rounded-full font-semibold">
@@ -940,27 +982,15 @@ export default function TourDetails() {
                     </Popover>
                   </li>
                   <Counter
-                    label="Adult"
-                    ageInfo="(Age 13+)"
-                    value={adult}
+                    label="Guest"
+                    value={guest || 1}
                     min={1}
                     onChange={(v) =>
-                      setValue("adult", v, { shouldValidate: true })
+                      setValue("guest", Number(v), {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      })
                     }
-                  />
-                  <Counter
-                    label="Children"
-                    ageInfo="(Age 3 - 12)"
-                    value={children}
-                    min={0}
-                    onChange={(v) => setValue("children", v)}
-                  />
-                  <Counter
-                    label="Infant"
-                    ageInfo="(Age 0 - 2)"
-                    value={infant}
-                    min={0}
-                    onChange={(v) => setValue("infant", v)}
                   />
                 </ul>
                 {allErrors.length > 0 && (
