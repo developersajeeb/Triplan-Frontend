@@ -2,7 +2,7 @@ import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Link, useNavigate } from "react-router"
+import { Link, useLocation, useNavigate } from "react-router"
 import Logo from '@/assets/triPlan-logo.svg';
 import { useForm, type FieldValues, type SubmitHandler } from "react-hook-form"
 import { useLoginMutation } from "@/redux/features/auth/auth.api"
@@ -32,6 +32,8 @@ export function LoginForm({
     ...props
 }: React.ComponentProps<"div">) {
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const location = useLocation();
+    const from = location.state?.from?.pathname || "/";
     const navigate = useNavigate();
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
@@ -49,7 +51,7 @@ export function LoginForm({
             const res = await login(data).unwrap();
             console.log(res);
             toast.success('Login Successfully');
-            navigate('/')
+            navigate(from, { replace: true });
             setIsLoginBtnLoading(false);
         } catch (err) {
             setIsLoginBtnLoading(false);
@@ -63,6 +65,11 @@ export function LoginForm({
 
             if (error.data.message === "User does not exist") {
                 toast.error("User does not exist");
+                return;
+            }
+            
+            if (error.data.message === "You have authenticated through Google. Please use google for login!") {
+                toast.error("You have authenticated through Google. Please use google for login!");
                 return;
             }
 

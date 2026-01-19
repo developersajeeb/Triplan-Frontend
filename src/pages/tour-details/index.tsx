@@ -5,8 +5,8 @@ import JsonLd from "@/components/utilities/JsonLd";
 import useFancyBox from "@/hooks/useFancybox";
 import { useWishlist } from "@/hooks/useWishlist";
 import { useGetSingleTourQuery } from "@/redux/features/tour/tour.api";
-import { useEffect, useRef, useState } from "react";
-import { FaFacebook, FaHeart, FaInstagram, FaStar, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
+import React, { useEffect, useRef, useState } from "react";
+import { FaFacebook, FaHeart, FaInstagram, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
 import { FiLink } from "react-icons/fi";
 import { GoShareAndroid } from "react-icons/go";
 import { LuCalendarFold, LuCheck, LuImages, LuNotepadText, LuSend } from "react-icons/lu";
@@ -20,12 +20,9 @@ import { Fancybox, type FancyboxOptions } from "@fancyapps/ui/dist/fancybox";
 import { MdOutlineWatchLater } from "react-icons/md";
 import { TbUsers } from "react-icons/tb";
 import { GrLocation } from "react-icons/gr";
-import { PiSealCheck } from "react-icons/pi";
+import { PiCalendarSlashBold, PiClockBold, PiSealCheck } from "react-icons/pi";
 import { RxCross2 } from "react-icons/rx";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
-import { TiStarFullOutline } from "react-icons/ti";
-import { Progress } from "@/components/ui/progress";
-import NotUserIcon from "@/components/shared/blocks/NotUserIcon";
 import { Button } from "@/components/ui/button";
 import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
@@ -43,6 +40,9 @@ import { GiCheckMark } from "react-icons/gi";
 import { Textarea } from "@/components/ui/textarea";
 import { FaRegDotCircle } from "react-icons/fa";
 import { getTotalDays } from "@/helper/CommonHelper";
+import { useCheckAvailabilityMutation } from "@/redux/features/booking/booking.api";
+import OverallRatingBox from "./OverallRatingBox";
+import UserReview from "./UserReview";
 
 type BookingFormValues = z.infer<typeof bookingSchema>;
 
@@ -58,8 +58,8 @@ const bookingSchema = z.object({
 
 export default function TourDetails() {
   const { slug } = useParams();
+  const [checkAvailability, { isLoading: isCheckingAvailabilityLoading }] = useCheckAvailabilityMutation();
   const { data: tourData, isLoading } = useGetSingleTourQuery(slug!);
-  console.log(tourData);
 
   const { isInWishlist, toggle } = useWishlist();
   const fancyBoxOptions = {
@@ -78,8 +78,15 @@ export default function TourDetails() {
   const [desktopFancyBoxRef] = useFancyBox(fancyBoxOptions);
   const [mobileFancyBoxRef] = useFancyBox(fancyBoxOptions);
   const [reviewImageFancyBoxRef] = useFancyBox(fancyBoxOptions);
-  const [openCalendar, setOpenCalendar] = useState<boolean>(false)
-
+  const [openCalendar, setOpenCalendar] = useState<boolean>(false);
+  const availabilityBoxRef = useRef<HTMLDivElement>(null);
+  const availabilityRef = useRef<HTMLDivElement>(null);
+  const scrollToAvailability = () => {
+    availabilityRef.current?.scrollIntoView({
+      behavior: "smooth",
+      block: "start",
+    });
+  };
   const shareUrl = `https://triplan.developersajeeb.com/tours/${tourData?.slug}`;
   const shareText = encodeURIComponent(tourData?.title ?? "");
   const [copied, setCopied] = useState<boolean>(false);
@@ -97,10 +104,9 @@ export default function TourDetails() {
   const [isLoginBtnLoading, setIsLoginBtnLoading] = useState<boolean>(false);
   const [openEnquiry, setOpenEnquiry] = useState<boolean>(false);
 
-  const enquiryOnSubmit: SubmitHandler<FieldValues> = async (data) => {
+  const enquiryOnSubmit: SubmitHandler<FieldValues> = async () => {
     try {
       setIsLoginBtnLoading(true);
-      console.log("Form Data:", data);
       toast.success("Thank you for reaching out. We will get back to you shortly.");
       enquiryForm.reset();
       setOpenEnquiry(false);
@@ -133,13 +139,18 @@ export default function TourDetails() {
   useEffect(() => {
     setNeedsReadMore(text.length > limit);
   }, [text, limit]);
-  const [progress, setProgress] = useState<number>(13);
-  // const totalPrice = (tourData?.costFrom || 0) * Math.max(1, guest);
+  const totalPrice = (tourData?.costFrom || 0) * Math.max(1, guest);
+  const [checking, setChecking] = useState(false);
+  const [availability, setAvailability] = useState<null | {
+    date: Date;
+    guest: number;
+    total: number;
+  }>(null);
+  const [hasCheckedAvailability, setHasCheckedAvailability] = useState<boolean>(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => setProgress(66), 500);
-    return () => clearTimeout(timer);
-  }, []);
+    setAvailability(null);
+  }, [selectedDate, guest]);
 
   const handleCopy = async () => {
     try {
@@ -210,9 +221,52 @@ export default function TourDetails() {
     </li>
   );
 
-  const onSubmit: SubmitHandler<BookingFormValues> = (data) => {
-    console.log(data);
+  const onSubmit: SubmitHandler<BookingFormValues> = async (data) => {
+    try {
+      setChecking(true);
+      setHasCheckedAvailability(true);
+
+      const result = await checkAvailability({
+        tour: tourData?._id,
+        date: new Date(data.date).toISOString(),
+        guest: data.guest,
+      }).unwrap();
+
+
+      if (!result.available) {
+        toast.error(result.message || "Selected date is not available");
+        setAvailability(null);
+        return;
+      }
+
+      setAvailability({
+        date: data.date,
+        guest: data.guest,
+        total: data.guest * (tourData?.costFrom || 0),
+      });
+
+      toast.success("Tour is available!");
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    } catch (error: any) {
+      toast.error(
+        error?.data?.message || "Failed to check availability"
+      );
+    } finally {
+      setChecking(false);
+    }
   };
+
+  useEffect(() => {
+    if (
+      isCheckingAvailabilityLoading ||
+      hasCheckedAvailability
+    ) {
+      availabilityBoxRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      });
+    }
+  }, [isCheckingAvailabilityLoading, hasCheckedAvailability]);
 
   const faqItems = [
     {
@@ -325,20 +379,19 @@ export default function TourDetails() {
                       <HiOutlineLocationMarker size={18} />
                     </span>{" "}
                     {tourData?.arrivalLocation + ", " + tourData?.divisionName}
-                    <span className="font-semibold text-primary-500 cursor-pointer">
-                      (View Map)
-                    </span>
                   </li>
                 </ul>
               </div>
               <div className="flex gap-2 fixed justify-between md:justify-normal md:relative bg-white md:bg-transparent left-0 right-0 bottom-0 p-3 md:p-0 shadow-[0px_0px_10px_0px_#00000012] md:shadow-none z-30">
                 <div className="md:hidden w-full sm:w-auto">
-                  <button
+                  <Button
+                    disabled={checking}
                     type="button"
+                    onClick={scrollToAvailability}
                     className="tp-primary-btn w-full sm:w-auto h-11 !py-2"
                   >
                     Check availability
-                  </button>
+                  </Button>
                 </div>
                 <div className="flex gap-2">
                   <Popover>
@@ -570,59 +623,75 @@ export default function TourDetails() {
           ) : (
             <div className="flex-1">
               {/* Available Book box */}
-              <div className="border border-primary-400 rounded-2xl p-5 shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white mb-6">
-                <p className="bg-green-500 text-white px-3 py-2 text-lg rounded-xl font-semibold flex items-center gap-2"><span><GiCheckMark /></span> Available</p>
-
-                <div className="flex flex-col sm:flex-row gap-4 mt-5">
-                  <div className="flex-1">
-                    <h1 className="text-base tracking-tight font-semibold text-gray-700 flex gap-1"><FaRegDotCircle className="text-primary-500 pt-1" size={22} /> {tourData?.title}</h1>
-                    {tourData?.startDate && (
-                      <div className="flex gap-1 text-sm text-gray-600 font-medium mt-5 sm:pl-6">
-                        <span>
-                          <LuCalendarFold size={20} />
-                        </span>
-                        <p>
-                          Start Date:{" "}
-                          <span className="font-semibold">
-                            {format(new Date(tourData.startDate), "MMM dd, yyyy")}
-                          </span>
-                        </p>
-                      </div>
-                    )}
-                    {tourData?.arrivalLocation && (
-                      <div className="flex text-sm gap-1 items-center text-gray-600 font-medium mt-3 sm:pl-6">
-                        <span>
-                          <GrLocation size={20} />
-                        </span>
-                        <p>
-                          Starting Location:{" "}
-                          <span className="font-semibold">
-                            {tourData?.departureLocation || "N/A"}
-                          </span>
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                  <div>
-                    <p className="mb-1 text-sm font-medium text-gray-500 space-y-1 sm:text-end">Total guests: 2</p>
-                    <p className="text-lg font-semibold sm:text-end">
-                      <span className="font-medium text-gray-600 tracking-tighter">Total: </span>
-                      <span className="text-primary-500">
-                        ৳{tourData?.costFrom}
-                      </span>
-                    </p>
-
-                    <div className="sm:text-end mt-5">
-                      <Link
-                        to={`/booking/${tourData?.slug}`}
-                        className="tp-primary-btn h-12 w-auto !py-3 inline-block"
-                      >
-                        Book Now
-                      </Link>
-                    </div>
-                  </div>
+              {isCheckingAvailabilityLoading ? (
+                <div ref={availabilityBoxRef} className="border border-primary-400 rounded-2xl p-5 shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white mb-6 scroll-mt-24">
+                  <p className="text-lg font-semibold text-gray-500 flex items-center gap-2"><span><PiClockBold size={22} /></span> Checking...</p>
+                  <Skeleton className="mt-3 w-full h-[30px] rounded-full" />
+                  <Skeleton className="mt-3 w-4/5 h-[30px] rounded-full" />
                 </div>
-              </div>
+              ) : (
+                hasCheckedAvailability && (
+                  availability ? (
+                    <div ref={availabilityBoxRef} className="border border-primary-400 rounded-2xl p-5 shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white mb-6 scroll-mt-24">
+                      <p className="bg-green-500 text-white px-3 py-2 text-lg rounded-xl font-semibold flex items-center gap-2"><span><GiCheckMark /></span> Available</p>
+
+                      <div className="flex flex-col sm:flex-row gap-4 mt-5">
+                        <div className="flex-1">
+                          <h1 className="text-base tracking-tight font-semibold text-gray-700 flex gap-1"><FaRegDotCircle className="text-primary-500 pt-1" size={22} /> {tourData?.title}</h1>
+                          {tourData?.startDate && (
+                            <div className="flex gap-1 text-sm text-gray-600 font-medium mt-5 sm:pl-6">
+                              <span>
+                                <LuCalendarFold size={20} />
+                              </span>
+                              <p>
+                                Start Date:{" "}
+                                <span className="font-semibold">
+                                  {format(new Date(tourData.startDate), "MMM dd, yyyy")}
+                                </span>
+                              </p>
+                            </div>
+                          )}
+                          {tourData?.arrivalLocation && (
+                            <div className="flex text-sm gap-1 items-center text-gray-600 font-medium mt-3 sm:pl-6">
+                              <span>
+                                <GrLocation size={20} />
+                              </span>
+                              <p>
+                                Starting Location:{" "}
+                                <span className="font-semibold">
+                                  {tourData?.departureLocation || "N/A"}
+                                </span>
+                              </p>
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <p className="mb-1 text-sm font-medium text-gray-500 space-y-1 sm:text-end">Total guests: 2</p>
+                          <p className="text-lg font-semibold sm:text-end">
+                            <span className="font-medium text-gray-600 tracking-tighter">Total: </span>
+                            <span className="text-primary-500">
+                              ৳{totalPrice}
+                            </span>
+                          </p>
+
+                          <div className="sm:text-end mt-5">
+                            <Link
+                              to={`/booking/${tourData?.slug}`}
+                              className="tp-primary-btn h-12 w-auto !py-3 inline-block"
+                            >
+                              Book Now
+                            </Link>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div ref={availabilityBoxRef} className="border border-primary-400 rounded-2xl p-5 shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white mb-6 scroll-mt-24">
+                      <p className="bg-red-500 text-white px-3 py-2 text-lg rounded-xl font-semibold flex items-center gap-2"><span><PiCalendarSlashBold size={22} /></span> Not Available Right Now</p>
+                    </div>
+                  )
+                )
+              )}
 
               <h3 className="text-2xl font-semibold text-gray-800 mb-6">
                 Overview
@@ -812,112 +881,14 @@ export default function TourDetails() {
               <h3 className="text-2xl font-semibold text-gray-800 mb-5">
                 Customer reviews
               </h3>
-              <div className="border border-gray-100 rounded-xl flex flex-col md:flex-row">
-                <div className="md:w-[180px] p-5 border-b md:border-r border-gray-100">
-                  <h6 className="text-xl font-semibold text-gray-800 mb-2">
-                    Overall rating
-                  </h6>
-                  <p className="tracking-tighter flex items-center">
-                    <span className="text-primary-500 text-3xl font-semibold inline-flex items-center gap-1">
-                      <TiStarFullOutline size={28} /> 5.0
-                    </span>
-                    <span className="font-semibold text-lg text-gray-800 -mb-1">
-                      /5
-                    </span>
-                  </p>
-                  <p className="mt-1 text-gray-700">(1 review)</p>
-                </div>
-                <div className="p-5 flex-1">
-                  <p className="text-lg font-semibold mb-4">Review summary</p>
-                  <div className="grid sm:grid-cols-2 gap-x-5 md:gap-x-14 gap-y-3 sm:gap-y-5">
-                    <div>
-                      <p className="flex justify-between gap-2 text-gray-600 text-sm font-medium mb-1">
-                        <span>Guide</span> <span>5.0/5</span>
-                      </p>
-                      <Progress
-                        value={progress}
-                        className="w-full bg-primary-500"
-                      />
-                    </div>
-                    <div>
-                      <p className="flex justify-between gap-2 text-gray-600 text-sm font-medium mb-1">
-                        <span>Service</span> <span>5.0/5</span>
-                      </p>
-                      <Progress
-                        value={progress}
-                        className="w-full bg-primary-500"
-                      />
-                    </div>
-                    <div>
-                      <p className="flex justify-between gap-2 text-gray-600 text-sm font-medium mb-1">
-                        <span>Transportation</span> <span>5.0/5</span>
-                      </p>
-                      <Progress
-                        value={progress}
-                        className="w-full bg-primary-500"
-                      />
-                    </div>
-                    <div>
-                      <p className="flex justify-between gap-2 text-gray-600 text-sm font-medium mb-1">
-                        <span>Organization</span> <span>5.0/5</span>
-                      </p>
-                      <Progress
-                        value={progress}
-                        className="w-full bg-primary-500"
-                      />
-                    </div>
-                  </div>
-                </div>
-              </div>
+              <OverallRatingBox />
 
               {/* User Review */}
               <div ref={reviewImageFancyBoxRef} className="mt-5 space-y-7">
                 {reviews.map((review, reviewIndex) => (
-                  <div key={reviewIndex}>
-                    <div className="flex gap-2 items-center">
-                      <NotUserIcon
-                        minWidth="w-14"
-                        width="w-14"
-                        height="h-14"
-                        iconSize={30}
-                      />
-                      <div>
-                        <p className="font-semibold text-gray-800 text-lg">
-                          {review.name}
-                        </p>
-                        <p className="text-sm text-gray-600">{review.date}</p>
-                      </div>
-                    </div>
-
-                    <ul className="flex gap-1 mt-4 mb-3">
-                      {[...Array(review.rating)].map((_, i) => (
-                        <li key={i}>
-                          <FaStar size={20} className="text-primary-500" />
-                        </li>
-                      ))}
-                    </ul>
-
-                    <p className="mt-3 mb-4 text-gray-600 font-medium">
-                      {review.comment}
-                    </p>
-
-                    <div className="flex flex-wrap gap-3">
-                      {review.images.map((img, imgIndex) => (
-                        <a
-                          key={imgIndex}
-                          href={img}
-                          data-fancybox={`review-${reviewIndex}`}
-                          className="min-w-20 w-20 h-20"
-                        >
-                          <img
-                            src={img}
-                            alt="Review image"
-                            className="w-full h-full object-cover rounded-lg"
-                          />
-                        </a>
-                      ))}
-                    </div>
-                  </div>
+                  <React.Fragment key={reviewIndex}>
+                    <UserReview review={review} reviewIndex={reviewIndex} />
+                  </React.Fragment>
                 ))}
               </div>
             </div>
@@ -927,7 +898,7 @@ export default function TourDetails() {
           {isLoading ? (
             <Skeleton className="my-2 w-full lg:min-w-[395px] lg:w-[395px] h-[500px] rounded-2xl sticky top-24" />
           ) : (
-            <div className="w-full lg:min-w-[395px] lg:w-[395px] lg:sticky top-24 h-fit">
+            <div ref={availabilityRef} className={`w-full scroll-mt-24 md:scroll-mt-0 lg:min-w-[395px] lg:w-[395px] lg:sticky top-24 h-fit`}>
               <div className="shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white p-6 rounded-2xl border border-gray-200">
                 <p className="text-base text-gray-700 font-medium flex justify-between">
                   <span>from</span>{" "}
