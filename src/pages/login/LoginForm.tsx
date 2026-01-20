@@ -33,7 +33,9 @@ export function LoginForm({
 }: React.ComponentProps<"div">) {
     const [showPassword, setShowPassword] = useState<boolean>(false);
     const location = useLocation();
-    const from = location.state?.from?.pathname || "/";
+    const searchParams = new URLSearchParams(location.search);
+    const queryReturnTo = searchParams.get("returnTo");
+    const from = queryReturnTo || sessionStorage.getItem("triplan:returnTo") || "/";
     const navigate = useNavigate();
     const form = useForm<z.infer<typeof loginSchema>>({
         resolver: zodResolver(loginSchema),
@@ -52,6 +54,7 @@ export function LoginForm({
             console.log(res);
             toast.success('Login Successfully');
             navigate(from, { replace: true });
+            sessionStorage.removeItem("triplan:returnTo");
             setIsLoginBtnLoading(false);
         } catch (err) {
             setIsLoginBtnLoading(false);

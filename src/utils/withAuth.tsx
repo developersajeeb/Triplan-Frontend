@@ -11,10 +11,12 @@ export const withAuth = (Component: ComponentType, requiredRole?: TRole) => {
     if (isLoading) return null;
 
     if (!isLoading && !data?.data?.email) {
+      const returnTo = `${location.pathname}${location.search ?? ""}${location.hash ?? ""}`;
+      const searchParams = new URLSearchParams();
+      searchParams.set("returnTo", returnTo);
       return (
         <Navigate
-          to="/login"
-          state={{ from: location }}
+          to={`/login?${searchParams.toString()}`}
           replace
         />
       );
