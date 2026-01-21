@@ -104,7 +104,7 @@ const Tours = () => {
             <section className='bg-[#F1F5FF]'>
                 <div className='tp-big-container flex flex-col lg:flex-row gap-6 pt-6 pb-16'>
                     {/* Filters */}
-                    <TourSideFilter className='hidden lg:block' />
+                    <div><TourSideFilter className='hidden lg:block' /></div>
 
                     <div className='w-full'>
                         <div className='flex flex-wrap justify-between gap-2 mb-6'>

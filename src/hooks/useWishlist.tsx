@@ -18,14 +18,33 @@ export const useWishlist = () => {
   const [wishlist, setWishlist] = useState<string[]>(getGuestWishlist());
 
   useEffect(() => {
-    if (isLoggedIn) {
+    if (!isLoggedIn) return;
+
+    const syncWishlist = async () => {
       const guest = getGuestWishlist();
       const db = userData?.data?.wishlist || [];
       const merged = Array.from(new Set([...db, ...guest]));
+
+      // Persist locally for instant UI
       setGuestWishlist(merged);
       setWishlist(merged);
-    }
-  }, [isLoggedIn, userData]);
+
+      // Push only the guest-only items to backend so server stays in sync
+      const toAdd = merged.filter(id => !db.includes(id));
+      if (toAdd.length === 0) return;
+
+      try {
+        await Promise.all(toAdd.map(id => toggleWishlist(id).unwrap()));
+      } catch {
+        // If sync fails, revert to server copy to avoid mismatch
+        setGuestWishlist(db);
+        setWishlist(db);
+        toast.error("Could not sync wishlist. Please try again.");
+      }
+    };
+
+    syncWishlist();
+  }, [isLoggedIn, userData, toggleWishlist]);
 
   const isInWishlist = (id: string) => wishlist.includes(id);
 
@@ -52,13 +71,19 @@ export const useWishlist = () => {
       return;
     }
 
+    const previous = wishlist;
+    const updated = exists ? wishlist.filter(w => w !== id) : [...wishlist, id];
+
+    // Optimistic update for instant UI feedback
+    setGuestWishlist(updated);
+    setWishlist(updated);
+
     try {
       await toggleWishlist(id).unwrap();
-
-      const updated = exists ? wishlist.filter(w => w !== id) : [...wishlist, id];
-      setGuestWishlist(updated);
-      setWishlist(updated);
     } catch {
+      // Revert on failure
+      setGuestWishlist(previous);
+      setWishlist(previous);
       toast.error("Something went wrong. Please try again.");
     }
   };
