@@ -896,7 +896,7 @@ export default function TourDetails() {
 
           {/* Availability Check */}
           {isLoading ? (
-            <Skeleton className="my-2 w-full lg:min-w-[395px] lg:w-[395px] h-[500px] rounded-2xl sticky top-24" />
+            <Skeleton className="my-2 w-full scroll-mt-24 md:scroll-mt-0 lg:min-w-[395px] lg:w-[395px] lg:sticky top-24" />
           ) : (
             <div ref={availabilityRef} className={`w-full scroll-mt-24 md:scroll-mt-0 lg:min-w-[395px] lg:w-[395px] lg:sticky top-24 h-fit`}>
               <div className="shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white p-6 rounded-2xl border border-gray-200">
