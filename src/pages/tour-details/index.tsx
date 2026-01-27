@@ -139,7 +139,6 @@ export default function TourDetails() {
   useEffect(() => {
     setNeedsReadMore(text.length > limit);
   }, [text, limit]);
-  const totalPrice = (tourData?.costFrom || 0) * Math.max(1, guest);
   const [checking, setChecking] = useState(false);
   const [availability, setAvailability] = useState<null | {
     date: Date;
@@ -147,10 +146,6 @@ export default function TourDetails() {
     total: number;
   }>(null);
   const [hasCheckedAvailability, setHasCheckedAvailability] = useState<boolean>(false);
-
-  useEffect(() => {
-    setAvailability(null);
-  }, [selectedDate, guest]);
 
   const handleCopy = async () => {
     try {
@@ -224,7 +219,6 @@ export default function TourDetails() {
   const onSubmit: SubmitHandler<BookingFormValues> = async (data) => {
     try {
       setChecking(true);
-      setHasCheckedAvailability(true);
 
       const result = await checkAvailability({
         tour: tourData?._id,
@@ -232,10 +226,13 @@ export default function TourDetails() {
         guest: data.guest,
       }).unwrap();
 
-
-      if (!result.available) {
-        toast.error(result.message || "Selected date is not available");
+      // Check if data is nested under result.data or directly in result
+      const availabilityData = result.data || result;
+      
+      if (!availabilityData.available) {
+        toast.error(availabilityData.message || "Selected date is not available");
         setAvailability(null);
+        setHasCheckedAvailability(true);
         return;
       }
 
@@ -244,13 +241,14 @@ export default function TourDetails() {
         guest: data.guest,
         total: data.guest * (tourData?.costFrom || 0),
       });
-
-      toast.success("Tour is available!");
+      setHasCheckedAvailability(true);
+      toast.success(availabilityData.message || "Tour is available for the selected date!");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
       toast.error(
         error?.data?.message || "Failed to check availability"
       );
+      setHasCheckedAvailability(true);
     } finally {
       setChecking(false);
     }
@@ -630,7 +628,7 @@ export default function TourDetails() {
                   <Skeleton className="mt-3 w-4/5 h-[30px] rounded-full" />
                 </div>
               ) : (
-                hasCheckedAvailability && (
+                hasCheckedAvailability && availability ? (
                   availability ? (
                     <div ref={availabilityBoxRef} className="border border-primary-400 rounded-2xl p-5 shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white mb-6 scroll-mt-24">
                       <p className="bg-green-500 text-white px-3 py-2 text-lg rounded-xl font-semibold flex items-center gap-2"><span><GiCheckMark /></span> Available</p>
@@ -666,11 +664,13 @@ export default function TourDetails() {
                           )}
                         </div>
                         <div>
-                          <p className="mb-1 text-sm font-medium text-gray-500 space-y-1 sm:text-end">Total guests: 2</p>
+                          <p className="mb-1 text-sm font-medium text-gray-500 space-y-1 sm:text-end">
+                            Total guests: {availability?.guest}
+                          </p>
                           <p className="text-lg font-semibold sm:text-end">
                             <span className="font-medium text-gray-600 tracking-tighter">Total: </span>
                             <span className="text-primary-500">
-                              ৳{totalPrice}
+                              ৳{availability?.total}
                             </span>
                           </p>
 
@@ -685,12 +685,12 @@ export default function TourDetails() {
                         </div>
                       </div>
                     </div>
-                  ) : (
-                    <div ref={availabilityBoxRef} className="border border-primary-400 rounded-2xl p-5 shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white mb-6 scroll-mt-24">
-                      <p className="bg-red-500 text-white px-3 py-2 text-lg rounded-xl font-semibold flex items-center gap-2"><span><PiCalendarSlashBold size={22} /></span> Not Available Right Now</p>
-                    </div>
-                  )
-                )
+                  ) : null
+                ) : hasCheckedAvailability && !availability ? (
+                  <div ref={availabilityBoxRef} className="border border-primary-400 rounded-2xl p-5 shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white mb-6 scroll-mt-24">
+                    <p className="bg-red-500 text-white px-3 py-2 text-lg rounded-xl font-semibold flex items-center gap-2"><span><PiCalendarSlashBold size={22} /></span> Not Available Right Now</p>
+                  </div>
+                ) : null
               )}
 
               <h3 className="text-2xl font-semibold text-gray-800 mb-6">
