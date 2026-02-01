@@ -1,4 +1,3 @@
-import { useCreateBookingMutation } from "@/redux/features/booking/booking.api";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
@@ -11,11 +10,13 @@ import { useForm } from "react-hook-form";
 import { FaRegCircleDot } from "react-icons/fa6";
 import { LuCalendarCheck2 } from "react-icons/lu";
 import { PiUsersThree } from "react-icons/pi";
-import { useParams } from "react-router";
+import { useParams, useSearchParams } from "react-router";
 import z from "zod";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { RiLoaderLine } from "react-icons/ri";
+import { format } from "date-fns";
+import { useCreateBookingMutation, useInitPaymentMutation } from "@/redux/features/booking/booking.api";
 
 const couponSchema = z.object({
   coupon: z
@@ -51,8 +52,15 @@ const bookingInfoSchema = z.object({
 
 export default function Booking() {
   const { slug } = useParams();
-  const { data: tourData, isLoading: isTourLoading, isError } = useGetAllToursQuery({ slug: slug! });
+  const [searchParams] = useSearchParams();
+  const dateParam = searchParams.get("date");
+  const guestParam = searchParams.get("guest");
+  const totalParam = searchParams.get("total");
+  const hasBookingData = Boolean(dateParam && guestParam && totalParam);
+
+  const { data: tourData, isLoading: isTourLoading, isError } = useGetAllToursQuery({ slug: slug! }, { skip: !hasBookingData });
   const { data: userData, isLoading: isUserLoading } = useUserInfoQuery(undefined);
+  const [initPayment] = useInitPaymentMutation();
   const [createBooking] = useCreateBookingMutation();
   const [isLoginBtnLoading, setIsLoginBtnLoading] = useState<boolean>(false);
 
@@ -90,59 +98,51 @@ export default function Booking() {
   }, [userData, form]);
 
   const handleBooking = async () => {
-    let bookingData;
+    const tour = tourData?.data?.[0]?._id;
+    const guestCount = guestParam ? Number(guestParam) : 0;
 
-    const normalizedPhone =
-      userData.data.phone && userData.data.phone !== ""
-        ? userData.data.phone.startsWith("+")
-          ? userData.data.phone
-          : `+${userData.data.phone}`
-        : undefined;
+    if (!tour || !guestCount) return;
+
+    const bookingData = {
+      tour,
+      guestCount,
+    };
 
     try {
-      const res = await createBooking(bookingData).unwrap();
-      if (res.success) {
-        window.open(res.data.paymentUrl);
+      setIsLoginBtnLoading(true);
+      const bookingRes = await createBooking(bookingData).unwrap();
+      console.log('bookingRes:', bookingRes?.data?.booking?._id);
+
+      const bookingId = bookingRes?.data?.booking?._id;
+      if (!bookingId) return;
+
+      const paymentRes = await initPayment(bookingId).unwrap();
+      console.log('paymentRes:', paymentRes);
+      const paymentUrl = paymentRes?.data?.paymentUrl;
+
+      if (paymentUrl) {
+        window.location.replace(paymentUrl);
       }
-    } catch (err) {
-      console.log(err);
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setIsLoginBtnLoading(false);
     }
   };
+
+  if (!hasBookingData) {
+    return (
+      <div className="tp-container min-h-[60vh] flex items-center justify-center">
+        <p className="text-xl font-semibold text-gray-600 text-center">
+          Please choose a tour and date to continue booking.
+        </p>
+      </div>
+    );
+  }
 
   if (isTourLoading) {
     return <p>Loading...</p>;
   }
-  //   "@context": "https://schema.org",
-  //   "@type": "Product",
-  //   name: tourData.title,
-  //   description: tourData.description,
-  //   image: tourData.images,
-  //   sku: tourData._id,
-  //   brand: {
-  //     "@type": "Organization",
-  //     name: "triPlan",
-  //     url: "https://triplan.developersajeeb.com"
-  //   },
-  //   offers: {
-  //     "@type": "Offer",
-  //     url: `https://triplan.developersajeeb.com/booking/${tourData.slug}`,
-  //     priceCurrency: "USD",
-  //     price: totalAmount || tourData.costFrom,
-  //     availability: tourData.maxGuest > 0 ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
-  //     eligibleQuantity: {
-  //       "@type": "QuantitativeValue",
-  //       maxValue: tourData.maxGuest,
-  //       value: guestCount
-  //     },
-  //     validFrom: tourData.startDate,
-  //   },
-  //   tour: {
-  //     "@type": "TouristTrip",
-  //     name: tourData.title,
-  //     itinerary: tourData.tourPlan
-  //   },
-  //   areaServed: tourData.location
-  // };
 
   return (
     <>
@@ -300,15 +300,15 @@ export default function Booking() {
             <div className="w-full scroll-mt-24 md:scroll-mt-0 lg:min-w-[420px] lg:w-[420px] lg:sticky top-24 h-fit">
               <div className="shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white rounded-2xl border border-gray-200">
                 <div className="p-6">
-                  <h2 className="text-lg font-bold text-gray-700 mb-10 flex gap-2"><span className="text-green-500 pt-[6px]"><FaRegCircleDot size={20} /></span> Elephant Jungle Sanctuary Half-Day Visit with Meal</h2>
+                  <h2 className="text-lg font-bold text-gray-700 mb-10 flex gap-2"><span className="text-green-500 pt-[6px]"><FaRegCircleDot size={20} /></span> {tourData?.data?.[0]?.title}</h2>
                   <ul className="space-y-1">
-                    <li className="text-base text-gray-600 font-medium flex items-center gap-1"><span><LuCalendarCheck2 size={16} /></span> Jan 20, 2026</li>
-                    <li className="text-base text-gray-600 font-medium flex items-center gap-1"><span><PiUsersThree size={20} /></span> 2 Guest</li>
+                    <li className="text-base text-gray-600 font-medium flex items-center gap-1"><span><LuCalendarCheck2 size={16} /></span> {dateParam ? format(new Date(dateParam), "MMM dd, yyyy") : ""}</li>
+                    <li className="text-base text-gray-600 font-medium flex items-center gap-1"><span><PiUsersThree size={20} /></span> {guestParam} Guest</li>
                   </ul>
                   <div className="border-b border-gray-200 my-5"></div>
-                  <p className="flex flex-wrap justify-between gap-2"><span className="text-base font-normal text-gray-700">৳12000 x 2 Guest</span> <span className="text-base font-semibold text-primary-900">৳24000</span></p>
+                  <p className="flex flex-wrap justify-between gap-2"><span className="text-base font-normal text-gray-700">৳{guestParam && totalParam ? Math.round(Number(totalParam) / Number(guestParam)) : 0} x {guestParam} Guest</span> <span className="text-base font-semibold text-primary-900">৳{totalParam}</span></p>
                   <div className="border-b border-gray-200 my-5"></div>
-                  <p className="flex flex-wrap justify-between gap-2"><span className="text-base font-normal text-gray-700">Price</span> <span className="text-base font-semibold text-primary-900">৳24000</span></p>
+                  <p className="flex flex-wrap justify-between gap-2"><span className="text-base font-normal text-gray-700">Price</span> <span className="text-base font-semibold text-primary-900">৳{totalParam}</span></p>
                   <div className="border-b border-gray-200 my-5"></div>
                   <Accordion
                     type="single"
@@ -352,7 +352,7 @@ export default function Booking() {
                 </div>
                 <div className="bg-gray-200 py-4 px-6 flex justify-between gap-2 flex-wrap">
                   <p className="text-base font-bold text-gray-800">Total</p>
-                  <p className="text-base font-bold text-gray-800">৳24000</p>
+                  <p className="text-base font-bold text-gray-800">৳{totalParam}</p>
                 </div>
                 <div className="p-5">
 

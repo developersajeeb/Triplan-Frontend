@@ -11,6 +11,14 @@ export const bookingApi = baseApi.injectEndpoints({
       invalidatesTags: ["BOOKING"],
     }),
 
+    initPayment: builder.mutation({
+      query: (bookingId: string) => ({
+        url: `/payment/init-payment/${bookingId}`,
+        method: "POST",
+      }),
+      invalidatesTags: ["BOOKING"],
+    }),
+
     checkAvailability: builder.mutation({
       query: (availabilityData) => ({
         url: "/booking/check-availability",
@@ -21,4 +29,4 @@ export const bookingApi = baseApi.injectEndpoints({
   }),
 });
 
-export const { useCreateBookingMutation, useCheckAvailabilityMutation } = bookingApi;
+export const { useCreateBookingMutation, useInitPaymentMutation, useCheckAvailabilityMutation } = bookingApi;

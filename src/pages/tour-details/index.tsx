@@ -676,7 +676,7 @@ export default function TourDetails() {
 
                           <div className="sm:text-end mt-5">
                             <Link
-                              to={`/booking/${tourData?.slug}`}
+                              to={`/booking/${tourData?.slug}?date=${format(availability.date, "yyyy-MM-dd")}&guest=${availability.guest}&total=${availability.total}`}
                               className="tp-primary-btn h-12 w-auto !py-3 inline-block"
                             >
                               Book Now
