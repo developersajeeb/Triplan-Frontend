@@ -27,6 +27,7 @@ const DestinationDetails = lazy(() => import("@/pages/destinations-details"));
 const TourGuiderPage = lazy(() => import("@/pages/tour-guide"));
 const NotFoundPage = lazy(() => import("@/pages/not-found"));
 const BlogPage = lazy(() => import("@/pages/blog"));
+const BlogDetails = lazy(() => import("@/pages/blog-details"));
 const PrivacyPolicyPage = lazy(() => import("@/pages/privacy-policy"));
 const TermsOfService = lazy(() => import("@/pages/terms-of-service"));
 
@@ -82,6 +83,10 @@ export const router = createBrowserRouter([
       {
         Component: BlogPage,
         path: "blog",
+      },
+      {
+        Component: BlogDetails,
+        path: "blog/:id",
       },
       {
         Component: ContactUs,

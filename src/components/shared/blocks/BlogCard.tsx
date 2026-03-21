@@ -8,7 +8,12 @@ const BlogCard = () => {
             <div className="h-[250px] overflow-hidden rounded-2xl">
                 <img src={ImageWaterMark} alt="Blog Image" className="group-hover:scale-110 duration-300 overflow-hidden w-full h-full object-cover rounded-2xl" />
             </div>
-            <p className='text-sm text-gray-600 font-medium mt-3'>January 10, 2026</p>
+            <div className="flex gap-3 mt-3 flex-wrap">
+                <p className='text-sm text-gray-600 font-medium'>January 10, 2026</p>
+                <div className="flex gap-2 flex-wrap">
+                    <span className="text-sm font-bold text-gray-700">General</span>
+                </div>
+            </div>
             <h6 className='text-2xl font-bold text-primary-900 hover:text-primary-500 cursor-pointer duration-300 mt-3 mb-5'>Exploring The Green Spaces Of Realar Residence</h6>
             <Link className="tp-transparent-black-btn !px-5 !py-3 inline-flex items-center gap-3" to="/#">
                 Read More
