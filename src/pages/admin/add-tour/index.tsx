@@ -54,6 +54,7 @@ const formSchema = z.object({
   costFrom: z.string().min(1, "Cost is required"),
   startDate: z.date({ message: "Start date is required" }),
   endDate: z.date({ message: "End date is required" }),
+  regEndDate: z.date({ message: "Registration end date is required" }),
   departureLocation: z.string().min(1, "Departure location is required"),
   arrivalLocation: z.string().min(1, "Arrival location is required"),
   included: z.array(z.object({ value: z.string() })),
@@ -98,6 +99,7 @@ export default function AddTour() {
       costFrom: "15000",
       startDate: new Date(),
       endDate: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000), // 3 days later
+      regEndDate: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // 2 days later
       departureLocation: "Dhaka",
       arrivalLocation: "Cox's Bazar",
       included: [
@@ -182,6 +184,7 @@ export default function AddTour() {
       maxGuest: Number(data.maxGuest),
       startDate: formatISO(data.startDate),
       endDate: formatISO(data.endDate),
+      regEndDate: formatISO(data.regEndDate),
       included:
         data.included[0].value === ""
           ? []
@@ -406,7 +409,7 @@ export default function AddTour() {
                   name="startDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col flex-1">
-                      <FormLabel>Start Date</FormLabel>
+                      <FormLabel className="leading-tight">Start Date</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -450,7 +453,7 @@ export default function AddTour() {
                   name="endDate"
                   render={({ field }) => (
                     <FormItem className="flex flex-col flex-1">
-                      <FormLabel>End Date</FormLabel>
+                      <FormLabel className="leading-tight">End Date</FormLabel>
                       <Popover>
                         <PopoverTrigger asChild>
                           <FormControl>
@@ -490,6 +493,51 @@ export default function AddTour() {
                   )}
                 />
               </div>
+
+              <FormField
+                control={form.control}
+                name="regEndDate"
+                render={({ field }) => (
+                  <FormItem className="flex flex-col flex-1">
+                    <FormLabel className="leading-tight">Registration End Date</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={"outline"}
+                            className={cn(
+                              "w-full pl-3 text-left font-normal",
+                              !field.value && "text-muted-foreground"
+                            )}
+                          >
+                            {field.value ? (
+                              format(field.value, "PPP")
+                            ) : (
+                              <span>Pick a date</span>
+                            )}
+                            <CalendarIcon className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={new Date(field.value)}
+                          onSelect={field.onChange}
+                          disabled={(date) =>
+                            date <
+                            new Date(
+                              new Date().setDate(new Date().getDate() - 1)
+                            )
+                          }
+                          captionLayout="dropdown"
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
               <div className="flex gap-5 items-stretch">
                 <FormField

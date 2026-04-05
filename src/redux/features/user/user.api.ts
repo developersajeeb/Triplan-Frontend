@@ -24,6 +24,13 @@ export const authApi = baseApi.injectEndpoints({
             }),
             invalidatesTags: ["USER"],
         }),
+        getWishlist: builder.query({
+            query: () => ({
+                url: "/user/wishlist",
+                method: "GET",
+            }),
+            providesTags: ["USER"],
+        }),
     }),
 });
 
@@ -31,4 +38,5 @@ export const {
     useUserInfoQuery,
     useUpdateUserInfoMutation,
     useToggleWishlistMutation,
+    useGetWishlistQuery,
 } = authApi;

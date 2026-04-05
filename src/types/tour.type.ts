@@ -9,6 +9,7 @@ export interface ITourPackage {
   slug: string;
   startDate: string;
   endDate: string;
+  regEndDate: string;
   arrivalLocation: string;
   departureLocation: string;
   location: string;

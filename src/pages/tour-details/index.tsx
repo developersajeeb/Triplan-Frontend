@@ -17,7 +17,7 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import ImageWaterMark from "@/assets/images/image-watermark.webp";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Fancybox, type FancyboxOptions } from "@fancyapps/ui/dist/fancybox";
-import { MdOutlineWatchLater } from "react-icons/md";
+import { MdAppRegistration, MdOutlineWatchLater } from "react-icons/md";
 import { TbUsers } from "react-icons/tb";
 import { GrLocation } from "react-icons/gr";
 import { PiCalendarSlashBold, PiClockBold, PiSealCheck } from "react-icons/pi";
@@ -50,10 +50,9 @@ const bookingSchema = z.object({
   date: z
     .any()
     .refine((val) => val instanceof Date, { message: "Please select a valid date" }),
-  guest: z
+  guestCount: z
     .number()
     .min(1, { message: "At least 1 guest is required" })
-    .max(20, { message: "Cannot book more than 20 guests" }),
 });
 
 export default function TourDetails() {
@@ -97,6 +96,8 @@ export default function TourDetails() {
   const [needsReadMore, setNeedsReadMore] = useState<boolean>(false);
   const contentRef = useRef<HTMLDivElement>(null);
   const today = new Date();
+  const regEndDate = tourData?.regEndDate ? new Date(tourData.regEndDate) : null;
+  const isRegistrationOver = !!regEndDate && regEndDate.getTime() < today.getTime();
   const [month, setMonth] = useState<Date>(today);
   const enquiryForm = useForm({
     mode: "onSubmit",
@@ -127,11 +128,11 @@ export default function TourDetails() {
     resolver: zodResolver(bookingSchema),
     defaultValues: {
       date: undefined,
-      guest: 1,
+      guestCount: 1,
     },
   });
   const selectedDate = watch("date");
-  const guest = watch("guest");
+  const guest = watch("guestCount");
   const allErrors = Object.values(errors)
     .map((e) => e?.message)
     .filter((msg): msg is string => typeof msg === "string");
@@ -146,6 +147,7 @@ export default function TourDetails() {
     total: number;
   }>(null);
   const [hasCheckedAvailability, setHasCheckedAvailability] = useState<boolean>(false);
+  const [availabilityErrorMessage, setAvailabilityErrorMessage] = useState<string>("");
 
   const handleCopy = async () => {
     try {
@@ -219,18 +221,21 @@ export default function TourDetails() {
   const onSubmit: SubmitHandler<BookingFormValues> = async (data) => {
     try {
       setChecking(true);
+      setAvailabilityErrorMessage("");
 
       const result = await checkAvailability({
         tour: tourData?._id,
         date: new Date(data.date).toISOString(),
-        guest: data.guest,
+        guestCount: data.guestCount,
       }).unwrap();
 
       // Check if data is nested under result.data or directly in result
       const availabilityData = result.data || result;
-      
+
       if (!availabilityData.available) {
-        toast.error(availabilityData.message || "Selected date is not available");
+        const errorMessage = availabilityData.message || "Selected date is not available";
+        toast.error(errorMessage);
+        setAvailabilityErrorMessage(errorMessage);
         setAvailability(null);
         setHasCheckedAvailability(true);
         return;
@@ -238,16 +243,20 @@ export default function TourDetails() {
 
       setAvailability({
         date: data.date,
-        guest: data.guest,
-        total: data.guest * (tourData?.costFrom || 0),
+        guest: data.guestCount,
+        total: data.guestCount * (tourData?.costFrom || 0),
       });
+      setAvailabilityErrorMessage("");
       setHasCheckedAvailability(true);
       toast.success(availabilityData.message || "Tour is available for the selected date!");
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (error: any) {
+      const errorMessage = error?.data?.message || "Failed to check availability";
       toast.error(
-        error?.data?.message || "Failed to check availability"
+        errorMessage
       );
+      setAvailabilityErrorMessage(errorMessage);
+      setAvailability(null);
       setHasCheckedAvailability(true);
     } finally {
       setChecking(false);
@@ -688,7 +697,7 @@ export default function TourDetails() {
                   ) : null
                 ) : hasCheckedAvailability && !availability ? (
                   <div ref={availabilityBoxRef} className="border border-primary-400 rounded-2xl p-5 shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white mb-6 scroll-mt-24">
-                    <p className="bg-red-500 text-white px-3 py-2 text-lg rounded-xl font-semibold flex items-center gap-2"><span><PiCalendarSlashBold size={22} /></span> Not Available Right Now</p>
+                    <p className="bg-red-500 text-white px-3 py-2 text-lg rounded-xl font-semibold flex items-center gap-2"><span><PiCalendarSlashBold size={22} /></span> {availabilityErrorMessage || "Not Available Right Now!"}</p>
                   </div>
                 ) : null
               )}
@@ -747,6 +756,30 @@ export default function TourDetails() {
                   </p>
                 </li>
               </ul>
+
+              <div
+                className={`flex flex-col gap-3 text-gray-600 font-medium mt-6 p-5 border rounded-lg ${isRegistrationOver
+                  ? "border-red-500 bg-red-100"
+                  : "border-green-500 bg-green-100"
+                  }`}
+              >
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className={isRegistrationOver ? "text-red-500" : "text-green-500"}>
+                    <MdAppRegistration size={22} />
+                  </span>
+                  <p className="flex items-center gap-2 flex-wrap">
+                    <span>Registration Last Date:</span>
+                    <span className="font-semibold">
+                      {regEndDate ? regEndDate.toLocaleDateString() : "N/A"}
+                    </span>
+                    {isRegistrationOver && (
+                      <span className="inline-flex items-center rounded-full bg-red-500 px-3 py-1 text-xs font-semibold text-white">
+                        Registration closed
+                      </span>
+                    )}
+                  </p>
+                </div>
+              </div>
 
               {tourData?.description && (
                 <div className="mt-6">
@@ -957,7 +990,7 @@ export default function TourDetails() {
                     value={guest || 1}
                     min={1}
                     onChange={(v) =>
-                      setValue("guest", Number(v), {
+                      setValue("guestCount", Number(v), {
                         shouldValidate: true,
                         shouldDirty: true,
                       })

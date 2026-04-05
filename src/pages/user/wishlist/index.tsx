@@ -1,12 +1,13 @@
 import TourCardList from "@/components/modules/tour/TourCardList";
 import TourListTypeLoader from "@/components/shared/blocks/TourListTypeLoader";
-import { useGetAllToursQuery } from "@/redux/features/tour/tour.api";
+import { useGetWishlistQuery } from "@/redux/features/user/user.api";
 import type { ITourPackage } from "@/types";
 
 
 const Wishlist = () => {
 
-    const { data: toursData, isLoading } = useGetAllToursQuery({ limit: "5" });
+    const { data: toursData, isLoading } = useGetWishlistQuery(undefined);
+    const wishlistTours: ITourPackage[] = toursData?.data ?? [];
 
     return (
         <>
@@ -17,8 +18,8 @@ const Wishlist = () => {
                     [...Array(3)].map((_, i) => (
                         <TourListTypeLoader key={i} />
                     ))
-                ) : (toursData?.data ?? []).length > 0 ? (
-                    (toursData?.data ?? []).map((tour: ITourPackage) => (
+                ) : wishlistTours.length > 0 ? (
+                    wishlistTours.map((tour) => (
                         <TourCardList key={tour.slug} tour={tour} />
                     ))
                 ) : (
