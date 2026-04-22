@@ -1,9 +1,7 @@
 import { BiSolidHot } from "react-icons/bi";
 import { FaHeart } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
-import { HiOutlineUsers } from "react-icons/hi2";
 import { LuNotepadText } from "react-icons/lu";
-import { TbCalendarClock } from "react-icons/tb";
 import { Link } from "react-router";
 import type { ITourPackage } from "@/types";
 import ImageWaterMark from '@/assets/images/image-watermark.webp'
@@ -11,10 +9,42 @@ import { useWishlist } from "@/hooks/useWishlist";
 
 interface Props {
     tour: ITourPackage;
+
 }
 
 const TourCardList = ({ tour }: Props) => {
     const { isInWishlist, toggle } = useWishlist();
+
+    const now = Date.now();
+    const availableBatches = (tour.batches ?? []).filter((batch) => {
+        const registrationOpen = new Date(batch.regEndDate).getTime() >= now;
+
+        const remainingSeats = typeof batch.remainingSeat === "number"
+            ? batch.remainingSeat
+            : typeof batch.bookedSeat === "number"
+                ? batch.maxSeat - batch.bookedSeat
+                : undefined;
+
+        const hasSeat = typeof remainingSeats === "number" ? remainingSeats > 0 : true;
+
+        return registrationOpen && hasSeat;
+    });
+
+    const hasBatchData = (tour.batches?.length ?? 0) > 0;
+    const isSoldOut = hasBatchData && availableBatches.length === 0;
+
+    const selectedBatch = availableBatches.reduce((lowestBatch, currentBatch) => {
+        const lowestBatchPrice = lowestBatch.sellingPrice || lowestBatch.costFrom;
+        const currentBatchPrice = currentBatch.sellingPrice || currentBatch.costFrom;
+
+        return currentBatchPrice < lowestBatchPrice ? currentBatch : lowestBatch;
+    }, availableBatches[0]);
+
+    const startsFromPrice = availableBatches.length > 0
+        ? Math.min(...availableBatches.map((batch) => batch.sellingPrice || batch.costFrom))
+        : tour?.costFrom;
+
+    const originalPrice = selectedBatch?.costFrom ?? startsFromPrice;
 
     return (
         <div className='sm:flex sm:items-stretch group rounded-[10px] border border-gray-200 overflow-hidden bg-white shadow-[0px_4px_24px_0px_rgba(194,194,194,0.25)]'>
@@ -47,11 +77,6 @@ const TourCardList = ({ tour }: Props) => {
                         </span>
                     </p>
 
-                    <p className='text-sm text-gray-800 font-semibold flex gap-1'>
-                        <LuNotepadText className='text-primary-500 pt-[2px]' size={18} />
-                        {tour?.tourTypeName}
-                    </p>
-
                     <h2 className='mt-2 mb-2'>
                         <Link
                             to={`/tours/${tour?.slug}`}
@@ -61,34 +86,32 @@ const TourCardList = ({ tour }: Props) => {
                         </Link>
                     </h2>
 
-                    <div>
-                        <p className='text-sm text-gray-500 font-medium inline-flex gap-1 pr-3'>
+                    <div className="flex flex-wrap gap-3">
+                        <p className='text-sm text-gray-500 font-medium inline-flex gap-1'>
                             <FaLocationDot size={14} className="mt-1" />
                             {tour?.arrivalLocation}, {tour?.divisionName}
                         </p>
-                        <p className='text-sm text-gray-500 font-medium inline-flex gap-1'>
-                            <HiOutlineUsers size={16} className='mt-[2px]' />
-                            {tour?.maxGuest} Guests
-                        </p>
+                        <p className='text-sm text-gray-500 font-medium inline-flex gap-1'><LuNotepadText size={14} className='mt-[2px]' /> {tour?.tourTypeName}</p>
                     </div>
-
-                    <p className='text-sm text-gray-700 font-semibold flex gap-1 mt-3'>
-                        <TbCalendarClock className='pt-[1px] mr-[2px]' size={19} />
-                        4 Day, 3 Night
-                    </p>
                 </div>
 
                 <div className='w-full xl:w-[1px] h-[1px] xl:h-full bg-gray-300 my-4 xl:my-0 xl:mr-3'></div>
 
                 <div>
                     <p className='text-gray-600 font-medium mb-4'>
-                        Starts From <br />
-                        <span className='text-primary-400 font-bold text-xl'>
-                            <span className='text-base'>৳</span>{tour?.costFrom}
-                        </span>
-                        <span className='text-gray-500 font-bold text-xl line-through ml-2'>
-                            $789
-                        </span>
+                        {isSoldOut ? (
+                            <span className='text-red-600 font-bold text-lg'>Sold Out</span>
+                        ) : (
+                            <>
+                                Starts From <br />
+                                <span className='text-primary-400 font-bold text-xl'>
+                                    <span className='text-base'>৳</span>{startsFromPrice}
+                                </span>
+                                {originalPrice ? (
+                                    <span className='text-gray-500 font-bold text-base line-through ml-2'>৳{originalPrice}</span>
+                                ) : null}
+                            </>
+                        )}
                     </p>
 
                     <Link

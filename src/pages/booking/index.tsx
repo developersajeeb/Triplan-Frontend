@@ -17,6 +17,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { RiLoaderLine } from "react-icons/ri";
 import { format } from "date-fns";
 import { useCreateBookingMutation, useInitPaymentMutation } from "@/redux/features/booking/booking.api";
+import { toast } from "sonner";
 
 const couponSchema = z.object({
   coupon: z
@@ -49,6 +50,28 @@ const bookingInfoSchema = z.object({
     .optional()
     .or(z.literal("")),
 });
+
+const getStringValue = (obj: Record<string, unknown>, key: string) => {
+  const value = obj[key];
+  return typeof value === "string" ? value : "";
+};
+
+const resolvePaymentUrl = (response: unknown) => {
+  if (!response || typeof response !== "object") return "";
+
+  const root = response as Record<string, unknown>;
+  const data = root.data && typeof root.data === "object" ? (root.data as Record<string, unknown>) : undefined;
+  const nestedData = data?.data && typeof data.data === "object" ? (data.data as Record<string, unknown>) : undefined;
+
+  return (
+    getStringValue(data ?? {}, "paymentUrl") ||
+    getStringValue(root, "paymentUrl") ||
+    getStringValue(nestedData ?? {}, "paymentUrl") ||
+    getStringValue(data ?? {}, "GatewayPageURL") ||
+    getStringValue(root, "GatewayPageURL") ||
+    ""
+  );
+};
 
 export default function Booking() {
   const { slug } = useParams();
@@ -100,12 +123,22 @@ export default function Booking() {
   const handleBooking = async () => {
     const tour = tourData?.data?.[0]?._id;
     const guestCount = guestParam ? Number(guestParam) : 0;
+    const isValid = await form.trigger(["phone", "address"]);
 
-    if (!tour || !guestCount) return;
+    if (!isValid) return;
+
+    const values = form.getValues();
+
+    if (!tour || !guestCount || !dateParam) return;
 
     const bookingData = {
       tour,
       guestCount,
+      date: dateParam,
+      phone: values.phone || undefined,
+      address: values.address || undefined,
+      country: values.country || undefined,
+      city: values.city || undefined,
     };
 
     try {
@@ -113,18 +146,29 @@ export default function Booking() {
       const bookingRes = await createBooking(bookingData).unwrap();
       console.log('bookingRes:', bookingRes?.data?.booking?._id);
 
+      const paymentUrlFromBooking = resolvePaymentUrl(bookingRes);
+      if (paymentUrlFromBooking) {
+        window.location.assign(paymentUrlFromBooking);
+        return;
+      }
+
       const bookingId = bookingRes?.data?.booking?._id;
       if (!bookingId) return;
 
       const paymentRes = await initPayment(bookingId).unwrap();
       console.log('paymentRes:', paymentRes);
-      const paymentUrl = paymentRes?.data?.paymentUrl;
+      const paymentUrl = resolvePaymentUrl(paymentRes);
 
       if (paymentUrl) {
-        window.location.replace(paymentUrl);
+        window.location.assign(paymentUrl);
+        return;
       }
+
+      toast.error("Payment URL পাওয়া যায়নি। আবার চেষ্টা করুন।");
     } catch (error) {
       console.error(error);
+      const err = error as { data?: { message?: string } };
+      toast.error(err?.data?.message || "Something went wrong. Please try again.");
     } finally {
       setIsLoginBtnLoading(false);
     }
@@ -141,7 +185,74 @@ export default function Booking() {
   }
 
   if (isTourLoading) {
-    return <p>Loading...</p>;
+    return (
+      <div className="tp-container my-20 flex flex-col lg:flex-row gap-8">
+        <div className="flex-1 space-y-4 sm:space-y-5 shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white rounded-2xl border border-gray-200 p-6">
+          <div className="grid sm:grid-cols-2 gap-4 sm:gap-5">
+            <div>
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-12 w-full mt-2 rounded-lg" />
+            </div>
+            <div>
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-12 w-full mt-2 rounded-lg" />
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4 sm:gap-5 mt-2">
+            <div>
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-12 w-full mt-2 rounded-lg" />
+            </div>
+            <div>
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-12 w-full mt-2 rounded-lg" />
+            </div>
+          </div>
+
+          <div className="grid sm:grid-cols-2 gap-4 sm:gap-5 mt-2">
+            <div>
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-12 w-full mt-2 rounded-lg" />
+            </div>
+            <div>
+              <Skeleton className="h-4 w-20" />
+              <Skeleton className="h-12 w-full mt-2 rounded-lg" />
+            </div>
+          </div>
+        </div>
+
+        <div className="w-full scroll-mt-24 md:scroll-mt-0 lg:min-w-[420px] lg:w-[420px] lg:sticky top-24 h-fit">
+          <div className="shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white rounded-2xl border border-gray-200">
+            <div className="p-6">
+              <Skeleton className="h-6 w-4/5 mb-10" />
+              <Skeleton className="h-4 w-2/3 mb-2" />
+              <Skeleton className="h-4 w-1/2" />
+              <div className="border-b border-gray-200 my-5"></div>
+              <div className="flex justify-between gap-2">
+                <Skeleton className="h-4 w-40" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+              <div className="border-b border-gray-200 my-5"></div>
+              <div className="flex justify-between gap-2">
+                <Skeleton className="h-4 w-20" />
+                <Skeleton className="h-4 w-24" />
+              </div>
+              <div className="border-b border-gray-200 my-5"></div>
+              <Skeleton className="h-4 w-36 mb-3" />
+              <Skeleton className="h-11 w-full rounded-lg" />
+            </div>
+            <div className="bg-gray-200 py-4 px-6 flex justify-between gap-2 flex-wrap">
+              <Skeleton className="h-5 w-12" />
+              <Skeleton className="h-5 w-20" />
+            </div>
+            <div className="p-5">
+              <Skeleton className="h-12 w-full rounded-lg" />
+            </div>
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (

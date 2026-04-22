@@ -1,15 +1,17 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import CommonMetadata from "@/components/utilities/CommonMetadata";
 import JsonLd from "@/components/utilities/JsonLd";
 import useFancyBox from "@/hooks/useFancybox";
 import { useWishlist } from "@/hooks/useWishlist";
+import { useCheckAvailabilityMutation } from "@/redux/features/booking/booking.api";
 import { useGetSingleTourQuery } from "@/redux/features/tour/tour.api";
 import React, { useEffect, useRef, useState } from "react";
 import { FaFacebook, FaHeart, FaInstagram, FaWhatsapp, FaXTwitter } from "react-icons/fa6";
 import { FiLink } from "react-icons/fi";
 import { GoShareAndroid } from "react-icons/go";
-import { LuCalendarFold, LuCheck, LuImages, LuNotepadText, LuSend } from "react-icons/lu";
+import { LuCheck, LuImages, LuNotepadText, LuSend } from "react-icons/lu";
 import { Link, useParams } from "react-router";
 import { toast } from "sonner";
 import { Pagination } from "swiper/modules";
@@ -17,47 +19,28 @@ import { Swiper, SwiperSlide } from "swiper/react";
 import ImageWaterMark from "@/assets/images/image-watermark.webp";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Fancybox, type FancyboxOptions } from "@fancyapps/ui/dist/fancybox";
-import { MdAppRegistration, MdOutlineWatchLater } from "react-icons/md";
-import { TbUsers } from "react-icons/tb";
-import { GrLocation } from "react-icons/gr";
-import { PiCalendarSlashBold, PiClockBold, PiSealCheck } from "react-icons/pi";
+import { PiSealCheck } from "react-icons/pi";
 import { RxCross2 } from "react-icons/rx";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
 import { format } from "date-fns";
 import { CiCircleMinus, CiCirclePlus } from "react-icons/ci";
-import z from "zod";
 import { useForm, type FieldValues, type SubmitHandler } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { HiOutlineLocationMarker } from "react-icons/hi";
 import { Dialog, DialogClose, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { RiLoaderLine } from "react-icons/ri";
-import { GiCheckMark } from "react-icons/gi";
 import { Textarea } from "@/components/ui/textarea";
-import { FaRegDotCircle } from "react-icons/fa";
-import { getTotalDays } from "@/helper/CommonHelper";
-import { useCheckAvailabilityMutation } from "@/redux/features/booking/booking.api";
+import { useNavigate } from "react-router";
 import OverallRatingBox from "./OverallRatingBox";
 import UserReview from "./UserReview";
 
-type BookingFormValues = z.infer<typeof bookingSchema>;
-
-const bookingSchema = z.object({
-  date: z
-    .any()
-    .refine((val) => val instanceof Date, { message: "Please select a valid date" }),
-  guestCount: z
-    .number()
-    .min(1, { message: "At least 1 guest is required" })
-});
-
 export default function TourDetails() {
   const { slug } = useParams();
-  const [checkAvailability, { isLoading: isCheckingAvailabilityLoading }] = useCheckAvailabilityMutation();
+  const navigate = useNavigate();
+  const [checkAvailability, { isLoading: isCheckingAvailability }] = useCheckAvailabilityMutation();
   const { data: tourData, isLoading } = useGetSingleTourQuery(slug!);
 
   const { isInWishlist, toggle } = useWishlist();
@@ -77,15 +60,6 @@ export default function TourDetails() {
   const [desktopFancyBoxRef] = useFancyBox(fancyBoxOptions);
   const [mobileFancyBoxRef] = useFancyBox(fancyBoxOptions);
   const [reviewImageFancyBoxRef] = useFancyBox(fancyBoxOptions);
-  const [openCalendar, setOpenCalendar] = useState<boolean>(false);
-  const availabilityBoxRef = useRef<HTMLDivElement>(null);
-  const availabilityRef = useRef<HTMLDivElement>(null);
-  const scrollToAvailability = () => {
-    availabilityRef.current?.scrollIntoView({
-      behavior: "smooth",
-      block: "start",
-    });
-  };
   const shareUrl = `https://triplan.developersajeeb.com/tours/${tourData?.slug}`;
   const shareText = encodeURIComponent(tourData?.title ?? "");
   const [copied, setCopied] = useState<boolean>(false);
@@ -93,17 +67,60 @@ export default function TourDetails() {
   const limit = 350;
   const text = tourData?.description ?? "";
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  const [isCollapsing, setIsCollapsing] = useState<boolean>(false);
   const [needsReadMore, setNeedsReadMore] = useState<boolean>(false);
-  const contentRef = useRef<HTMLDivElement>(null);
-  const today = new Date();
-  const regEndDate = tourData?.regEndDate ? new Date(tourData.regEndDate) : null;
-  const isRegistrationOver = !!regEndDate && regEndDate.getTime() < today.getTime();
-  const [month, setMonth] = useState<Date>(today);
+  const contentRef = useRef<HTMLParagraphElement>(null);
   const enquiryForm = useForm({
     mode: "onSubmit",
   });
   const [isLoginBtnLoading, setIsLoginBtnLoading] = useState<boolean>(false);
   const [openEnquiry, setOpenEnquiry] = useState<boolean>(false);
+  const [guest, setGuest] = useState<number>(1);
+
+  const batchOptions = tourData?.batches ?? [];
+  const [selectedBatchId, setSelectedBatchId] = useState<string>("");
+  const selectedBatch =
+    batchOptions.find((batch) => batch._id === selectedBatchId) || batchOptions[0];
+
+  const formatBatchDateRange = (startDate: string, endDate: string) => {
+    return `${format(new Date(startDate), "MMM dd")} – ${format(new Date(endDate), "MMM dd, yyyy")}`;
+  };
+
+  const getBatchSeatsLeft = (batch: (typeof batchOptions)[number]) => {
+    if (typeof batch.remainingSeat === "number") {
+      return batch.remainingSeat;
+    }
+
+    return Math.max(0, (batch.maxSeat || 0) - (batch.bookedSeat || 0));
+  };
+
+  const getBatchStatus = (batch: (typeof batchOptions)[number]) => {
+    const seatsLeft = getBatchSeatsLeft(batch);
+    const regEndDate = new Date(batch.regEndDate);
+    const now = new Date();
+    const regClosed = regEndDate.getTime() < now.getTime();
+
+    if (seatsLeft <= 0 || regClosed) return "Closed";
+
+    const daysUntilRegClose = Math.ceil(
+      (regEndDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+    );
+
+    if (daysUntilRegClose <= 2) return "Closing soon";
+    return "Open";
+  };
+
+  const getBatchBadgeClasses = (status: string) => {
+    if (status === "Closing soon") {
+      return "bg-yellow-400 text-yellow-800";
+    }
+
+    if (status === "Open") {
+      return "bg-green-400 text-green-800";
+    }
+
+    return "bg-red-300 text-red-800";
+  };
 
   const enquiryOnSubmit: SubmitHandler<FieldValues> = async () => {
     try {
@@ -119,35 +136,91 @@ export default function TourDetails() {
     }
   };
 
-  const {
-    watch,
-    setValue,
-    handleSubmit,
-    formState: { errors },
-  } = useForm<BookingFormValues>({
-    resolver: zodResolver(bookingSchema),
-    defaultValues: {
-      date: undefined,
-      guestCount: 1,
-    },
-  });
-  const selectedDate = watch("date");
-  const guest = watch("guestCount");
-  const allErrors = Object.values(errors)
-    .map((e) => e?.message)
-    .filter((msg): msg is string => typeof msg === "string");
+  useEffect(() => {
+    const batches = tourData?.batches ?? [];
+
+    if (!batches.length) {
+      setSelectedBatchId("");
+      return;
+    }
+
+    if (!selectedBatchId || !batches.some((batch) => batch._id === selectedBatchId)) {
+      setSelectedBatchId(batches[0]._id);
+    }
+  }, [tourData?.batches, selectedBatchId]);
+
+  const selectedBatchStatus = selectedBatch ? getBatchStatus(selectedBatch) : "";
+  const selectedBatchSellingPrice = selectedBatch?.sellingPrice ?? tourData?.sellingPrice ?? 0;
+  const selectedBatchCostFrom = selectedBatch?.costFrom ?? tourData?.costFrom ?? 0;
+  const liveGuestTotal = guest * selectedBatchSellingPrice;
+  const bookingUrl = selectedBatch
+    ? `/booking/${tourData?.slug}?date=${format(new Date(selectedBatch.startDate), "yyyy-MM-dd")}&guest=${guest}&total=${liveGuestTotal}`
+    : "#";
+  const discountPercent =
+    selectedBatchCostFrom > 0
+      ? Math.max(0, Math.round(((selectedBatchCostFrom - selectedBatchSellingPrice) / selectedBatchCostFrom) * 100))
+      : 0;
+
+  const handleBookNow = async () => {
+    if (!tourData?._id) {
+      toast.error("Tour data is missing. Please try again.");
+      return;
+    }
+
+    if (!selectedBatch) {
+      toast.error("No batch is available for this tour.");
+      return;
+    }
+
+    if (selectedBatchStatus === "Closed") {
+      toast.error("This batch is closed. Please select another batch.");
+      return;
+    }
+
+    try {
+      const result = await checkAvailability({
+        tour: tourData._id,
+        date: new Date(selectedBatch.startDate).toISOString(),
+        guestCount: guest,
+      }).unwrap();
+
+      const availabilityData = result.data || result;
+
+      if (!availabilityData.available) {
+        toast.error(availabilityData.message || "Selected batch is not available");
+        return;
+      }
+
+      navigate(bookingUrl);
+    } catch (error: any) {
+      const errorMessage = error?.data?.message || "Failed to check availability";
+      toast.error(errorMessage);
+    }
+  };
 
   useEffect(() => {
     setNeedsReadMore(text.length > limit);
   }, [text, limit]);
-  const [checking, setChecking] = useState(false);
-  const [availability, setAvailability] = useState<null | {
-    date: Date;
-    guest: number;
-    total: number;
-  }>(null);
-  const [hasCheckedAvailability, setHasCheckedAvailability] = useState<boolean>(false);
-  const [availabilityErrorMessage, setAvailabilityErrorMessage] = useState<string>("");
+
+  useEffect(() => {
+    if (!isCollapsing) return;
+
+    const timer = setTimeout(() => {
+      setIsCollapsing(false);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [isCollapsing]);
+
+  const handleToggleDescription = () => {
+    if (isExpanded) {
+      setIsCollapsing(true);
+      setIsExpanded(false);
+      return;
+    }
+
+    setIsExpanded(true);
+  };
 
   const handleCopy = async () => {
     try {
@@ -184,119 +257,9 @@ export default function TourDetails() {
     );
   };
 
-  const Counter = ({
-    label,
-    value,
-    min,
-    onChange,
-  }: {
-    label: string;
-    value: number;
-    min: number;
-    onChange: (val: number) => void;
-  }) => (
-    <li className="flex justify-between border-b py-3 last-of-type:border-none">
-      <p className="font-semibold text-gray-700">{label}</p>
-      <div className="flex items-center">
-        <button
-          className="text-gray-600 hover:bg-primary-950 hover:text-white rounded-full duration-300 disabled:opacity-35 disabled:pointer-events-none"
-          type="button"
-          disabled={value <= min}
-          onClick={() => onChange(Math.max(min, value - 1))}
-        >
-          <CiCircleMinus size={24} />
-        </button>
-        <span className="w-8 text-center font-medium">{value}</span>
-        <button
-          className="text-gray-600 hover:bg-primary-950 hover:text-white rounded-full duration-300"
-          type="button"
-          onClick={() => onChange(value + 1)}
-        >
-          <CiCirclePlus size={24} />
-        </button>
-      </div>
-    </li>
+  const faqItems = (tourData?.faq ?? []).filter(
+    (item) => item?.question?.trim() && item?.answer?.trim()
   );
-
-  const onSubmit: SubmitHandler<BookingFormValues> = async (data) => {
-    try {
-      setChecking(true);
-      setAvailabilityErrorMessage("");
-
-      const result = await checkAvailability({
-        tour: tourData?._id,
-        date: new Date(data.date).toISOString(),
-        guestCount: data.guestCount,
-      }).unwrap();
-
-      // Check if data is nested under result.data or directly in result
-      const availabilityData = result.data || result;
-
-      if (!availabilityData.available) {
-        const errorMessage = availabilityData.message || "Selected date is not available";
-        toast.error(errorMessage);
-        setAvailabilityErrorMessage(errorMessage);
-        setAvailability(null);
-        setHasCheckedAvailability(true);
-        return;
-      }
-
-      setAvailability({
-        date: data.date,
-        guest: data.guestCount,
-        total: data.guestCount * (tourData?.costFrom || 0),
-      });
-      setAvailabilityErrorMessage("");
-      setHasCheckedAvailability(true);
-      toast.success(availabilityData.message || "Tour is available for the selected date!");
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      const errorMessage = error?.data?.message || "Failed to check availability";
-      toast.error(
-        errorMessage
-      );
-      setAvailabilityErrorMessage(errorMessage);
-      setAvailability(null);
-      setHasCheckedAvailability(true);
-    } finally {
-      setChecking(false);
-    }
-  };
-
-  useEffect(() => {
-    if (
-      isCheckingAvailabilityLoading ||
-      hasCheckedAvailability
-    ) {
-      availabilityBoxRef.current?.scrollIntoView({
-        behavior: "smooth",
-        block: "start",
-      });
-    }
-  }, [isCheckingAvailabilityLoading, hasCheckedAvailability]);
-
-  const faqItems = [
-    {
-      question: "What services does TripPlan offer?",
-      answer: "TripPlan offers complete travel management — including tour packages, hotel bookings, transport, adventure trips, and custom itinerary planning to make your journey hassle-free.",
-    },
-    {
-      question: "Can I customize my tour package?",
-      answer: "Yes! You can fully personalize your trip by choosing destinations, activities, and travel dates that match your preferences and budget.",
-    },
-    {
-      question: "Do you offer group discounts?",
-      answer: "Absolutely. We have special offers for group bookings, families, and corporate travelers. Contact our team for the best available deals.",
-    },
-    {
-      question: "How do I book a trip with TripPlan?",
-      answer: "Simply browse your desired destination, select a package, and click “Book Now.” You can also reach out to our travel experts for personalized guidance.",
-    },
-    {
-      question: "Is TripPlan a trusted tour operator?",
-      answer: "Yes — we work with verified global partners and provide transparent pricing, secure payments, and 24/7 support to ensure a reliable travel experience.",
-    },
-  ];
 
   const reviews = [
     {
@@ -385,21 +348,11 @@ export default function TourDetails() {
                     <span>
                       <HiOutlineLocationMarker size={18} />
                     </span>{" "}
-                    {tourData?.arrivalLocation + ", " + tourData?.divisionName}
+                    {tourData?.arrivalLocation}
                   </li>
                 </ul>
               </div>
               <div className="flex gap-2 fixed justify-between md:justify-normal md:relative bg-white md:bg-transparent left-0 right-0 bottom-0 p-3 md:p-0 shadow-[0px_0px_10px_0px_#00000012] md:shadow-none z-30">
-                <div className="md:hidden w-full sm:w-auto">
-                  <Button
-                    disabled={checking}
-                    type="button"
-                    onClick={scrollToAvailability}
-                    className="tp-primary-btn w-full sm:w-auto h-11 !py-2"
-                  >
-                    Check availability
-                  </Button>
-                </div>
                 <div className="flex gap-2">
                   <Popover>
                     <PopoverTrigger asChild>
@@ -629,178 +582,48 @@ export default function TourDetails() {
             </div>
           ) : (
             <div className="flex-1">
-              {/* Available Book box */}
-              {isCheckingAvailabilityLoading ? (
-                <div ref={availabilityBoxRef} className="border border-primary-400 rounded-2xl p-5 shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white mb-6 scroll-mt-24">
-                  <p className="text-lg font-semibold text-gray-500 flex items-center gap-2"><span><PiClockBold size={22} /></span> Checking...</p>
-                  <Skeleton className="mt-3 w-full h-[30px] rounded-full" />
-                  <Skeleton className="mt-3 w-4/5 h-[30px] rounded-full" />
-                </div>
-              ) : (
-                hasCheckedAvailability && availability ? (
-                  availability ? (
-                    <div ref={availabilityBoxRef} className="border border-primary-400 rounded-2xl p-5 shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white mb-6 scroll-mt-24">
-                      <p className="bg-green-500 text-white px-3 py-2 text-lg rounded-xl font-semibold flex items-center gap-2"><span><GiCheckMark /></span> Available</p>
-
-                      <div className="flex flex-col sm:flex-row gap-4 mt-5">
-                        <div className="flex-1">
-                          <h1 className="text-base tracking-tight font-semibold text-gray-700 flex gap-1"><FaRegDotCircle className="text-primary-500 pt-1" size={22} /> {tourData?.title}</h1>
-                          {tourData?.startDate && (
-                            <div className="flex gap-1 text-sm text-gray-600 font-medium mt-5 sm:pl-6">
-                              <span>
-                                <LuCalendarFold size={20} />
-                              </span>
-                              <p>
-                                Start Date:{" "}
-                                <span className="font-semibold">
-                                  {format(new Date(tourData.startDate), "MMM dd, yyyy")}
-                                </span>
-                              </p>
-                            </div>
-                          )}
-                          {tourData?.arrivalLocation && (
-                            <div className="flex text-sm gap-1 items-center text-gray-600 font-medium mt-3 sm:pl-6">
-                              <span>
-                                <GrLocation size={20} />
-                              </span>
-                              <p>
-                                Starting Location:{" "}
-                                <span className="font-semibold">
-                                  {tourData?.departureLocation || "N/A"}
-                                </span>
-                              </p>
-                            </div>
-                          )}
-                        </div>
-                        <div>
-                          <p className="mb-1 text-sm font-medium text-gray-500 space-y-1 sm:text-end">
-                            Total guests: {availability?.guest}
-                          </p>
-                          <p className="text-lg font-semibold sm:text-end">
-                            <span className="font-medium text-gray-600 tracking-tighter">Total: </span>
-                            <span className="text-primary-500">
-                              ৳{availability?.total}
-                            </span>
-                          </p>
-
-                          <div className="sm:text-end mt-5">
-                            <Link
-                              to={`/booking/${tourData?.slug}?date=${format(availability.date, "yyyy-MM-dd")}&guest=${availability.guest}&total=${availability.total}`}
-                              className="tp-primary-btn h-12 w-auto !py-3 inline-block"
-                            >
-                              Book Now
-                            </Link>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  ) : null
-                ) : hasCheckedAvailability && !availability ? (
-                  <div ref={availabilityBoxRef} className="border border-primary-400 rounded-2xl p-5 shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white mb-6 scroll-mt-24">
-                    <p className="bg-red-500 text-white px-3 py-2 text-lg rounded-xl font-semibold flex items-center gap-2"><span><PiCalendarSlashBold size={22} /></span> {availabilityErrorMessage || "Not Available Right Now!"}</p>
-                  </div>
-                ) : null
-              )}
-
               <h3 className="text-2xl font-semibold text-gray-800 mb-6">
                 Overview
               </h3>
-              <ul className="grid sm:grid-cols-2 gap-4 content-between">
-                <li className="flex gap-2 text-gray-600 font-medium">
-                  <span className="text-primary-600">
-                    <MdOutlineWatchLater size={22} />
-                  </span>
-                  <p>
-                    Duration:{" "}
-                    <span className="font-semibold">
-                      {tourData?.startDate && tourData?.endDate
-                        ? `${getTotalDays(
-                          tourData.startDate,
-                          tourData.endDate
-                        )} Days`
-                        : "N/A"}
-                    </span>
-                  </p>
-                </li>
-                <li className="flex gap-2 text-gray-600 font-medium">
-                  <span className="text-primary-600">
-                    <LuNotepadText size={22} />
-                  </span>
-                  <p>
-                    Tour Type:{" "}
-                    <span className="font-semibold">
-                      {tourData?.tourTypeName || "N/A"}
-                    </span>
-                  </p>
-                </li>
-                <li className="flex gap-2 text-gray-600 font-medium">
-                  <span className="text-primary-600">
-                    <TbUsers size={22} />
-                  </span>
-                  <p>
-                    On every tour:{" "}
-                    <span className="font-semibold">
-                      {tourData?.maxGuest || "N/A"} guests (max)
-                    </span>
-                  </p>
-                </li>
-                <li className="flex gap-2 text-gray-600 font-medium">
-                  <span className="text-primary-600">
-                    <GrLocation size={22} />
-                  </span>
-                  <p>
-                    Location:{" "}
-                    <span className="font-semibold">
-                      {tourData?.location || "N/A"}
-                    </span>
-                  </p>
-                </li>
-              </ul>
-
-              <div
-                className={`flex flex-col gap-3 text-gray-600 font-medium mt-6 p-5 border rounded-lg ${isRegistrationOver
-                  ? "border-red-500 bg-red-100"
-                  : "border-green-500 bg-green-100"
-                  }`}
-              >
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className={isRegistrationOver ? "text-red-500" : "text-green-500"}>
-                    <MdAppRegistration size={22} />
-                  </span>
-                  <p className="flex items-center gap-2 flex-wrap">
-                    <span>Registration Last Date:</span>
-                    <span className="font-semibold">
-                      {regEndDate ? regEndDate.toLocaleDateString() : "N/A"}
-                    </span>
-                    {isRegistrationOver && (
-                      <span className="inline-flex items-center rounded-full bg-red-500 px-3 py-1 text-xs font-semibold text-white">
-                        Registration closed
-                      </span>
-                    )}
-                  </p>
-                </div>
-              </div>
-
               {tourData?.description && (
                 <div className="mt-6">
                   <div
-                    ref={contentRef}
-                    style={{
-                      maxHeight: isExpanded
-                        ? `${contentRef.current?.scrollHeight}px`
-                        : "150px",
-                      overflow: "hidden",
-                      transition: "max-height 0.5s ease",
-                    }}
+                    className="overflow-hidden"
+                    style={
+                      isExpanded
+                        ? {
+                            maxHeight: `${contentRef.current?.scrollHeight ?? 0}px`,
+                            opacity: 1,
+                            transition: "max-height 0.5s ease, opacity 0.35s ease",
+                          }
+                        : {
+                            maxHeight: "7.5em",
+                            opacity: isCollapsing ? 1 : 0.95,
+                            transition: "max-height 0.5s ease, opacity 0.35s ease",
+                          }
+                    }
                   >
-                    <p className="text-gray-600 font-medium">
+                    <p
+                      ref={contentRef}
+                      className="text-gray-600 font-medium"
+                      style={
+                        !isExpanded && !isCollapsing
+                          ? {
+                              display: "-webkit-box",
+                              WebkitLineClamp: 5,
+                              WebkitBoxOrient: "vertical",
+                              overflow: "hidden",
+                            }
+                          : undefined
+                      }
+                    >
                       {tourData.description}
                     </p>
                   </div>
 
                   {needsReadMore && (
                     <button
-                      onClick={() => setIsExpanded(!isExpanded)}
+                      onClick={handleToggleDescription}
                       className="mt-2 text-blue-500 font-semibold"
                     >
                       {isExpanded ? "Read Less" : "Read More"}
@@ -874,46 +697,37 @@ export default function TourDetails() {
                   </>
                 )}
 
-              <h3 className="text-2xl font-semibold text-gray-800 mb-5">
-                Frequently asked questions
-              </h3>
-              <Accordion
-                type="single"
-                collapsible
-                className="w-full space-y-3"
-                defaultValue={String(0)}
-              >
-                {faqItems.map((item, index) => (
-                  <AccordionItem
-                    value={String(index)}
-                    key={index}
-                    className="py-2 px-4 border bg-gray-50 rounded-lg"
+              {faqItems.length > 0 && (
+                <>
+                  <h3 className="text-2xl font-semibold text-gray-800 mb-5">
+                    Frequently asked questions
+                  </h3>
+                  <Accordion
+                    type="single"
+                    collapsible
+                    className="w-full space-y-3"
+                    defaultValue={String(0)}
                   >
-                    <AccordionTrigger className="py-2 text-lg text-primary-950 leading-6 hover:no-underline">
-                      {item.question}
-                    </AccordionTrigger>
-                    <AccordionContent className="pb-2 text-base font-medium text-gray-600">
-                      {item.answer}
-                    </AccordionContent>
-                  </AccordionItem>
-                ))}
-              </Accordion>
+                    {faqItems.map((item, index) => (
+                      <AccordionItem
+                        value={String(index)}
+                        key={index}
+                        className="py-2 px-4 border bg-gray-50 rounded-lg"
+                      >
+                        <AccordionTrigger className="py-2 text-lg text-primary-950 leading-6 hover:no-underline">
+                          {item.question}
+                        </AccordionTrigger>
+                        <AccordionContent className="pb-2 text-base font-medium text-gray-600 whitespace-pre-line">
+                          {item.answer}
+                        </AccordionContent>
+                      </AccordionItem>
+                    ))}
+                  </Accordion>
 
-              <div className="border-b w-full border-gray-200 my-8"></div>
+                  <div className="border-b w-full border-gray-200 my-8"></div>
+                </>
+              )}
 
-              <h3 className="text-2xl font-semibold text-gray-800 mb-5">
-                Cancellation policy
-              </h3>
-              <p className="text-gray-600 font-medium">
-                You can cancel up to 24 hours in advance of the experience for a
-                full refund.
-              </p>
-
-              <div className="border-b w-full border-gray-200 my-8"></div>
-
-              <h3 className="text-2xl font-semibold text-gray-800 mb-5">
-                Customer reviews
-              </h3>
               <OverallRatingBox />
 
               {/* User Review */}
@@ -927,90 +741,111 @@ export default function TourDetails() {
             </div>
           )}
 
-          {/* Availability Check */}
+          {/* Booking Card */}
           {isLoading ? (
             <Skeleton className="my-2 w-full scroll-mt-24 md:scroll-mt-0 lg:min-w-[395px] lg:w-[395px] lg:sticky top-24" />
           ) : (
-            <div ref={availabilityRef} className={`w-full scroll-mt-24 md:scroll-mt-0 lg:min-w-[395px] lg:w-[395px] lg:sticky top-24 h-fit`}>
+            <div className={`w-full scroll-mt-24 md:scroll-mt-0 lg:min-w-[395px] lg:w-[395px] lg:sticky top-24 h-fit`}>
               <div className="shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white p-6 rounded-2xl border border-gray-200">
                 <p className="text-base text-gray-700 font-medium flex justify-between">
                   <span>from</span>{" "}
                   <span className="inline-block px-3 py-1 bg-green-500 text-white text-sm rounded-full font-semibold">
-                    -5%
+                    -{discountPercent}%
                   </span>
                 </p>
                 <p className="text-primary-500">
                   <span className="text-[24px] font-semibold tracking-tighter">
-                    ৳{tourData?.costFrom}
+                    ৳{selectedBatchSellingPrice}
                   </span>
-                  <span className="text-base font-medium">/person</span>
-                </p>
-                <p className="text-base text-gray-500 font-semibold line-through tracking-tighter -mt-1">
-                  ৳30000
+                  <span className="text-base font-medium">/person</span>{" "}
+                  {selectedBatchCostFrom > 0 && (
+                    <span className="text-base text-gray-500 font-semibold line-through tracking-tighter -mt-1">
+                      ৳{selectedBatchCostFrom}
+                    </span>
+                  )}
                 </p>
 
-                <ul>
-                  <li className="flex justify-between gap-2 border-b border-gray-200 py-3 mt-4">
-                    <span className="font-semibold text-gray-700">Date</span>
-                    <Popover open={openCalendar} onOpenChange={setOpenCalendar}>
-                      <PopoverTrigger asChild>
-                        <Button
-                          type="button"
-                          id="date"
-                          className="flex gap-2 w-auto h-auto text-left text-gray-700 font-semibold text-base tracking-tighter bg-transparent p-0 shadow-none hover:bg-transparent"
+                <hr className="border-gray-200 my-4" />
+
+                <p className="text-sm font-bold text-gray-600 mb-2">Select a batch</p>
+
+                {batchOptions.map((batch) => {
+                  const isSelected = selectedBatchId === batch._id;
+                  const batchStatus = getBatchStatus(batch);
+                  const seatsLeft = getBatchSeatsLeft(batch);
+
+                  return (
+                    <div
+                      key={batch._id}
+                      onClick={() => {
+                        if (batchStatus !== "Closed") {
+                          setSelectedBatchId(batch._id);
+                        }
+                      }}
+                      className={`border rounded-lg px-4 py-2 flex justify-between gap-3 mb-2 ${
+                        isSelected
+                          ? "border-primary-200 bg-primary-400"
+                          : "border-gray-200 bg-gray-50"
+                      } ${batchStatus === "Closed" ? "opacity-65 pointer-events-none" : "cursor-pointer"}`}
+                    >
+                      <div>
+                        <p className={`text-sm font-semibold ${isSelected ? "text-white" : "text-gray-600"}`}>
+                          {formatBatchDateRange(batch.startDate, batch.endDate)}
+                        </p>
+                        <p className={`text-xs font-medium ${isSelected ? "text-white" : "text-gray-500"}`}>
+                          Reg. ends {format(new Date(batch.regEndDate), "MMM dd, yyyy")} / {seatsLeft} seats left
+                        </p>
+                      </div>
+                      <div>
+                        <span
+                          className={`inline-block px-2 py-[2px] text-xs rounded-full font-semibold ${
+                            getBatchBadgeClasses(batchStatus)
+                          }`}
                         >
-                          <span>
-                            <LuCalendarFold size={22} />
-                          </span>
-                          {selectedDate
-                            ? format(selectedDate, "MMM dd, yyyy")
-                            : "Select date"}
-                        </Button>
-                      </PopoverTrigger>
-                      <PopoverContent
-                        className="w-auto overflow-hidden p-0"
-                        align="end"
-                      >
-                        <Calendar
-                          mode="single"
-                          selected={selectedDate}
-                          month={month}
-                          onMonthChange={setMonth}
-                          disabled={{ before: today }}
-                          onSelect={(d) => {
-                            setValue("date", d!, { shouldValidate: true });
-                            setOpenCalendar(false);
-                          }}
-                        />
-                      </PopoverContent>
-                    </Popover>
-                  </li>
-                  <Counter
-                    label="Guest"
-                    value={guest || 1}
-                    min={1}
-                    onChange={(v) =>
-                      setValue("guestCount", Number(v), {
-                        shouldValidate: true,
-                        shouldDirty: true,
-                      })
-                    }
-                  />
-                </ul>
-                {allErrors.length > 0 && (
-                  <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-3">
-                    <ul className="list-disc list-inside space-y-1 text-sm text-red-600 font-medium">
-                      {allErrors.map((msg, i) => (
-                        <li key={i}>{msg}</li>
-                      ))}
-                    </ul>
+                          {batchStatus}
+                        </span>
+                      </div>
+                    </div>
+                  );
+                })}
+
+                <hr className="border-gray-200 mt-5" />
+
+                <div className="flex justify-between py-3">
+                  <p className="font-semibold text-gray-700">Guest</p>
+                  <div className="flex items-center">
+                    <button
+                      className="text-gray-600 hover:bg-primary-950 hover:text-white rounded-full duration-300 disabled:opacity-35 disabled:pointer-events-none"
+                      type="button"
+                      disabled={guest <= 1}
+                      onClick={() => setGuest((prev) => Math.max(1, prev - 1))}
+                    >
+                      <CiCircleMinus size={24} />
+                    </button>
+                    <span className="w-8 text-center font-medium">{guest}</span>
+                    <button
+                      className="text-gray-600 hover:bg-primary-950 hover:text-white rounded-full duration-300"
+                      type="button"
+                      onClick={() => setGuest((prev) => prev + 1)}
+                    >
+                      <CiCirclePlus size={24} />
+                    </button>
                   </div>
-                )}
+                </div>
+                <div className="flex justify-between pb-3">
+                  <p className="font-semibold text-gray-700">Amount</p>
+                  <p className="text-lg font-semibold text-primary-500 tracking-tight">
+                    ৳{liveGuestTotal}
+                  </p>
+                </div>
+
                 <Button
-                  onClick={handleSubmit(onSubmit)}
+                  type="button"
+                  disabled={isCheckingAvailability}
+                  onClick={handleBookNow}
                   className="tp-primary-btn h-12 w-full mt-5"
                 >
-                  Check Availability
+                  {isCheckingAvailability ? "Checking..." : "Book Now"}
                 </Button>
                 <Dialog
                   open={openEnquiry}

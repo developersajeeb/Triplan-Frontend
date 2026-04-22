@@ -24,7 +24,7 @@ export default function MultipleImageUploader({
       getInputProps,
     },
   ] = useFileUpload({
-    accept: "image/svg+xml,image/png,image/jpeg,image/jpg,image/gif",
+    accept: "image/svg+xml,image/png,image/jpeg,image/jpg,image/webp",
     maxSize,
     multiple: true,
     maxFiles,
@@ -49,7 +49,7 @@ export default function MultipleImageUploader({
         onDrop={handleDrop}
         data-dragging={isDragging || undefined}
         data-files={files.length > 0 || undefined}
-        className="border-input data-[dragging=true]:bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 relative flex min-h-52 flex-col items-center overflow-hidden rounded-xl border border-dashed p-4 transition-colors not-data-[files]:justify-center has-[input:focus]:ring-[3px]"
+        className="border-input data-[dragging=true]:bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 relative flex min-h-52 flex-col items-center overflow-hidden rounded-lg border border-gray-300 p-4 transition-colors not-data-[files]:justify-center has-[input:focus]:ring-[3px]"
       >
         <input
           {...getInputProps()}
@@ -111,7 +111,7 @@ export default function MultipleImageUploader({
             </div>
             <p className="mb-1.5 text-sm font-medium">Drop your images here</p>
             <p className="text-muted-foreground text-xs">
-              SVG, PNG, JPG or GIF (max. {maxSizeMB}MB)
+              SVG, PNG, JPG or WEBP (max. {maxSizeMB}MB)
             </p>
             <Button
               type="button"

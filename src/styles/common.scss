@@ -32,16 +32,20 @@
     @apply text-[14px] font-semibold bg-white hover:bg-primary-50 border border-primary-500 text-primary-500 px-5 h-10 rounded-lg transition duration-300;
 }
 
-// Form input related class
+// Form related class
 .tp-input {
-    @apply w-full !text-sm bg-white font-medium border border-gray-300 hover:border-primary-400 focus:border-primary-400 focus-visible:ring-0 px-3 py-2 h-11;
+    @apply w-full !text-sm bg-white font-medium border border-gray-300 hover:border-primary-400 focus:border-primary-400 focus-visible:ring-0 px-3 py-2 h-11 duration-300;
 }
 
 .tp-textarea {
-    @apply w-full !text-sm bg-white font-medium border border-gray-300 hover:border-primary-400 focus:border-primary-400 focus-visible:ring-0 px-3 py-2;
+    @apply w-full !text-sm bg-white font-medium border border-gray-300 hover:border-primary-400 focus:border-primary-400 focus:outline-none focus-visible:ring-0 px-3 py-2 duration-300;
 }
 
-// Font related class
+.tp-select {
+    @apply w-full !text-sm bg-white font-medium border border-gray-300 hover:border-primary-400 focus:border-primary-400 focus:ring-0 focus-visible:ring-0 px-3 py-2 h-11 duration-300;
+}
+
+// Section/Element related class
 .section-sub-title {
     @apply text-[20px] sm:text-[26px] md:text-[36px] font-Nunito;
 }
@@ -49,8 +53,13 @@
 .section-title {
     @apply text-[30px] leading-[42px] sm:text-[34px] sm:leading-[48px] md:leading-[58px] md:text-[44px] font-bold tracking-tight;
 }
+
 .section-heading-paragraph {
     @apply text-base md:text-lg font-medium text-gray-700 tracking-tight;
+}
+
+.tp-shadow {
+    @apply shadow-[0_5px_20px_rgba(0,0,0,.03)];
 }
 
 // Drag Text style

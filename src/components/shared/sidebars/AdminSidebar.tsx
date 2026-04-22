@@ -65,8 +65,8 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
           </SidebarGroup>
         ))}
       </SidebarContent>
-      <SidebarFooter className="bg-gray-100 px-4 py-4">
-        <p className="flex items-center gap-2 font-semibold text-sm cursor-pointer" onClick={handleLogout}><RiLogoutCircleLine size={18} /> <span>Logout</span></p>
+      <SidebarFooter className="p-0">
+        <p className="bg-primary-50 duration-300 hover:bg-primary-100 px-4 py-4 flex items-center gap-2 font-semibold text-sm cursor-pointer text-primary-400" onClick={handleLogout}><RiLogoutCircleLine size={18} /> <span>Logout</span></p>
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

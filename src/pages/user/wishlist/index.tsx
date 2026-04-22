@@ -2,6 +2,7 @@ import TourCardList from "@/components/modules/tour/TourCardList";
 import TourListTypeLoader from "@/components/shared/blocks/TourListTypeLoader";
 import { useGetWishlistQuery } from "@/redux/features/user/user.api";
 import type { ITourPackage } from "@/types";
+import React from "react";
 
 
 const Wishlist = () => {
@@ -20,7 +21,9 @@ const Wishlist = () => {
                     ))
                 ) : wishlistTours.length > 0 ? (
                     wishlistTours.map((tour) => (
-                        <TourCardList key={tour.slug} tour={tour} />
+                        <React.Fragment key={tour.slug}>
+                            <TourCardList tour={tour} />
+                        </React.Fragment>
                     ))
                 ) : (
                     <p className="text-gray-500 text-center font-medium">
