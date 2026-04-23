@@ -3,47 +3,23 @@ import { FaHeart } from "react-icons/fa";
 import { FaLocationDot } from "react-icons/fa6";
 import { LuNotepadText } from "react-icons/lu";
 import { Link } from "react-router";
-import type { ITourPackage } from "@/types";
+import type { ITourListItemWithReview } from "@/types";
 import ImageWaterMark from '@/assets/images/image-watermark.webp'
 import { useWishlist } from "@/hooks/useWishlist";
 
 interface Props {
-    tour: ITourPackage;
+    tour: ITourListItemWithReview;
 }
 
 const TourCardBox = ({ tour }: Props) => {
     const { isInWishlist, toggle } = useWishlist();
-
-    const now = Date.now();
-    const availableBatches = (tour.batches ?? []).filter((batch) => {
-        const registrationOpen = new Date(batch.regEndDate).getTime() >= now;
-
-        const remainingSeats = typeof batch.remainingSeat === "number"
-            ? batch.remainingSeat
-            : typeof batch.bookedSeat === "number"
-                ? batch.maxSeat - batch.bookedSeat
-                : undefined;
-
-        const hasSeat = typeof remainingSeats === "number" ? remainingSeats > 0 : true;
-
-        return registrationOpen && hasSeat;
-    });
-
-    const hasBatchData = (tour.batches?.length ?? 0) > 0;
-    const isSoldOut = hasBatchData && availableBatches.length === 0;
-
-    const selectedBatch = availableBatches.reduce((lowestBatch, currentBatch) => {
-        const lowestBatchPrice = lowestBatch.sellingPrice || lowestBatch.costFrom;
-        const currentBatchPrice = currentBatch.sellingPrice || currentBatch.costFrom;
-
-        return currentBatchPrice < lowestBatchPrice ? currentBatch : lowestBatch;
-    }, availableBatches[0]);
-
-    const startsFromPrice = availableBatches.length > 0
-        ? Math.min(...availableBatches.map((batch) => batch.sellingPrice || batch.costFrom))
-        : tour?.costFrom;
-
-    const originalPrice = selectedBatch?.costFrom ?? startsFromPrice;
+    const startsFromPrice = tour?.sellingPrice ?? tour?.costFrom;
+    const originalPrice =
+        typeof tour?.sellingPrice === "number" && tour?.sellingPrice < (tour?.costFrom ?? 0)
+            ? tour.costFrom
+            : undefined;
+    const reviewCount = tour.reviewCount ?? 0;
+    const averageRating = tour.averageRating ?? 0;
 
     return (
         <div className='group rounded-[10px] border border-gray-200 overflow-hidden bg-white shadow-[0px_4px_24px_0px_rgba(194, 194, 194, 0.25)]'>
@@ -57,24 +33,27 @@ const TourCardBox = ({ tour }: Props) => {
 
             <div className='p-5 flex flex-col h-[calc(100%-200px)] xl:h-[calc(100%-260px)]'>
                 <div className="flex-1">
-                    <p className='text-sm text-gray-600 font-medium mb-1'><span className='bg-[#FFCA18] text-[13px] text-gray-900 px-2 pt-[1px] pb-[2px] font-semibold rounded mr-[2px]'>4.8</span> <span className='hover:underline cursor-pointer duration-300'>(180 Reviews)</span></p>
+                    {reviewCount > 0 && (
+                        <p className='text-sm text-gray-600 font-medium mb-1'>
+                            <span className='bg-[#FFCA18] text-[13px] text-gray-900 px-2 pt-[1px] pb-[2px] font-semibold rounded mr-[2px]'>
+                                {averageRating.toFixed(1)}
+                            </span>{" "}
+                            <span>
+                                ({reviewCount} Review{reviewCount === 1 ? "" : "s"})
+                            </span>
+                        </p>
+                    )}
                     <h2 className='mt-2 mb-2'><Link to={`/tours/${tour?.slug}`} className='text-gray-800 hover:text-primary-500 text-xl font-bold cursor-pointer duration-300'>{tour?.title}</Link></h2>
                     <div className="flex flex-wrap gap-3">
-                        <p className='text-sm text-gray-500 font-medium inline-flex gap-1'><span><FaLocationDot size={14} className="mt-1" /></span> {tour?.arrivalLocation + ", " + tour?.divisionName}</p>
+                        <p className='text-sm text-gray-500 font-medium inline-flex gap-1'><span><FaLocationDot size={14} className="mt-1" /></span> {tour?.arrivalLocation}</p>
                         <p className='text-sm text-gray-500 font-medium inline-flex gap-1'><LuNotepadText size={14} className='mt-[2px]' /> {tour?.tourTypeName}</p>
                     </div>
 
                     <p className='text-gray-600 font-semibold mt-3'>
-                        {isSoldOut ? (
-                            <span className='text-red-600 font-bold text-lg'>Sold Out</span>
-                        ) : (
-                            <>
-                                Starts From <span className='text-primary-400 font-bold text-xl'><span className='text-base'>৳</span>{startsFromPrice}</span>
-                                {originalPrice ? (
-                                    <span className='text-gray-500 font-bold text-base line-through ml-2'>৳{originalPrice}</span>
-                                ) : null}
-                            </>
-                        )}
+                        Starts From <span className='text-primary-400 font-bold text-xl'><span className='text-base'>৳</span>{startsFromPrice}</span>
+                        {originalPrice ? (
+                            <span className='text-gray-500 font-bold text-base line-through ml-2'>৳{originalPrice}</span>
+                        ) : null}
                     </p>
                 </div>
 

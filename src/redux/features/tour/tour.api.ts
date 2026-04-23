@@ -1,5 +1,5 @@
 import { baseApi } from "@/redux/baseApi";
-import type { IResponse, ITourPackage, IToursResponse } from "@/types";
+import type { IResponse, ITourPackage, ITourListItem, IToursResponse } from "@/types";
 
 export const tourApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -41,7 +41,7 @@ export const tourApi = baseApi.injectEndpoints({
         method: "GET",
         params,
       }),
-      transformResponse: (response: IResponse<never>): IToursResponse => ({
+      transformResponse: (response: IResponse<ITourListItem[]>): IToursResponse => ({
         data: response.data,
         meta: response.meta,
       }),

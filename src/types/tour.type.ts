@@ -50,3 +50,22 @@ export interface ITourPackage {
   createdAt: string;
   updatedAt: string;
 }
+
+export type ITourListItem = Pick<
+  ITourPackage,
+  | "_id"
+  | "title"
+  | "slug"
+  | "images"
+  | "costFrom"
+  | "sellingPrice"
+  | "arrivalLocation"
+  | "divisionName"
+  | "tourTypeName"
+  | "createdAt"
+>;
+
+export interface ITourListItemWithReview extends ITourListItem {
+  averageRating?: number;
+  reviewCount?: number;
+}

@@ -1,9 +1,8 @@
-import { useGetAllToursQuery, useGetTourTypesQuery } from "@/redux/features/tour/tour.api";
+import { useGetAllToursQuery } from "@/redux/features/tour/tour.api";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Pagination } from "swiper/modules";
-import { useGetDivisionsQuery } from "@/redux/features/division/division.api";
 import TourCardBox from "@/components/modules/tour/TourCardBox";
-import type { ITourPackage } from "@/types";
+import type { ITourListItemWithReview } from "@/types";
 import WhiteSvgIcon from "@/components/shared/blocks/WhiteSvgIcon";
 import { Link } from "react-router";
 import React from "react";
@@ -11,15 +10,7 @@ import TourCardLoader from "@/components/shared/blocks/TourCardLoader";
 
 const TourCardSlider = () => {
     const { data: tours, isLoading } = useGetAllToursQuery({ limit: "8" });
-    const { data: tourTypes } = useGetTourTypesQuery(undefined);
-    const { data: divisions } = useGetDivisionsQuery(undefined);
-    const toursData = tours?.data?.map((item) => ({
-        ...item,
-        tourTypeName: tourTypes?.data?.find((tt: { _id: string; }) => tt._id === item.tourType)?.name || "Unknown",
-        divisionName: Array.isArray(divisions)
-            ? divisions.find(d => d._id === item.division)?.name || "Unknown"
-            : "Unknown"
-    }));
+    const toursData = tours?.data ?? [];
 
     return (
         <section className="tp-container py-12 md:py-16 lg:py-20">
@@ -54,7 +45,7 @@ const TourCardSlider = () => {
                         </div>
                     ) : (
                         (toursData ?? []).length > 0 ? (
-                            (toursData ?? []).map((tour: ITourPackage) => (
+                            (toursData ?? []).map((tour: ITourListItemWithReview) => (
                                 <SwiperSlide key={tour.slug}>
                                     <TourCardBox tour={tour} />
                                 </SwiperSlide>

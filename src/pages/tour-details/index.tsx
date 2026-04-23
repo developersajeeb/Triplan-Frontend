@@ -34,14 +34,17 @@ import { Input } from "@/components/ui/input";
 import { RiLoaderLine } from "react-icons/ri";
 import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router";
-import OverallRatingBox from "./OverallRatingBox";
-import UserReview from "./UserReview";
+import TourReviewSection from "./TourReviewSection";
+import { useGetTourReviewsQuery } from "@/redux/features/review/review.api";
 
 export default function TourDetails() {
   const { slug } = useParams();
   const navigate = useNavigate();
   const [checkAvailability, { isLoading: isCheckingAvailability }] = useCheckAvailabilityMutation();
   const { data: tourData, isLoading } = useGetSingleTourQuery(slug!);
+  const { data: reviewData } = useGetTourReviewsQuery(tourData?._id || "", {
+    skip: !tourData?._id,
+  });
 
   const { isInWishlist, toggle } = useWishlist();
   const fancyBoxOptions = {
@@ -59,7 +62,6 @@ export default function TourDetails() {
   } as unknown as FancyboxOptions;
   const [desktopFancyBoxRef] = useFancyBox(fancyBoxOptions);
   const [mobileFancyBoxRef] = useFancyBox(fancyBoxOptions);
-  const [reviewImageFancyBoxRef] = useFancyBox(fancyBoxOptions);
   const shareUrl = `https://triplan.developersajeeb.com/tours/${tourData?.slug}`;
   const shareText = encodeURIComponent(tourData?.title ?? "");
   const [copied, setCopied] = useState<boolean>(false);
@@ -261,24 +263,19 @@ export default function TourDetails() {
     (item) => item?.question?.trim() && item?.answer?.trim()
   );
 
-  const reviews = [
-    {
-      name: "Sajeeb Debnath",
-      date: "July 9, 2025",
-      rating: 5,
-      comment:
-        "Entire journey on the river cruise was amazing. This is the first such cruise dinner for my family.",
-      images: [ImageWaterMark, ImageWaterMark],
-    },
-    {
-      name: "Sajeeb Debnath",
-      date: "July 9, 2025",
-      rating: 5,
-      comment:
-        "We loved everything, right from table organising, food, music and the hospitality.",
-      images: [ImageWaterMark, ImageWaterMark],
-    },
-  ];
+  const reviewSummary = reviewData?.data?.summary;
+  const headerRating = reviewSummary?.overallRating?.toFixed(1) ?? "0.0";
+  const headerTotalReviews = reviewSummary?.totalReviews ?? 0;
+  const hasReviewData = headerTotalReviews > 0;
+
+  const handleScrollToReviews = () => {
+    const reviewSection = document.getElementById("tour-reviews");
+    if (!reviewSection) return;
+
+    const top = reviewSection.getBoundingClientRect().top + window.scrollY - 90;
+    window.scrollTo({ top, behavior: "smooth" });
+  };
+
 
   return (
     <>
@@ -332,14 +329,27 @@ export default function TourDetails() {
                   {tourData?.title}
                 </h1>
                 <ul className="flex flex-wrap gap-2 md:gap-4">
-                  <li className="text-sm text-gray-600 font-medium mb-1">
-                    <span className="bg-[#FFCA18] text-[13px] text-gray-900 px-2 pt-[1px] pb-[2px] font-semibold rounded mr-[2px]">
-                      4.8
-                    </span>{" "}
-                    <span className="hover:underline cursor-pointer duration-300">
-                      (180 Reviews)
-                    </span>
-                  </li>
+                  {hasReviewData && (
+                    <li
+                      className="text-sm text-gray-600 font-medium mb-1"
+                      onClick={handleScrollToReviews}
+                      role="button"
+                      tabIndex={0}
+                      onKeyDown={(event) => {
+                        if (event.key === "Enter" || event.key === " ") {
+                          event.preventDefault();
+                          handleScrollToReviews();
+                        }
+                      }}
+                    >
+                      <span className="bg-[#FFCA18] text-[13px] text-gray-900 px-2 pt-[1px] pb-[2px] font-semibold rounded mr-[2px]">
+                        {headerRating}
+                      </span>{" "}
+                      <span className="hover:underline cursor-pointer duration-300">
+                        ({headerTotalReviews} Review{headerTotalReviews === 1 ? "" : "s"})
+                      </span>
+                    </li>
+                  )}
                   <li className="text-sm text-gray-600 font-semibold flex gap-1">
                     <LuNotepadText className="pt-[2px]" size={18} />{" "}
                     {tourData?.tourTypeName}
@@ -728,16 +738,7 @@ export default function TourDetails() {
                 </>
               )}
 
-              <OverallRatingBox />
-
-              {/* User Review */}
-              <div ref={reviewImageFancyBoxRef} className="mt-5 space-y-7">
-                {reviews.map((review, reviewIndex) => (
-                  <React.Fragment key={reviewIndex}>
-                    <UserReview review={review} reviewIndex={reviewIndex} />
-                  </React.Fragment>
-                ))}
-              </div>
+              <TourReviewSection tourId={tourData?._id} sectionId="tour-reviews" />
             </div>
           )}
 

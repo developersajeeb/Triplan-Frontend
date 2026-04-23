@@ -15,7 +15,7 @@ import { GrPowerReset } from "react-icons/gr";
 import { useGetAllToursQuery } from "@/redux/features/tour/tour.api";
 import PaginationComponent from "@/components/ui/PaginationComponent";
 import TourCardLoader from "@/components/shared/blocks/TourCardLoader";
-import type { ITourPackage } from "@/types";
+import type { ITourListItem } from "@/types";
 import TourCardBox from "@/components/modules/tour/TourCardBox";
 import TourCardList from "@/components/modules/tour/TourCardList";
 import CommonMetadata from "@/components/utilities/CommonMetadata";
@@ -230,13 +230,13 @@ const DestinationDetails = () => {
 
                     viewType === "grid" ? (
                         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
-                            {(toursData?.data ?? []).map((tour: ITourPackage) => (
+                                {(toursData?.data ?? []).map((tour: ITourListItem) => (
                                 <React.Fragment key={tour.slug}><TourCardBox tour={tour} /></React.Fragment>
                             ))}
                         </div>
                     ) : (
                         <div className="flex flex-col gap-4">
-                            {(toursData?.data ?? []).map((tour: ITourPackage) => (
+                                {(toursData?.data ?? []).map((tour: ITourListItem) => (
                                 <TourCardList key={tour.slug} tour={tour} />
                             ))}
                         </div>

@@ -33,6 +33,7 @@ const TourSideFilter = ({ className }: Props) => {
     const hasQueryParams = searchParams.toString().length > 0;
     const form = useForm();
     const [priceRange, setPriceRange] = useState([0, 0]);
+
     useEffect(() => {
         if (!tourMaxPrice) return;
 
@@ -41,6 +42,7 @@ const TourSideFilter = ({ className }: Props) => {
 
         setPriceRange([min, max]);
     }, [searchParams, tourMaxPrice]);
+
     const [selectedReviewSet, setSelectedReviewSet] = useState<Set<number>>(new Set());
 
     const [selectedTourTypeSet, setSelectedTourTypeSet] = useState<Set<string>>(new Set());
@@ -49,6 +51,8 @@ const TourSideFilter = ({ className }: Props) => {
         const params = searchParams.get("tourType");
         if (params) {
             setSelectedTourTypeSet(new Set(params.split(",")));
+        } else {
+            setSelectedTourTypeSet(new Set());
         }
     }, [searchParams]);
 
@@ -58,6 +62,8 @@ const TourSideFilter = ({ className }: Props) => {
         const params = searchParams.get("division");
         if (params) {
             setSelectedDivisionSet(new Set(params.split(",")));
+        } else {
+            setSelectedDivisionSet(new Set());
         }
     }, [searchParams]);
 
@@ -65,6 +71,8 @@ const TourSideFilter = ({ className }: Props) => {
         const searchText = searchParams.get("search") || "";
         if (searchText) {
             form.setValue("search", searchText);
+        } else {
+            form.setValue("search", "");
         }
     }, [form, searchParams]);
 
@@ -72,23 +80,36 @@ const TourSideFilter = ({ className }: Props) => {
         const ratingParam = searchParams.get("rating");
         if (ratingParam) {
             setSelectedReviewSet(new Set(ratingParam.split(",").map(Number)));
+        } else {
+            setSelectedReviewSet(new Set());
         }
     }, [searchParams]);
 
     const toggleReviewSelection = (star: number, checked: boolean) => {
-        setSelectedReviewSet((prev) => {
-            const next = new Set(prev);
-            if (checked) next.add(star);
-            else next.delete(star);
-            return next;
-        });
+        const next = new Set(selectedReviewSet);
+
+        if (checked) next.add(star);
+        else next.delete(star);
+
+        setSelectedReviewSet(next);
+
+        const newParams = new URLSearchParams(searchParams);
+        if (next.size > 0) {
+            newParams.set("rating", Array.from(next).sort((a, b) => b - a).join(","));
+        } else {
+            newParams.delete("rating");
+        }
+        newParams.set("page", "1");
+        setSearchParams(newParams);
     };
 
     const handlePriceChange = (value: number[]) => {
         setPriceRange(value);
-        searchParams.set("minPrice", String(value[0]));
-        searchParams.set("maxPrice", String(value[1]));
-        setSearchParams(searchParams);
+        const newParams = new URLSearchParams(searchParams);
+        newParams.set("minPrice", String(value[0]));
+        newParams.set("maxPrice", String(value[1]));
+        newParams.set("page", "1");
+        setSearchParams(newParams);
     };
 
     const toggleSelection = (type: string, checked: boolean) => {
@@ -100,7 +121,12 @@ const TourSideFilter = ({ className }: Props) => {
         setSelectedTourTypeSet(next);
 
         const newParams = new URLSearchParams(searchParams);
-        newParams.set("tourType", Array.from(next).join(","));
+        if (next.size > 0) {
+            newParams.set("tourType", Array.from(next).join(","));
+        } else {
+            newParams.delete("tourType");
+        }
+        newParams.set("page", "1");
         setSearchParams(newParams);
     };
 
@@ -113,13 +139,24 @@ const TourSideFilter = ({ className }: Props) => {
         setSelectedDivisionSet(next);
 
         const newParams = new URLSearchParams(searchParams);
-        newParams.set("division", Array.from(next).join(","));
+        if (next.size > 0) {
+            newParams.set("division", Array.from(next).join(","));
+        } else {
+            newParams.delete("division");
+        }
+        newParams.set("page", "1");
         setSearchParams(newParams);
     };
 
     const onSubmit = (data: FieldValues) => {
-        searchParams.set("search", data.search || "");
-        setSearchParams(searchParams);
+        const newParams = new URLSearchParams(searchParams);
+        if (data.search?.trim()) {
+            newParams.set("search", data.search.trim());
+        } else {
+            newParams.delete("search");
+        }
+        newParams.set("page", "1");
+        setSearchParams(newParams);
     };
 
     const searchValue = form.getValues("search") || "";
@@ -144,15 +181,17 @@ const TourSideFilter = ({ className }: Props) => {
                         setSelectedDivisionSet(new Set());
                         setSelectedReviewSet(new Set());
 
-                        searchParams.delete("minPrice");
-                        searchParams.delete("maxPrice");
-                        searchParams.delete("tourType");
-                        searchParams.delete("division");
-                        searchParams.delete("rating");
-                        searchParams.delete("search");
-                        searchParams.delete("sort");
+                        const newParams = new URLSearchParams(searchParams);
+                        newParams.delete("minPrice");
+                        newParams.delete("maxPrice");
+                        newParams.delete("tourType");
+                        newParams.delete("division");
+                        newParams.delete("rating");
+                        newParams.delete("search");
+                        newParams.delete("sort");
+                        newParams.delete("page");
 
-                        setSearchParams(searchParams);
+                        setSearchParams(newParams);
                     }}
                     disabled={isResetDisabled}
                     className={`text-sm font-semibold px-3 py-1 rounded-full ${isResetDisabled ? "text-gray-400 pointer-events-none bg-gray-200" : "text-white bg-primary-500 hover:bg-primary-700 duration-300"}`}
@@ -320,7 +359,7 @@ const TourSideFilter = ({ className }: Props) => {
                                 }
                             </div>
 
-                            {!isDivisionsLoading && Array.isArray(divisions) && divisions.length > 5 && (
+                            {!isDivisionsLoading && Array.isArray(divisions?.data) && divisions.data.length > 5 && (
                                 <button
                                     onClick={() => setShowAllDivision((s) => !s)}
                                     className="text-primary-500 hover:text-primary-600 duration-300 text-sm font-semibold mt-3 underline underline-offset-2 flex items-center gap-1"

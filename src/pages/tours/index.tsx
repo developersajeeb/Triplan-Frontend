@@ -5,7 +5,7 @@ import TourCardBox from '@/components/modules/tour/TourCardBox';
 import { useSearchParams } from 'react-router';
 import TourSideFilter from '@/components/modules/tour/TourSideFilter';
 import { Button } from '@/components/ui/button';
-import type { ITourPackage } from '@/types';
+import type { ITourListItem } from '@/types';
 import React, { useEffect, useState } from 'react';
 import { IoClose, IoFilter } from 'react-icons/io5';
 import { Drawer, DrawerClose, DrawerContent, DrawerTrigger } from '@/components/ui/drawer';
@@ -196,13 +196,13 @@ const Tours = () => {
 
                             viewType === "grid" ? (
                                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                                    {(toursData?.data ?? []).map((tour: ITourPackage) => (
+                                    {(toursData?.data ?? []).map((tour: ITourListItem) => (
                                         <React.Fragment key={tour.slug}><TourCardBox tour={tour} /></React.Fragment>
                                     ))}
                                 </div>
                             ) : (
                                 <div className="flex flex-col gap-4">
-                                    {(toursData?.data ?? []).map((tour: ITourPackage) => (
+                                    {(toursData?.data ?? []).map((tour: ITourListItem) => (
                                         <TourCardList key={tour.slug} tour={tour} />
                                     ))}
                                 </div>

@@ -1,10 +1,11 @@
 import type { ComponentType } from "react";
 import type { IconType } from "react-icons/lib";
-import type { ITourPackage } from "./tour.type";
+import type { ITourListItem } from "./tour.type";
 
 // Child file export
 export type { ISendOtp, IVerifyOtp, ILogin } from "./auth.type";
-export type { ITourPackage } from "./tour.type";
+export type { ITourListItem, ITourListItemWithReview, ITourPackage } from "./tour.type";
+export type { IReview, IReviewEligibility, IReviewSummary, ITourReviewResponse } from "./review.type";
 
 export interface IResponse<T> {
   statusCode: number;
@@ -21,7 +22,7 @@ export interface IResponse<T> {
 }
 
 export interface IToursResponse {
-  data: ITourPackage[];
+  data: ITourListItem[];
   meta: {
     page: number;
     limit: number;
