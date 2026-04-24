@@ -1,36 +1,213 @@
 import { IoCalendarOutline, IoHeartHalfOutline, IoNotificationsOutline } from "react-icons/io5";
-import { LuFolderOpen, LuTentTree, LuTicket, LuTimer } from "react-icons/lu";
+import { LuFolderOpen, LuTentTree, LuTimer } from "react-icons/lu";
 import { TbLocationPin, TbMapPin2 } from "react-icons/tb";
 import { Link } from "react-router";
 import ImageWaterMark from '@/assets/images/image-watermark.webp'
 import { FaLocationDot, FaRegFilePdf } from "react-icons/fa6";
 import { BiSupport } from "react-icons/bi";
+import { useGetWishlistQuery } from "@/redux/features/user/user.api";
+import { useGetMyBookingsQuery } from "@/redux/features/booking/booking.api";
+import { Skeleton } from "@/components/ui/skeleton";
+
+type TBookingRecord = {
+    _id?: string;
+    createdAt?: string;
+    startDate?: string;
+    date?: string;
+    startTime?: string;
+    endDate?: string;
+    bookingStatus?: string;
+    status?: string;
+    tour?: {
+        title?: string;
+        slug?: string;
+        images?: string[];
+        arrivalLocation?: string;
+        startDate?: string;
+        startTime?: string;
+        endDate?: string;
+    };
+    title?: string;
+    slug?: string;
+    arrivalLocation?: string;
+    image?: string;
+    payment?: {
+        _id?: string;
+        invoiceUrl?: string;
+        transactionId?: string;
+        amount?: number;
+        status?: string;
+    };
+};
+
+const normalizeStatus = (status?: string) => (status ?? "").toLowerCase();
+
+const getStatusDate = (value?: string) => {
+    if (!value) {
+        return null;
+    }
+
+    const parsed = new Date(value);
+    if (Number.isNaN(parsed.getTime())) {
+        return null;
+    }
+
+    return parsed;
+};
+
+const getTimelineStatus = (booking: TBookingRecord): "Upcoming" | "Ongoing" | "Completed" => {
+    const startDate = getStatusDate(booking.startDate ?? booking.date ?? booking.tour?.startDate);
+    const endDate = getStatusDate(booking.endDate ?? booking.tour?.endDate ?? booking.startDate ?? booking.date ?? booking.tour?.startDate);
+
+    if (!startDate || !endDate) {
+        return "Upcoming";
+    }
+
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const start = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate());
+    const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+
+    if (today < start) {
+        return "Upcoming";
+    }
+
+    if (today > end) {
+        return "Completed";
+    }
+
+    return "Ongoing";
+};
+
+const isUpcomingBooking = (booking: TBookingRecord) => {
+    const status = normalizeStatus(booking.bookingStatus ?? booking.status);
+
+    if (status.includes("cancel") || status.includes("failed")) {
+        return false;
+    }
+
+    if (status.includes("upcoming")) {
+        return true;
+    }
+
+    return getTimelineStatus(booking) === "Upcoming";
+};
+
+const formatCount = (count: number) => String(count).padStart(2, "0");
+
+const formatBookingDate = (value?: string) => {
+    if (!value) {
+        return "N/A";
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return value;
+    }
+
+    return date.toLocaleDateString("en-US", {
+        month: "short",
+        day: "2-digit",
+        year: "numeric",
+    });
+};
 
 const UserDashboard = () => {
+    const { data: wishlistData, isLoading: isWishlistLoading } = useGetWishlistQuery(undefined);
+    const { data: bookingData, isLoading: isBookingLoading } = useGetMyBookingsQuery({ page: 1, limit: 10 });
+
+    const wishlistItems = Array.isArray((wishlistData as { data?: unknown[] } | undefined)?.data)
+        ? ((wishlistData as { data?: unknown[] }).data ?? [])
+        : [];
+    const bookings = Array.isArray((bookingData as { data?: unknown[] } | undefined)?.data)
+        ? (((bookingData as { data?: unknown[] }).data ?? []) as TBookingRecord[])
+        : [];
+
+    const totalBookings = bookings.length;
+    const upcomingTours = bookings.filter(isUpcomingBooking).length;
+    const wishlistCount = wishlistItems.length;
+
+    const recentBooking = bookings.length
+        ? [...bookings].sort((a, b) => {
+            const aDate = new Date(a.createdAt ?? a.startDate ?? a.date ?? 0).getTime();
+            const bDate = new Date(b.createdAt ?? b.startDate ?? b.date ?? 0).getTime();
+            return bDate - aDate;
+        })[0]
+        : null;
+
+    const recentBookingTourSlug = recentBooking?.tour?.slug ?? recentBooking?.slug;
+    const recentBookingTourTitle = recentBooking?.tour?.title ?? recentBooking?.title ?? "Tour name";
+    const recentBookingLocation = recentBooking?.tour?.arrivalLocation ?? recentBooking?.arrivalLocation ?? "N/A";
+    const recentBookingStartDate = formatBookingDate(
+        recentBooking?.startDate ?? recentBooking?.date ?? recentBooking?.tour?.startDate
+    );
+    const recentBookingImage = recentBooking?.tour?.images?.[0] ?? recentBooking?.image ?? ImageWaterMark;
+    const recentBookingStatus = recentBooking
+        ? getTimelineStatus(recentBooking)
+        : "Upcoming";
+
+    const statusClassName = normalizeStatus(recentBookingStatus).includes("upcoming")
+        ? "text-xs font-medium bg-blue-500 text-white px-3 py-[3px] rounded-full"
+        : normalizeStatus(recentBookingStatus).includes("ongoing")
+            ? "text-xs font-medium bg-amber-500 text-white px-3 py-[3px] rounded-full"
+            : "text-xs font-medium bg-green-600 text-white px-3 py-[3px] rounded-full";
+
+    const detailsUrl = recentBookingTourSlug ? `/tours/${recentBookingTourSlug}` : "/tours";
+
     return (
         <>
             <section className="grid sm:grid-cols-3 gap-4 sm:gap-6">
+                {isBookingLoading ? (
+                    <div className="flex flex-col md:flex-row items-center gap-2 xl:gap-4 border border-gray-200 rounded-xl p-3 md:p-5">
+                        <Skeleton className="min-w-12 w-12 h-12 xl:min-w-16 xl:w-16 xl:h-16 rounded-full" />
+                        <div className="flex-1">
+                            <Skeleton className="h-8 w-12 mb-2" />
+                            <Skeleton className="h-4 w-32" />
+                        </div>
+                    </div>
+                ) : (
                 <div className="flex flex-col md:flex-row items-center gap-2 xl:gap-4 border border-gray-200 rounded-xl p-3 md:p-5">
                     <span className="min-w-12 w-12 h-12 xl:min-w-16 xl:w-16 xl:h-16 bg-primary-500 flex justify-center items-center rounded-full text-white text-[22px] xl:text-[25px]"><IoCalendarOutline /></span>
                     <div>
-                        <p className="text-center md:text-start text-2xl font-bold text-gray-700">04</p>
+                        <p className="text-center md:text-start text-2xl font-bold text-gray-700">{formatCount(totalBookings)}</p>
                         <p className="text-center md:text-start text-base text-gray-600 font-medium">Total Bookings</p>
                     </div>
                 </div>
+                )}
+                {isBookingLoading ? (
+                    <div className="flex flex-col md:flex-row items-center gap-2 xl:gap-4 border border-gray-200 rounded-xl p-3 md:p-5">
+                        <Skeleton className="min-w-12 w-12 h-12 xl:min-w-16 xl:w-16 xl:h-16 rounded-full" />
+                        <div className="flex-1">
+                            <Skeleton className="h-8 w-12 mb-2" />
+                            <Skeleton className="h-4 w-32" />
+                        </div>
+                    </div>
+                ) : (
                 <div className="flex flex-col md:flex-row items-center gap-2 xl:gap-4 border border-gray-200 rounded-xl p-3 md:p-5">
                     <span className="min-w-12 w-12 h-12 xl:min-w-16 xl:w-16 xl:h-16 bg-green-500 flex justify-center items-center rounded-full text-white text-[22px] xl:text-[25px]"><TbLocationPin /></span>
                     <div>
-                        <p className="text-center md:text-start text-2xl font-bold text-gray-700">01</p>
+                        <p className="text-center md:text-start text-2xl font-bold text-gray-700">{formatCount(upcomingTours)}</p>
                         <p className="text-center md:text-start text-base text-gray-600 font-medium">Upcoming Tours</p>
                     </div>
                 </div>
+                )}
+                {isWishlistLoading ? (
+                    <div className="flex flex-col md:flex-row items-center gap-2 xl:gap-4 border border-gray-200 rounded-xl p-3 md:p-5">
+                        <Skeleton className="min-w-12 w-12 h-12 xl:min-w-16 xl:w-16 xl:h-16 rounded-full" />
+                        <div className="flex-1">
+                            <Skeleton className="h-8 w-12 mb-2" />
+                            <Skeleton className="h-4 w-32" />
+                        </div>
+                    </div>
+                ) : (
                 <div className="flex flex-col md:flex-row items-center gap-2 xl:gap-4 border border-gray-200 rounded-xl p-3 md:p-5">
                     <span className="min-w-12 w-12 h-12 xl:min-w-16 xl:w-16 xl:h-16 bg-red-500 flex justify-center items-center rounded-full text-white text-[22px] xl:text-[25px]"><IoHeartHalfOutline /></span>
                     <div>
-                        <p className="text-center md:text-start text-2xl font-bold text-gray-700">10</p>
+                        <p className="text-center md:text-start text-2xl font-bold text-gray-700">{formatCount(wishlistCount)}</p>
                         <p className="text-center md:text-start text-base text-gray-600 font-medium">Wishlist Items</p>
                     </div>
                 </div>
+                )}
             </section>
 
             <section className="mt-6 border border-gray-200 rounded-xl p-3 md:p-5">
@@ -39,22 +216,40 @@ const UserDashboard = () => {
                     <p><Link to="/user/my-bookings" className="tp-action-btn !h-9 !py-2 inline-flex gap-2 items-center">View All <span><LuFolderOpen size={16} /></span></Link></p>
                 </div>
 
-                <div className="border flex flex-col sm:flex-row sm:items-center gap-3 border-gray-200 rounded-xl p-3 md:p-4 mt-5">
-                    <img className="rounded-xl h-[220px] sm:h-[130px] object-cover w-full sm:max-w-48" src={ImageWaterMark} alt="Tour Image" />
-                    <div>
-                        <h2 className='mt-1 mb-2'><Link to={`/tours/#`} className='text-gray-800 hover:text-primary-500 text-xl font-bold cursor-pointer duration-300'>Tour name</Link> <span className="text-xs font-medium bg-blue-500 text-white px-3 py-[3px] rounded-full">Upcoming</span></h2>
-
-                        <div>
-                            <p className='text-sm text-gray-500 font-medium inline-flex gap-1 pr-3'><span><FaLocationDot size={14} className="mt-1" /></span> asdasdasd</p>
-                            <p className='text-sm text-gray-500 font-medium inline-flex gap-1'><span><LuTimer size={16} className='mt-[2px]' /></span> Start: 09:30 AM</p>
-                        </div>
-                        <div className="flex gap-2 flex-wrap">
-                            <Link to={`/tours/#`} className='mt-2 text-[14px] text-center inline-block font-semibold bg-primary-900 hover:bg-primary-400 text-white hover:text-white px-4 pt-[6px] pb-2 rounded-full transition-all duration-300'>View Details</Link>
-                            <Link to={`/tours/#`} className='mt-2 text-[14px] text-center font-semibold bg-red-500 hover:bg-red-700 text-white hover:text-white px-4 pt-[6px] pb-2 rounded-full transition-all duration-300 inline-flex items-center gap-2'>PDF <span><FaRegFilePdf size={15} /></span></Link>
-                            <Link to={`/tours/#`} className='mt-2 text-[14px] text-center font-semibold bg-purple-500 hover:bg-purple-700 text-white hover:text-white px-4 pt-[6px] pb-2 rounded-full transition-all duration-300 inline-flex items-center gap-2'>Ticket <span><LuTicket /></span></Link>
+                {isBookingLoading ? (
+                    <div className="border flex flex-col sm:flex-row sm:items-center gap-3 border-gray-200 rounded-xl p-3 md:p-4 mt-5">
+                        <Skeleton className="rounded-xl h-[220px] sm:h-[130px] w-full sm:max-w-48" />
+                        <div className="flex-1">
+                            <Skeleton className="h-8 w-48 mb-4" />
+                            <Skeleton className="h-4 w-64 mb-2" />
+                            <Skeleton className="h-4 w-48 mb-6" />
+                            <div className="flex gap-2">
+                                <Skeleton className="h-10 w-28" />
+                                <Skeleton className="h-10 w-20" />
+                            </div>
                         </div>
                     </div>
-                </div>
+                ) : recentBooking ? (
+                    <div className="border flex flex-col sm:flex-row sm:items-center gap-3 border-gray-200 rounded-xl p-3 md:p-4 mt-5">
+                        <img className="rounded-xl h-[220px] sm:h-[130px] object-cover w-full sm:max-w-48" src={recentBookingImage} alt="Tour Image" />
+                        <div>
+                            <h2 className='mt-1 mb-2'><Link to={detailsUrl} className='text-gray-800 hover:text-primary-500 text-xl font-bold cursor-pointer duration-300'>{recentBookingTourTitle}</Link> <span className={statusClassName}>{recentBookingStatus}</span></h2>
+
+                            <div>
+                                <p className='text-sm text-gray-500 font-medium inline-flex gap-1 pr-3'><span><FaLocationDot size={14} className="mt-1" /></span> {recentBookingLocation}</p>
+                                <p className='text-sm text-gray-500 font-medium inline-flex gap-1'><span><LuTimer size={16} className='mt-[2px]' /></span> Start Date: {recentBookingStartDate}</p>
+                            </div>
+                            <div className="flex gap-2 flex-wrap">
+                                <Link to={detailsUrl} className='mt-2 text-[14px] text-center inline-block font-semibold bg-primary-900 hover:bg-primary-400 text-white hover:text-white px-4 pt-[6px] pb-2 rounded-full transition-all duration-300'>View Details</Link>
+                                {recentBooking?.payment?.invoiceUrl && (
+                                    <a href={recentBooking.payment.invoiceUrl} target="_blank" rel="noreferrer" className='mt-2 text-[14px] text-center font-semibold bg-red-500 hover:bg-red-700 text-white hover:text-white px-4 pt-[6px] pb-2 rounded-full transition-all duration-300 inline-flex items-center gap-2'>PDF <span><FaRegFilePdf size={15} /></span></a>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <h2 className='mt-1 mb-2 text-gray-800 text-xl font-bold'>No booking found</h2>
+                )}
             </section>
 
             <section className="mt-8 grid md:grid-cols-2 gap-6">

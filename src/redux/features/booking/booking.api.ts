@@ -1,5 +1,10 @@
 import { baseApi } from "@/redux/baseApi";
 
+type IMyBookingQueryParams = {
+  page?: number;
+  limit?: number;
+};
+
 export const bookingApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createBooking: builder.mutation({
@@ -26,7 +31,31 @@ export const bookingApi = baseApi.injectEndpoints({
         data: availabilityData,
       }),
     }),
+
+    getMyBookings: builder.query({
+      query: (args: IMyBookingQueryParams = {}) => ({
+        url: "/booking/my-bookings",
+        method: "GET",
+        params: {
+          page: args.page ?? 1,
+          limit: args.limit ?? 10,
+        },
+      }),
+      transformResponse: (response: { data?: unknown[] } | unknown) => {
+        if (response && typeof response === "object" && "data" in response) {
+          return response;
+        }
+
+        return { data: [] };
+      },
+      providesTags: ["BOOKING"],
+    }),
   }),
 });
 
-export const { useCreateBookingMutation, useInitPaymentMutation, useCheckAvailabilityMutation } = bookingApi;
+export const {
+  useCreateBookingMutation,
+  useInitPaymentMutation,
+  useCheckAvailabilityMutation,
+  useGetMyBookingsQuery,
+} = bookingApi;
