@@ -5,6 +5,7 @@ export interface ITourType {
 
 export interface ITourBatch {
   _id: string;
+  batchNo: number;
   costFrom: number;
   sellingPrice: number;
   startDate: string;

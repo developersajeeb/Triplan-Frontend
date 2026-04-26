@@ -186,7 +186,8 @@ export default function AddTour() {
     const divisionName = divisionOptions?.find((d: { value: string; }) => d.value === data.division)?.label || "";
     const tourTypeName = tourTypeOptions?.find((t: { value: string; }) => t.value === data.tourType)?.label || "";
 
-    const normalizedBatches = data.batches.map((batch) => ({
+    const normalizedBatches = data.batches.map((batch, index) => ({
+      batchNo: index + 1,
       costFrom: Number(batch.costFrom),
       sellingPrice: Number(batch.sellingPrice),
       startDate: formatISO(batch.startDate),

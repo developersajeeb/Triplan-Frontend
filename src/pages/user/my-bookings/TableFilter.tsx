@@ -13,10 +13,7 @@ const TableFilter = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const search = searchParams.get("search") || "";
     const searchValue = form.watch("search");
-    const sortValue = searchParams.get("sort") || "";
-
-    const queryParams: Record<string, string> = {};
-    if (search) queryParams.search = search;
+    const statusValue = searchParams.get("status") || "";
 
     useEffect(() => {
         form.setValue("search", search);
@@ -31,16 +28,16 @@ const TableFilter = () => {
         setSearchParams(newParams);
     };
 
-    const handleSortChange = (value: string) => {
+    const handleStatusChange = (value: string) => {
         const params = new URLSearchParams(searchParams);
-        params.set("sort", value);
+        params.set("status", value);
         params.set("page", "1");
         setSearchParams(params);
     };
 
-    const handleResetSort = () => {
+    const handleResetStatus = () => {
         const params = new URLSearchParams(searchParams);
-        params.delete("sort");
+        params.delete("status");
         params.set("page", "1");
         setSearchParams(params);
     };
@@ -49,6 +46,7 @@ const TableFilter = () => {
         form.setValue("search", "");
         const newParams = new URLSearchParams(searchParams);
         newParams.delete("search");
+        newParams.delete("status");
         newParams.delete("page");
         setSearchParams(newParams);
     };
@@ -61,7 +59,6 @@ const TableFilter = () => {
                         <FormField
                             control={form.control}
                             name="search"
-                            rules={{ required: "Please enter a search term" }}
                             render={({ field }) => (
                                 <FormItem>
                                     <div className="relative">
@@ -91,17 +88,18 @@ const TableFilter = () => {
                     </div>
                 )}
             </div>
-            <Select value={sortValue} onValueChange={handleSortChange}>
+            <Select value={statusValue} onValueChange={handleStatusChange}>
                 <SelectTrigger className="w-[160px] rounded-full shadow-none h-[34px] bg-white focus:ring-0 border border-primary-200">
-                    <SelectValue placeholder="Select status" />
+                    <SelectValue placeholder="All Status" />
                 </SelectTrigger>
 
                 <SelectContent>
                     <SelectItem value="upcoming">Upcoming</SelectItem>
-                    <SelectItem value="previous">Previous</SelectItem>
+                    <SelectItem value="completed">Completed</SelectItem>
                     <div className="border-t mt-2 pt-2 px-2 pb-1">
                         <button
-                            onClick={handleResetSort}
+                            type="button"
+                            onClick={handleResetStatus}
                             className="w-full text-center py-2 text-sm font-medium rounded-md bg-red-100 hover:bg-red-200 text-red-700"
                         >
                             Reset

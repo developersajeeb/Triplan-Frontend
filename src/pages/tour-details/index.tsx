@@ -81,8 +81,6 @@ export default function TourDetails() {
 
   const batchOptions = tourData?.batches ?? [];
   const [selectedBatchId, setSelectedBatchId] = useState<string>("");
-  const selectedBatch =
-    batchOptions.find((batch) => batch._id === selectedBatchId) || batchOptions[0];
 
   const formatBatchDateRange = (startDate: string, endDate: string) => {
     return `${format(new Date(startDate), "MMM dd")} – ${format(new Date(endDate), "MMM dd, yyyy")}`;
@@ -124,6 +122,16 @@ export default function TourDetails() {
     return "bg-red-300 text-red-800";
   };
 
+  const orderedBatchOptions = [
+    ...batchOptions.filter((batch) => getBatchStatus(batch) !== "Closed"),
+    ...batchOptions.filter((batch) => getBatchStatus(batch) === "Closed"),
+  ];
+
+  const selectedBatch =
+    batchOptions.find((batch) => batch._id === selectedBatchId) ||
+    batchOptions.find((batch) => getBatchStatus(batch) !== "Closed") ||
+    batchOptions[0];
+
   const enquiryOnSubmit: SubmitHandler<FieldValues> = async () => {
     try {
       setIsLoginBtnLoading(true);
@@ -141,13 +149,32 @@ export default function TourDetails() {
   useEffect(() => {
     const batches = tourData?.batches ?? [];
 
+    const getLocalBatchStatus = (batch: (typeof batches)[number]) => {
+      const seatsLeft =
+        typeof batch.remainingSeat === "number"
+          ? batch.remainingSeat
+          : Math.max(0, (batch.maxSeat || 0) - (batch.bookedSeat || 0));
+      const regClosed = new Date(batch.regEndDate).getTime() < new Date().getTime();
+
+      return seatsLeft <= 0 || regClosed ? "Closed" : "Open";
+    };
+
     if (!batches.length) {
       setSelectedBatchId("");
       return;
     }
 
-    if (!selectedBatchId || !batches.some((batch) => batch._id === selectedBatchId)) {
-      setSelectedBatchId(batches[0]._id);
+    const selectedBatchData = batches.find((batch) => batch._id === selectedBatchId);
+    const firstOpenBatch = batches.find((batch) => getLocalBatchStatus(batch) !== "Closed");
+    const nextBatchId =
+      firstOpenBatch?._id || selectedBatchData?._id || batches[0]._id;
+
+    if (
+      !selectedBatchData ||
+      getLocalBatchStatus(selectedBatchData) === "Closed" ||
+      selectedBatchId !== nextBatchId
+    ) {
+      setSelectedBatchId(nextBatchId);
     }
   }, [tourData?.batches, selectedBatchId]);
 
@@ -770,7 +797,7 @@ export default function TourDetails() {
 
                 <p className="text-sm font-bold text-gray-600 mb-2">Select a batch</p>
 
-                {batchOptions.map((batch) => {
+                {orderedBatchOptions.map((batch) => {
                   const isSelected = selectedBatchId === batch._id;
                   const batchStatus = getBatchStatus(batch);
                   const seatsLeft = getBatchSeatsLeft(batch);

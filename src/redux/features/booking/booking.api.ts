@@ -3,6 +3,8 @@ import { baseApi } from "@/redux/baseApi";
 type IMyBookingQueryParams = {
   page?: number;
   limit?: number;
+  search?: string;
+  status?: string;
 };
 
 export const bookingApi = baseApi.injectEndpoints({
@@ -39,6 +41,8 @@ export const bookingApi = baseApi.injectEndpoints({
         params: {
           page: args.page ?? 1,
           limit: args.limit ?? 10,
+          ...(args.search ? { search: args.search } : {}),
+          ...(args.status ? { status: args.status } : {}),
         },
       }),
       transformResponse: (response: { data?: unknown[] } | unknown) => {
