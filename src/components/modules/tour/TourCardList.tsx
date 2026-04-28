@@ -6,6 +6,7 @@ import { Link } from "react-router";
 import type { ITourListItemWithReview } from "@/types";
 import ImageWaterMark from '@/assets/images/image-watermark.webp'
 import { useWishlist } from "@/hooks/useWishlist";
+import { formatCurrency } from "@/config";
 
 interface Props {
     tour: ITourListItemWithReview;
@@ -79,10 +80,10 @@ const TourCardList = ({ tour }: Props) => {
                     <p className='text-gray-600 font-medium mb-4'>
                         Starts From <br />
                         <span className='text-primary-400 font-bold text-xl'>
-                            <span className='text-base'>৳</span>{startsFromPrice}
+                            {formatCurrency(startsFromPrice)}
                         </span>
                         {originalPrice ? (
-                            <span className='text-gray-500 font-bold text-base line-through ml-2'>৳{originalPrice}</span>
+                            <span className='text-gray-500 font-bold text-base line-through ml-2'>{formatCurrency(originalPrice)}</span>
                         ) : null}
                     </p>
 

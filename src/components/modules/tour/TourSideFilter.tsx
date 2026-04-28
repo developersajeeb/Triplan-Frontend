@@ -18,6 +18,7 @@ import { IoIosArrowDown, IoIosArrowUp } from "react-icons/io";
 import { RiSearch2Line } from "react-icons/ri";
 import { useSelector } from "react-redux";
 import { useSearchParams } from "react-router";
+import { formatCurrency } from "@/config";
 
 interface Props {
     className?: string
@@ -261,8 +262,8 @@ const TourSideFilter = ({ className }: Props) => {
                                     />
 
                                     <div className="flex items-center justify-between text-muted-foreground font-medium mt-2">
-                                        <span>৳{priceRange[0]}</span>
-                                        <span>৳{priceRange[1]}</span>
+                                        <span>{formatCurrency(priceRange[0])}</span>
+                                        <span>{formatCurrency(priceRange[1])}</span>
                                     </div>
                                 </>
                             )}

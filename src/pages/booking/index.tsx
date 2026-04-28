@@ -18,6 +18,7 @@ import { RiLoaderLine } from "react-icons/ri";
 import { format } from "date-fns";
 import { useCreateBookingMutation, useInitPaymentMutation } from "@/redux/features/booking/booking.api";
 import { toast } from "sonner";
+import { CURRENCY, formatCurrency } from "@/config";
 
 const couponSchema = z.object({
   coupon: z
@@ -417,9 +418,9 @@ export default function Booking() {
                     <li className="text-base text-gray-600 font-medium flex items-center gap-1"><span><PiUsersThree size={20} /></span> {guestParam} Guest</li>
                   </ul>
                   <div className="border-b border-gray-200 my-5"></div>
-                  <p className="flex flex-wrap justify-between gap-2"><span className="text-base font-normal text-gray-700">৳{guestParam && totalParam ? Math.round(Number(totalParam) / Number(guestParam)) : 0} x {guestParam} Guest</span> <span className="text-base font-semibold text-primary-900">৳{totalParam}</span></p>
+                  <p className="flex flex-wrap justify-between gap-2"><span className="text-base font-normal text-gray-700">{formatCurrency(guestParam && totalParam ? Math.round(Number(totalParam) / Number(guestParam)) : 0)} x {guestParam} Guest</span> <span className="text-base font-semibold text-primary-900">{formatCurrency(totalParam)}</span></p>
                   <div className="border-b border-gray-200 my-5"></div>
-                  <p className="flex flex-wrap justify-between gap-2"><span className="text-base font-normal text-gray-700">Price</span> <span className="text-base font-semibold text-primary-900">৳{totalParam}</span></p>
+                  <p className="flex flex-wrap justify-between gap-2"><span className="text-base font-normal text-gray-700">Price</span> <span className="text-base font-semibold text-primary-900">{formatCurrency(totalParam)}</span></p>
                   <div className="border-b border-gray-200 my-5"></div>
                   <Accordion
                     type="single"
@@ -463,7 +464,7 @@ export default function Booking() {
                 </div>
                 <div className="bg-gray-200 py-4 px-6 flex justify-between gap-2 flex-wrap">
                   <p className="text-base font-bold text-gray-800">Total</p>
-                  <p className="text-base font-bold text-gray-800">৳{totalParam}</p>
+                  <p className="text-base font-bold text-gray-800">{formatCurrency(totalParam)}</p>
                 </div>
                 <div className="p-5">
 

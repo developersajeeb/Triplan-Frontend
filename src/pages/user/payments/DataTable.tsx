@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/table"
 import { FiDownloadCloud } from "react-icons/fi"
 import { Link } from "react-router"
+import { formatCurrency } from "@/config";
 
 const invoices = [
     {
@@ -48,7 +49,7 @@ export function DataTable() {
                         <TableCell className="font-medium pl-6 text-primary-500 py-3">{invoice.invoice}</TableCell>
                         <TableCell className="py-3"><Link to={'/tour/slug'} className="font-medium text-gray-800 hover:text-primary-500 duration-300">{invoice.title}</Link></TableCell>
                         <TableCell className="py-3 font-medium text-gray-800">15 May 2026</TableCell>
-                        <TableCell className="py-3 font-medium text-gray-800">৳25000</TableCell>
+                        <TableCell className="py-3 font-medium text-gray-800">{formatCurrency(25000)}</TableCell>
                         <TableCell className="py-3">
                             {invoice.paymentStatus === "Paid" ? (
                                 <span className="bg-green-200 text-green-700 px-3 py-1 inline-block rounded-full text-xs font-medium">Paid</span>

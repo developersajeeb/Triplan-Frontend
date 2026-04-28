@@ -5,7 +5,7 @@ import type { ITourListItem } from "./tour.type";
 // Child file export
 export type { ISendOtp, IVerifyOtp, ILogin } from "./auth.type";
 export type { ITourListItem, ITourListItemWithReview, ITourPackage } from "./tour.type";
-export type { IReview, IReviewEligibility, IReviewSummary, ITourReviewResponse } from "./review.type";
+export type { IReview, IReviewEligibility, IReviewSummary, ITourReviewResponse, IUserReview } from "./review.type";
 export type { IBookingBatch, IBookingPayment, IBookingRecord, IBookingTour, IMyBookingsDataTableProps } from "./booking.type";
 
 export interface IResponse<T> {

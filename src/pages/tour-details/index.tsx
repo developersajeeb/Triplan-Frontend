@@ -36,6 +36,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useNavigate } from "react-router";
 import TourReviewSection from "./TourReviewSection";
 import { useGetTourReviewsQuery } from "@/redux/features/review/review.api";
+import { formatCurrency } from "@/config";
 
 export default function TourDetails() {
   const { slug } = useParams();
@@ -783,12 +784,12 @@ export default function TourDetails() {
                 </p>
                 <p className="text-primary-500">
                   <span className="text-[24px] font-semibold tracking-tighter">
-                    ৳{selectedBatchSellingPrice}
+                    {formatCurrency(selectedBatchSellingPrice)}
                   </span>
                   <span className="text-base font-medium">/person</span>{" "}
                   {selectedBatchCostFrom > 0 && (
                     <span className="text-base text-gray-500 font-semibold line-through tracking-tighter -mt-1">
-                      ৳{selectedBatchCostFrom}
+                      {formatCurrency(selectedBatchCostFrom)}
                     </span>
                   )}
                 </p>
@@ -863,7 +864,7 @@ export default function TourDetails() {
                 <div className="flex justify-between pb-3">
                   <p className="font-semibold text-gray-700">Amount</p>
                   <p className="text-lg font-semibold text-primary-500 tracking-tight">
-                    ৳{liveGuestTotal}
+                    {formatCurrency(liveGuestTotal)}
                   </p>
                 </div>
 
