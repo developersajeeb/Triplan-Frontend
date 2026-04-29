@@ -18,7 +18,7 @@ import { RiLoaderLine } from "react-icons/ri";
 import { format } from "date-fns";
 import { useCreateBookingMutation, useInitPaymentMutation } from "@/redux/features/booking/booking.api";
 import { toast } from "sonner";
-import { CURRENCY, formatCurrency } from "@/config";
+import { formatCurrency } from "@/config";
 
 const couponSchema = z.object({
   coupon: z

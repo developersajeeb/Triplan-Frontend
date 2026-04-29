@@ -16,54 +16,77 @@ const TableFilter = () => {
     const [searchParams, setSearchParams] = useSearchParams();
     const searchValue = form.watch("search");
     const paymentDateValue = form.watch("payment_date");
-    const sortValue = searchParams.get("sort") || "";
-    const search = searchParams.get("search") || "";
-    const paymentDate = searchParams.get("payment_date");
+    const statusValue = form.watch("status");
 
-    const queryParams: Record<string, string> = {};
-    if (search) queryParams.search = search;
+    const search = searchParams.get("search") || "";
+    const status = searchParams.get("status") || "";
+    const startDate = searchParams.get("startDate");
 
     useEffect(() => {
         form.setValue("search", search);
-        if (paymentDate) {
-            form.setValue("payment_date", new Date(paymentDate));
+        form.setValue("status", status);
+        if (startDate) {
+            const [year, month, day] = startDate.split("-").map(Number);
+            form.setValue("payment_date", new Date(year, month - 1, day));
         } else {
             form.setValue("payment_date", undefined);
         }
-    }, [search, paymentDate, form]);
+    }, [search, status, startDate, form]);
+
+    const normalizeLocalDate = (date: Date) => new Date(date.getFullYear(), date.getMonth(), date.getDate());
 
     const onSubmit = (data: FieldValues) => {
         const value = data.search?.trim() ?? "";
         const newParams = new URLSearchParams(searchParams);
+
         if (value) newParams.set("search", value);
         else newParams.delete("search");
+
         newParams.set("page", "1");
         setSearchParams(newParams);
     };
 
-    const handleSortChange = (value: string) => {
+    const handleStatusChange = (value: string) => {
         const params = new URLSearchParams(searchParams);
-        params.set("sort", value);
+        if (value && value !== "all") {
+            params.set("status", value);
+        } else {
+            params.delete("status");
+        }
         params.set("page", "1");
         setSearchParams(params);
     };
 
-    const handleResetSort = () => {
+    const handleDateChange = (date: Date | undefined) => {
         const params = new URLSearchParams(searchParams);
-        params.delete("sort");
-        params.delete("page");
+        if (date) {
+            const normalizedDate = normalizeLocalDate(date);
+            const dateStr = `${normalizedDate.getFullYear()}-${String(normalizedDate.getMonth() + 1).padStart(2, "0")}-${String(normalizedDate.getDate()).padStart(2, "0")}`;
+            params.set("startDate", dateStr);
+            params.set("endDate", dateStr);
+        } else {
+            params.delete("startDate");
+            params.delete("endDate");
+        }
+        params.set("page", "1");
         setSearchParams(params);
     };
 
     const handleReset = () => {
         form.setValue("search", "");
         form.setValue("payment_date", undefined);
+        form.setValue("status", "");
         const newParams = new URLSearchParams(searchParams);
         newParams.delete("search");
         newParams.delete("payment_date");
+        newParams.delete("status");
+        newParams.delete("startDate");
+        newParams.delete("endDate");
         newParams.delete("page");
         setSearchParams(newParams);
     };
+
+    const hasFilters = searchValue?.trim() || paymentDateValue || statusValue;
 
     return (
         <section className="flex flex-wrap justify-between gap-5 p-5 pb-8">
@@ -73,8 +96,6 @@ const TableFilter = () => {
                         onSubmit={form.handleSubmit(onSubmit)}
                         className="space-y-3 flex flex-wrap gap-3"
                     >
-
-                        {/* Search Field */}
                         <FormField
                             control={form.control}
                             name="search"
@@ -86,17 +107,15 @@ const TableFilter = () => {
                                                 {...field}
                                                 type="text"
                                                 className="tp-input !w-[212px]"
-                                                placeholder="Search by tour name..."
+                                                placeholder="Search by tour title..."
                                             />
                                         </FormControl>
                                     </div>
-
                                     <FormMessage className="!mt-1" />
                                 </FormItem>
                             )}
                         />
 
-                        {/* Payment Date Field */}
                         <FormField
                             control={form.control}
                             name="payment_date"
@@ -120,7 +139,11 @@ const TableFilter = () => {
                                                 <Calendar
                                                     mode="single"
                                                     selected={field.value}
-                                                    onSelect={field.onChange}
+                                                    onSelect={(date) => {
+                                                        const normalizedDate = date ? normalizeLocalDate(date) : undefined;
+                                                        field.onChange(normalizedDate);
+                                                        handleDateChange(normalizedDate);
+                                                    }}
                                                     captionLayout="dropdown"
                                                 />
                                             </PopoverContent>
@@ -133,36 +156,55 @@ const TableFilter = () => {
                         />
 
                         <div className="inline-block !mt-0">
-                            <button type="submit" className="inline-flex items-center text-sm gap-1 font-semibold border border-primary-500 bg-primary-500 hover:bg-primary-600 px-4 py-[11px] text-white duration-300 rounded-lg">Search <span><FiSearch /></span></button>
+                            <button
+                                type="submit"
+                                className="inline-flex items-center text-sm gap-1 font-semibold border border-primary-500 bg-primary-500 hover:bg-primary-600 px-4 py-[11px] text-white duration-300 rounded-lg"
+                            >
+                                Search <span><FiSearch /></span>
+                            </button>
                         </div>
                     </form>
                 </Form>
-                {(searchValue?.trim() || paymentDateValue) && (
+
+                {hasFilters && (
                     <div className="inline-block">
-                        <button onClick={handleReset} type="button" className="inline-flex items-center text-sm gap-1 font-semibold border border-red-500 hover:bg-red-500 px-4 py-[11px] text-red-500 hover:text-white duration-300 rounded-lg">Reset <span><GrPowerReset /></span></button>
+                        <button
+                            onClick={handleReset}
+                            type="button"
+                            className="inline-flex items-center text-sm gap-1 font-semibold border border-red-500 hover:bg-red-500 px-4 py-[11px] text-red-500 hover:text-white duration-300 rounded-lg"
+                        >
+                            Reset <span><GrPowerReset /></span>
+                        </button>
                     </div>
                 )}
             </div>
-            <Select value={sortValue} onValueChange={handleSortChange}>
-                <SelectTrigger className="w-[160px] rounded-full shadow-none h-[34px] bg-white focus:ring-0 border border-primary-200">
-                    <SelectValue placeholder="Select status" />
-                </SelectTrigger>
 
-                <SelectContent>
-                    <SelectItem value="paid">Paid</SelectItem>
-                    <SelectItem value="failed">Failed</SelectItem>
-                    <SelectItem value="cancel">Cancel</SelectItem>
-                    <div className="border-t mt-2 pt-2 px-2 pb-1">
-                        <button
-                            onClick={handleResetSort}
-                            className="w-full text-center py-2 text-sm font-medium rounded-md bg-red-100 hover:bg-red-200 text-red-700"
-                        >
-                            Reset
-                        </button>
-                    </div>
+            <Form {...form}>
+                <FormField
+                    control={form.control}
+                    name="status"
+                    render={() => (
+                        <FormItem className="!mt-0">
+                            <Select value={statusValue || ""} onValueChange={handleStatusChange}>
+                                <FormControl>
+                                    <SelectTrigger className="w-[180px] rounded-full shadow-none h-[44px] bg-white focus:ring-0 border border-primary-200">
+                                        <SelectValue placeholder="Select status" />
+                                    </SelectTrigger>
+                                </FormControl>
 
-                </SelectContent>
-            </Select>
+                                <SelectContent>
+                                    <SelectItem value="all">All Status</SelectItem>
+                                    <SelectItem value="PAID">Paid</SelectItem>
+                                    <SelectItem value="FAILED">Failed</SelectItem>
+                                    <SelectItem value="CANCELLED">Cancel</SelectItem>
+                                    <SelectItem value="UNPAID">Unpaid</SelectItem>
+                                </SelectContent>
+                            </Select>
+                            <FormMessage className="!mt-1" />
+                        </FormItem>
+                    )}
+                />
+            </Form>
         </section>
     );
 };

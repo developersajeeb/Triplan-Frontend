@@ -11,6 +11,8 @@ import { Textarea } from "@/components/ui/textarea";
 import MultipleImageUploader from "@/components/shared/uploaders/MultipleImageUploader";
 import ConfirmationDialog from "@/components/utilities/ConfirmationDialog";
 import type { FileMetadata } from "@/hooks/use-file-upload";
+import useFancyBox from "@/hooks/useFancybox";
+import { type FancyboxOptions } from "@fancyapps/ui/dist/fancybox";
 
 
 const MyReviews = () => {
@@ -31,6 +33,20 @@ const MyReviews = () => {
     });
     const [existingEditImages, setExistingEditImages] = useState<string[]>([]);
     const [newEditImages, setNewEditImages] = useState<(File | FileMetadata)[] | []>([]);
+
+    const fancyBoxOptions = {
+        Hash: false,
+        placeFocusBack: false,
+        dragToClose: true,
+        Toolbar: {
+            display: {
+                left: [],
+                middle: [],
+                right: ["close"],
+            },
+        },
+    } as unknown as FancyboxOptions;
+    const [fancyBoxRef] = useFancyBox(fancyBoxOptions);
 
     const reviews = reviewData?.data ?? [];
 
@@ -130,7 +146,7 @@ const MyReviews = () => {
         <>
             <h2 className="text-xl font-bold text-primary-950 mb-4">My Reviews</h2>
 
-            <section className="space-y-4">
+            <section ref={fancyBoxRef} className="space-y-4">
                 {isLoading || isFetching ? (
                     Array.from({ length: 3 }).map((_, index) => (
                         <div key={index} className="border border-gray-200 rounded-xl p-5 space-y-3">
@@ -177,6 +193,7 @@ const MyReviews = () => {
                                         <a
                                             key={imageUrl}
                                             href={imageUrl}
+                                            data-fancybox={`review-${review._id}`}
                                             target="_blank"
                                             rel="noreferrer"
                                             className="block h-20 w-20 overflow-hidden rounded-2xl border border-gray-100"
@@ -272,7 +289,13 @@ const MyReviews = () => {
                                             <div className="flex flex-wrap gap-3">
                                                 {existingEditImages.map((imageUrl) => (
                                                     <div key={imageUrl} className="relative h-20 w-20 overflow-hidden rounded-2xl border border-gray-100 bg-white">
-                                                        <img src={imageUrl} alt="Existing review image" className="h-full w-full object-cover" />
+                                                        <a
+                                                            href={imageUrl}
+                                                            data-fancybox={`edit-review-${review._id}`}
+                                                            className="block h-full w-full"
+                                                        >
+                                                            <img src={imageUrl} alt="Existing review image" className="h-full w-full object-cover" />
+                                                        </a>
                                                         <button
                                                             type="button"
                                                             onClick={() => setExistingEditImages((prev) => prev.filter((item) => item !== imageUrl))}
