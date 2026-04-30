@@ -2,7 +2,7 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/
 import { Button } from "@/components/ui/button";
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
-import { useGetAllToursQuery } from "@/redux/features/tour/tour.api";
+import { useGetSingleTourQuery } from "@/redux/features/tour/tour.api";
 import { useUserInfoQuery } from "@/redux/features/user/user.api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useEffect, useState } from "react";
@@ -80,9 +80,9 @@ export default function Booking() {
   const dateParam = searchParams.get("date");
   const guestParam = searchParams.get("guest");
   const totalParam = searchParams.get("total");
-  const hasBookingData = Boolean(dateParam && guestParam && totalParam);
+  const hasBookingData = Boolean(dateParam && guestParam && totalParam && slug);
 
-  const { data: tourData, isLoading: isTourLoading, isError } = useGetAllToursQuery({ slug: slug! }, { skip: !hasBookingData });
+  const { data: tourData, isLoading: isTourLoading, isError } = useGetSingleTourQuery(slug!, { skip: !hasBookingData });
   const { data: userData, isLoading: isUserLoading } = useUserInfoQuery(undefined);
   const [initPayment] = useInitPaymentMutation();
   const [createBooking] = useCreateBookingMutation();
@@ -122,7 +122,7 @@ export default function Booking() {
   }, [userData, form]);
 
   const handleBooking = async () => {
-    const tour = tourData?.data?.[0]?._id;
+    const tour = tourData?._id;
     const guestCount = guestParam ? Number(guestParam) : 0;
     const isValid = await form.trigger(["phone", "address"]);
 
@@ -412,7 +412,7 @@ export default function Booking() {
             <div className="w-full scroll-mt-24 md:scroll-mt-0 lg:min-w-[420px] lg:w-[420px] lg:sticky top-24 h-fit">
               <div className="shadow-[0px_5px_20px_0px_rgba(0,0,0,.05)] bg-white rounded-2xl border border-gray-200">
                 <div className="p-6">
-                  <h2 className="text-lg font-bold text-gray-700 mb-10 flex gap-2"><span className="text-green-500 pt-[6px]"><FaRegCircleDot size={20} /></span> {tourData?.data?.[0]?.title}</h2>
+                  <h2 className="text-lg font-bold text-gray-700 mb-10 flex gap-2"><span className="text-green-500 pt-[6px]"><FaRegCircleDot size={20} /></span> {tourData?.title}</h2>
                   <ul className="space-y-1">
                     <li className="text-base text-gray-600 font-medium flex items-center gap-1"><span><LuCalendarCheck2 size={16} /></span> {dateParam ? format(new Date(dateParam), "MMM dd, yyyy") : ""}</li>
                     <li className="text-base text-gray-600 font-medium flex items-center gap-1"><span><PiUsersThree size={20} /></span> {guestParam} Guest</li>

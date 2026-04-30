@@ -87,6 +87,19 @@ export default function TourDetails() {
     return `${format(new Date(startDate), "MMM dd")} – ${format(new Date(endDate), "MMM dd, yyyy")}`;
   };
 
+  const toUTCDateKey = (value: string | Date) => {
+    const date = value instanceof Date ? value : new Date(value);
+
+    if (Number.isNaN(date.getTime())) {
+      return "";
+    }
+
+    const year = date.getUTCFullYear();
+    const month = String(date.getUTCMonth() + 1).padStart(2, "0");
+    const day = String(date.getUTCDate()).padStart(2, "0");
+    return `${year}-${month}-${day}`;
+  };
+
   const getBatchSeatsLeft = (batch: (typeof batchOptions)[number]) => {
     if (typeof batch.remainingSeat === "number") {
       return batch.remainingSeat;
@@ -183,8 +196,9 @@ export default function TourDetails() {
   const selectedBatchSellingPrice = selectedBatch?.sellingPrice ?? tourData?.sellingPrice ?? 0;
   const selectedBatchCostFrom = selectedBatch?.costFrom ?? tourData?.costFrom ?? 0;
   const liveGuestTotal = guest * selectedBatchSellingPrice;
+  const selectedBatchDateKey = selectedBatch ? toUTCDateKey(selectedBatch.startDate) : "";
   const bookingUrl = selectedBatch
-    ? `/booking/${tourData?.slug}?date=${format(new Date(selectedBatch.startDate), "yyyy-MM-dd")}&guest=${guest}&total=${liveGuestTotal}`
+    ? `/booking/${tourData?.slug}?date=${selectedBatchDateKey}&guest=${guest}&total=${liveGuestTotal}`
     : "#";
   const discountPercent =
     selectedBatchCostFrom > 0
@@ -207,10 +221,15 @@ export default function TourDetails() {
       return;
     }
 
+    if (!selectedBatchDateKey) {
+      toast.error("Selected batch date is invalid. Please choose another batch.");
+      return;
+    }
+
     try {
       const result = await checkAvailability({
         tour: tourData._id,
-        date: new Date(selectedBatch.startDate).toISOString(),
+        date: selectedBatchDateKey,
         guestCount: guest,
       }).unwrap();
 
