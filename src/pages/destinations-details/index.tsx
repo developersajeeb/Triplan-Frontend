@@ -46,7 +46,7 @@ const DestinationDetails = () => {
         queryParams.division = destination.data.name;
     }
 
-    const { data: toursData, isLoading: isTourLoading, isFetching } = useGetAllToursQuery(queryParams);
+    const { data: toursData, isLoading: isTourLoading, isFetching } = useGetAllToursQuery({ ...queryParams, status: "active" });
 
     console.log(toursData);
 

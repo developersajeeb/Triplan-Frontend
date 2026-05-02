@@ -9,7 +9,7 @@ import React from "react";
 import TourCardLoader from "@/components/shared/blocks/TourCardLoader";
 
 const TourCardSlider = () => {
-    const { data: tours, isLoading } = useGetAllToursQuery({ limit: "8" });
+    const { data: tours, isLoading } = useGetAllToursQuery({ limit: "8", status: "active" });
     const toursData = tours?.data ?? [];
 
     return (

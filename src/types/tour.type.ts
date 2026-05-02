@@ -27,6 +27,8 @@ export interface ITourPackage {
   _id: string;
   title: string;
   slug: string;
+  isDraft?: boolean;
+  isTrending?: boolean;
   startDate: string;
   endDate: string;
   regEndDate: string;
@@ -57,6 +59,8 @@ export type ITourListItem = Pick<
   | "_id"
   | "title"
   | "slug"
+  | "isDraft"
+  | "isTrending"
   | "images"
   | "costFrom"
   | "sellingPrice"

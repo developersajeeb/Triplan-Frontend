@@ -20,8 +20,6 @@ import {
     ArrowUpRight,
     ArrowDownRight,
     MoreVertical,
-    Download,
-    Filter,
 } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -134,24 +132,10 @@ const AdminDashboard = () => {
         <>
             {/* Header Section */}
             <div className="mb-8">
-                <div className="flex items-center justify-between">
-                    <div>
-                        <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
-                        <p className="text-slate-600 mt-2">
-                            Welcome back! Here's what's happening with your tours today.
-                        </p>
-                    </div>
-                    <div className="flex gap-3">
-                        <Button variant="outline" size="sm" className="gap-2">
-                            <Filter className="w-4 h-4" />
-                            Filter
-                        </Button>
-                        <Button size="sm" className="gap-2">
-                            <Download className="w-4 h-4" />
-                            Export
-                        </Button>
-                    </div>
-                </div>
+                <h1 className="text-3xl font-bold text-slate-900">Dashboard</h1>
+                <p className="text-slate-600 mt-2">
+                    Welcome back! Here's what's happening with your tours today.
+                </p>
             </div>
 
             {/* Stats Cards */}
@@ -170,8 +154,8 @@ const AdminDashboard = () => {
                                     </div>
                                     <div
                                         className={`flex items-center gap-1 text-sm font-semibold ${stat.isPositive
-                                                ? 'text-green-600'
-                                                : 'text-red-600'
+                                            ? 'text-green-600'
+                                            : 'text-red-600'
                                             }`}
                                     >
                                         {stat.isPositive ? (
@@ -341,8 +325,8 @@ const AdminDashboard = () => {
                                     <TableCell>
                                         <span
                                             className={`px-3 py-1 rounded-full text-xs font-semibold ${booking.status === 'Completed'
-                                                    ? 'bg-green-50 text-green-700'
-                                                    : 'bg-yellow-50 text-yellow-700'
+                                                ? 'bg-green-50 text-green-700'
+                                                : 'bg-yellow-50 text-yellow-700'
                                                 }`}
                                         >
                                             {booking.status}

@@ -30,9 +30,11 @@ const TourCardList = ({ tour }: Props) => {
             <div className='relative w-full h-[200px] sm:h-auto sm:max-w-[300px] sm:min-w-[300px] overflow-hidden'>
                 <ul className='flex gap-2 justify-between absolute left-3 top-3 right-3 z-10'>
                     <li onClick={() => toggle(tour._id)} className='bg-white shadow w-6 h-6 rounded-full flex justify-center items-center cursor-pointer'><FaHeart className={`transition-colors duration-300 ${isInWishlist(tour._id) ? "text-red-500" : "text-gray-400"}`} size={14} /></li>
-                    <li className='text-xs text-white font-medium bg-primary-500 px-2 pr-3 py-1 rounded-full inline-flex items-center gap-1'>
-                        <BiSolidHot size={14} /> Trending
-                    </li>
+                    {tour.isTrending && (
+                        <li className='text-xs text-white font-medium bg-primary-500 px-2 pr-3 py-1 rounded-full inline-flex items-center gap-1'>
+                            <BiSolidHot size={14} /> Trending
+                        </li>
+                    )}
                 </ul>
 
                 <img

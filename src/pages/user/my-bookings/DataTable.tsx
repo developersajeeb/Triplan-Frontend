@@ -7,6 +7,7 @@ import {
     TableHeader,
     TableRow,
 } from "@/components/ui/table"
+import { formatCurrency } from "@/config";
 import { Skeleton } from "@/components/ui/skeleton"
 import { Link } from "react-router"
 import { useMemo } from "react"
@@ -251,7 +252,7 @@ export function DataTable({ bookings = [], isLoading }: IMyBookingsDataTableProp
                                         <span className="text-gray-500"> - {endDate}</span>
                                     )}
                                 </TableCell>
-                                <TableCell className="py-3 font-medium text-gray-800 min-w-[110px] md:min-w-0">{formatAmount(amount)}</TableCell>
+                                <TableCell className="py-3 font-medium text-gray-800 min-w-[110px] md:min-w-0">{formatCurrency(amount)}</TableCell>
                                 <TableCell className="py-3 pr-6 min-w-[130px] md:min-w-0">
                                     <div className="flex justify-end gap-2 flex-wrap">
                                         <Link

@@ -46,7 +46,7 @@ const Tours = () => {
     if (search) queryParams.search = search;
     if (sort) queryParams.sort = sort;
 
-    const { data: toursData, isLoading, isFetching } = useGetAllToursQuery({ ...queryParams });
+    const { data: toursData, isLoading, isFetching } = useGetAllToursQuery({ ...queryParams, status: "active" });
 
     useEffect(() => {
         if (toursData && Array.isArray(toursData.data) && toursData.data.length > 0) {
@@ -89,6 +89,9 @@ const Tours = () => {
             ],
         },
     };
+
+    console.log(toursData);
+    
 
     return (
         <>
