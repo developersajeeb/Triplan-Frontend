@@ -55,6 +55,21 @@ export const tourApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["TOUR"],
     }),
+    updateTourMultipart: builder.mutation({
+      query: ({ id, formData }: { id: string; formData: FormData }) => ({
+        url: `/tour/${id}`,
+        method: "PATCH",
+        data: formData,
+      }),
+      invalidatesTags: ["TOUR"],
+    }),
+    deleteTour: builder.mutation({
+      query: (id: string) => ({
+        url: `/tour/${id}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["TOUR"],
+    }),
     getSingleTour: builder.query({
       query: (slug: string) => ({
         url: `/tour/slug/${slug}`,
@@ -73,5 +88,7 @@ export const {
   useAddTourMutation,
   useGetAllToursQuery,
   useUpdateTourMutation,
+  useUpdateTourMultipartMutation,
+  useDeleteTourMutation,
   useGetSingleTourQuery,
 } = tourApi;

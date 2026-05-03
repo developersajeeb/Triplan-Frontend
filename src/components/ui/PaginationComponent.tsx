@@ -34,7 +34,7 @@ export default function PaginationComponent({
         {/* Previous page button */}
         <PaginationItem>
           <PaginationPrevious
-            className="aria-disabled:pointer-events-none aria-disabled:opacity-50"
+            className="aria-disabled:pointer-events-none cursor-pointer aria-disabled:opacity-50"
             onClick={() => onPageChange(currentPage - 1)}
             aria-disabled={currentPage === 1}
           />
@@ -51,6 +51,7 @@ export default function PaginationComponent({
         {pages.map((page) => (
           <PaginationItem key={page}>
             <PaginationLink
+              className="cursor-pointer"
               isActive={page === currentPage}
               onClick={() => onPageChange(page)}
             >
@@ -69,7 +70,7 @@ export default function PaginationComponent({
         {/* Next page button */}
         <PaginationItem>
           <PaginationNext
-            className="aria-disabled:pointer-events-none aria-disabled:opacity-50"
+            className="aria-disabled:pointer-events-none cursor-pointer aria-disabled:opacity-50"
             onClick={() => onPageChange(currentPage + 1)}
             aria-disabled={currentPage === totalPages}
           />

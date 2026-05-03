@@ -11,6 +11,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
   SidebarRail,
+  useSidebar,
 } from "@/components/ui/sidebar"
 import { Link, useLocation } from "react-router"
 import { getSidebarMenus } from "@/utils/getSidebarMenus"
@@ -29,6 +30,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
   const location = useLocation();
   const [logout] = useLogoutMutation();
   const dispatch = useAppDispatch();
+  const { isMobile, setOpenMobile } = useSidebar();
 
   const handleLogout = async () => {
     await logout(undefined);
@@ -36,8 +38,14 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
     onLogoutCleanup();
   };
 
+  const handleMenuClick = () => {
+    if (isMobile) {
+      setOpenMobile(false);
+    }
+  };
+
   return (
-    <Sidebar {...props}>
+    <Sidebar {...props} className="z-50">
       <SidebarHeader>
         <Link to="/"><img className="w-36 py-3 px-2" src={Logo} alt="" /></Link>
       </SidebarHeader>
@@ -53,7 +61,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
                   return (
                     (
                       <SidebarMenuItem key={item.title}>
-                        <SidebarMenuButton asChild className={`${isActive ? "bg-primary-400 text-white" : ""} duration-300 transition-all hover:bg-primary-600 hover:text-white`}>
+                        <SidebarMenuButton asChild onClick={handleMenuClick} className={`${isActive ? "bg-primary-400 text-white" : ""} duration-300 transition-all hover:bg-primary-600 hover:text-white`}>
                           <Link className="font-semibold" to={item?.url}>{item.icon && <item.icon className={item?.iconClassName || ""} size={item?.iconSize} />} {item?.title}</Link>
                         </SidebarMenuButton>
                       </SidebarMenuItem>

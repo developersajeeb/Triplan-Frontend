@@ -30,6 +30,7 @@ const BlogPage = lazy(() => import("@/pages/blog"));
 const BlogDetails = lazy(() => import("@/pages/blog-details"));
 const PrivacyPolicyPage = lazy(() => import("@/pages/privacy-policy"));
 const TermsOfService = lazy(() => import("@/pages/terms-of-service"));
+import EditTour from "@/pages/admin/edit-tour";
 
 export const router = createBrowserRouter([
   {
@@ -121,6 +122,7 @@ export const router = createBrowserRouter([
     path: "/admin",
     children: [
       { index: true, element: <Navigate to="/admin/dashboard" /> },
+        { path: "edit-tour/:slug", Component: EditTour },
       ...generateRoutes(adminSidebarMenus),
     ],
   },

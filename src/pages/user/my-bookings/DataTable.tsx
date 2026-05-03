@@ -47,18 +47,6 @@ const formatBookingDate = (value?: string) => {
     });
 };
 
-const formatAmount = (amount?: number) => {
-    if (typeof amount !== "number") {
-        return "N/A";
-    }
-
-    return new Intl.NumberFormat("en-BD", {
-        style: "currency",
-        currency: "BDT",
-        maximumFractionDigits: 0,
-    }).format(amount);
-};
-
 const getBookingBatches = (booking: IBookingRecord): IBookingBatch[] => {
     if (Array.isArray(booking.batches) && booking.batches.length > 0) {
         return booking.batches;

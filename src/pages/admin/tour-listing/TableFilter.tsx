@@ -14,6 +14,7 @@ import {
 export type Filters = {
   search: string;
   status: string; // 'all' | 'active' | 'draft' etc
+  sort: string;
 };
 
 interface Props {
@@ -23,29 +24,31 @@ interface Props {
 const TableFilter: React.FC<Props> = ({ onChange }) => {
   const [query, setQuery] = useState('');
   const [status, setStatus] = useState('all');
+  const [sort, setSort] = useState('newest');
 
   useEffect(() => {
     // initialize empty
-    onChange({ search: query, status: status || 'all' });
+    onChange({ search: query, status: status || 'all', sort });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleSearchSubmit = (e?: React.FormEvent) => {
     e?.preventDefault();
-    onChange({ search: query, status: status || 'all' });
+    onChange({ search: query, status: status || 'all', sort });
   };
 
   const handleReset = () => {
     setQuery('');
     setStatus('all');
-    onChange({ search: '', status: 'all' });
+    setSort('newest');
+    onChange({ search: '', status: 'all', sort: 'newest' });
   };
 
   return (
-    <section className="flex justify-between gap-5 p-5">
+    <section className="flex flex-wrap justify-between gap-5 p-5">
       <div className="flex gap-3 items-center">
-        <form onSubmit={handleSearchSubmit} className="w-full max-w-[360px] flex items-center gap-2">
-          <div className="relative flex-1">
+        <form onSubmit={handleSearchSubmit} className="flex items-center gap-2">
+          <div className="relative w-full max-w-[360px]">
               <Input
                 value={query}
                 onChange={(e) => setQuery(e.target.value)}
@@ -57,17 +60,17 @@ const TableFilter: React.FC<Props> = ({ onChange }) => {
               <RiSearch2Line className="!h-[18px] !w-[18px]" />
             </Button>
           </div>
-
-          {query && query.trim() !== '' && (
-            <button onClick={handleReset} type="button" className="flex items-center text-sm gap-1 font-semibold border border-red-500 hover:bg-red-500 px-4 py-[11px] text-red-500 hover:text-white duration-300 rounded-lg">
-              Reset <span className="ml-1"><GrPowerReset /></span>
-            </button>
-          )}
         </form>
+
+        {(query.trim() !== '' || status !== 'all' || sort !== 'newest') && (
+          <button onClick={handleReset} type="button" className="flex items-center text-sm gap-1 font-semibold border border-red-500 hover:bg-red-500 px-4 py-[11px] text-red-500 hover:text-white duration-300 rounded-lg">
+            Reset <span className="ml-1"><GrPowerReset /></span>
+          </button>
+        )}
       </div>
 
-      <div>
-        <Select value={status} onValueChange={(v) => { setStatus(v); onChange({ search: query, status: v || 'all' }); }}>
+      <div className="flex flex-wrap items-center gap-3">
+        <Select value={status} onValueChange={(v) => { setStatus(v); onChange({ search: query, status: v || 'all', sort }); }}>
           <SelectTrigger className="w-[160px] rounded-full shadow-none h-[34px] bg-white focus:ring-0 border border-primary-200">
             <SelectValue placeholder="All Status" />
           </SelectTrigger>
@@ -76,9 +79,18 @@ const TableFilter: React.FC<Props> = ({ onChange }) => {
             <SelectItem value="all">All</SelectItem>
             <SelectItem value="active">Active</SelectItem>
             <SelectItem value="draft">Draft</SelectItem>
-            <div className="border-t mt-2 pt-2 px-2 pb-1">
-              <button type="button" onClick={handleReset} className="w-full text-center py-2 text-sm font-medium rounded-md bg-red-100 hover:bg-red-200 text-red-700">Reset</button>
-            </div>
+          </SelectContent>
+        </Select>
+
+        <Select value={sort} onValueChange={(v) => { setSort(v); onChange({ search: query, status: status || 'all', sort: v || 'newest' }); }}>
+          <SelectTrigger className="w-[180px] rounded-full shadow-none h-[34px] bg-white focus:ring-0 border border-primary-200">
+            <SelectValue placeholder="Sort by bookings" />
+          </SelectTrigger>
+
+          <SelectContent>
+            <SelectItem value="newest">Newest</SelectItem>
+            <SelectItem value="bookingsHighToLow">Bookings: High to Low</SelectItem>
+            <SelectItem value="bookingsLowToHigh">Bookings: Low to High</SelectItem>
           </SelectContent>
         </Select>
       </div>

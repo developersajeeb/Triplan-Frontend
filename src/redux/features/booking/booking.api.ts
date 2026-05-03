@@ -7,6 +7,40 @@ type IMyBookingQueryParams = {
   status?: string;
 };
 
+export type IAdminDashboardSummary = {
+  stats: {
+    totalRevenue: number;
+    totalBookings: number;
+    activeUsers: number;
+    averageRating: number;
+  };
+  trend: {
+    revenueChange: number;
+    bookingsChange: number;
+    activeUsersChange: number;
+    averageRatingChange: number;
+  };
+  revenueData: Array<{
+    month: string;
+    revenue: number;
+    bookings: number;
+  }>;
+  destinationData: Array<{
+    name: string;
+    value: number;
+    color: string;
+  }>;
+  recentBookings: Array<{
+    id: string;
+    customer: string;
+    destination: string;
+    amount: number;
+    status: string;
+    date: string;
+    rating: number | null;
+  }>;
+};
+
 export const bookingApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
     createBooking: builder.mutation({
@@ -54,6 +88,15 @@ export const bookingApi = baseApi.injectEndpoints({
       },
       providesTags: ["BOOKING"],
     }),
+
+    getAdminDashboardSummary: builder.query<IAdminDashboardSummary, void>({
+      query: () => ({
+        url: "/booking/dashboard-summary",
+        method: "GET",
+      }),
+      transformResponse: (response: { data: IAdminDashboardSummary }) => response.data,
+      providesTags: ["BOOKING"],
+    }),
   }),
 });
 
@@ -62,4 +105,5 @@ export const {
   useInitPaymentMutation,
   useCheckAvailabilityMutation,
   useGetMyBookingsQuery,
+  useGetAdminDashboardSummaryQuery,
 } = bookingApi;

@@ -90,9 +90,6 @@ const Tours = () => {
         },
     };
 
-    console.log(toursData);
-    
-
     return (
         <>
             <CommonMetadata

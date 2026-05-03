@@ -5,15 +5,19 @@ import { useFileUpload, type FileMetadata } from "@/hooks/use-file-upload";
 
 export default function MultipleImageUploader({
   onChange,
+  defaultImageUrls = [],
+  onRemoveDefaultImage,
 }: {
   onChange: Dispatch<React.SetStateAction<[] | (File | FileMetadata)[]>>;
+  defaultImageUrls?: string[];
+  onRemoveDefaultImage?: (url: string) => void;
 }) {
   const maxSizeMB = 5;
   const maxSize = maxSizeMB * 1024 * 1024; // 5MB default
   const maxFiles = 3;
 
   const [
-    { files, isDragging, errors },
+    { files: selectedFiles, isDragging, errors },
     {
       handleDragEnter,
       handleDragLeave,
@@ -30,14 +34,17 @@ export default function MultipleImageUploader({
     maxFiles,
   });
 
+  const hasAnyImages = defaultImageUrls.length > 0 || selectedFiles.length > 0;
+  const totalUploaded = defaultImageUrls.length + selectedFiles.length;
+
   useEffect(() => {
-    if (files.length > 0) {
-      const imageList = files.map((item) => item.file);
+    if (selectedFiles.length > 0) {
+      const imageList = selectedFiles.map((item) => item.file);
       onChange(imageList);
     } else {
       onChange([]);
     }
-  }, [files]);
+  }, [selectedFiles, onChange]);
 
   return (
     <div className="flex flex-col gap-2">
@@ -48,7 +55,7 @@ export default function MultipleImageUploader({
         onDragOver={handleDragOver}
         onDrop={handleDrop}
         data-dragging={isDragging || undefined}
-        data-files={files.length > 0 || undefined}
+        data-files={hasAnyImages || undefined}
         className="border-input data-[dragging=true]:bg-accent/50 has-[input:focus]:border-ring has-[input:focus]:ring-ring/50 relative flex min-h-52 flex-col items-center overflow-hidden rounded-lg border border-gray-300 p-4 transition-colors not-data-[files]:justify-center has-[input:focus]:ring-[3px]"
       >
         <input
@@ -56,17 +63,17 @@ export default function MultipleImageUploader({
           className="sr-only"
           aria-label="Upload image file"
         />
-        {files.length > 0 ? (
+        {hasAnyImages ? (
           <div className="flex w-full flex-col gap-3">
             <div className="flex items-center justify-between gap-2">
               <h3 className="truncate text-sm font-medium">
-                Uploaded Files ({files.length})
+                Uploaded Files ({totalUploaded})
               </h3>
               <Button
                 variant="outline"
                 size="sm"
                 onClick={openFileDialog}
-                disabled={files.length >= maxFiles}
+                disabled={totalUploaded >= maxFiles}
                 type="button"
               >
                 <UploadIcon
@@ -78,7 +85,31 @@ export default function MultipleImageUploader({
             </div>
 
             <div className="grid grid-cols-2 gap-4 md:grid-cols-3">
-              {files.map((file) => (
+              {defaultImageUrls.map((url, index) => (
+                <div
+                  key={`default-${url}-${index}`}
+                  className="bg-accent relative aspect-square rounded-md"
+                >
+                  <img
+                    src={url}
+                    alt={`Default image ${index + 1}`}
+                    className="size-full rounded-[inherit] object-cover"
+                  />
+                  {onRemoveDefaultImage ? (
+                    <Button
+                      onClick={() => onRemoveDefaultImage(url)}
+                      size="icon"
+                      className="border-background focus-visible:border-background absolute -top-2 -right-2 size-6 rounded-full border-2 shadow-none"
+                      aria-label={`Remove default image ${index + 1}`}
+                      type="button"
+                    >
+                      <XIcon className="size-3.5" />
+                    </Button>
+                  ) : null}
+                </div>
+              ))}
+
+              {selectedFiles.map((file) => (
                 <div
                   key={file.id}
                   className="bg-accent relative aspect-square rounded-md"
