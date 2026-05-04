@@ -8,6 +8,7 @@ import { BiSupport } from "react-icons/bi";
 import { useGetWishlistQuery } from "@/redux/features/user/user.api";
 import { useGetMyBookingsQuery } from "@/redux/features/booking/booking.api";
 import { Skeleton } from "@/components/ui/skeleton";
+import { formatCurrency } from "@/config";
 
 type TBookingRecord = {
     _id?: string;
@@ -76,36 +77,28 @@ const getStatusDate = (value?: string) => {
     return parsed;
 };
 
-const getTimelineStatus = (booking: TBookingRecord): "Upcoming" | "Completed" => {
-    const endDate = getStatusDate(booking.tour?.endDate ?? booking.endDate ?? booking.startDate ?? booking.date ?? booking.tour?.startDate);
+const getTimelineStatus = (booking: TBookingRecord): "Upcoming" | "Ongoing" | "Completed" => {
+    const startDate = getStatusDate(booking.startDate ?? booking.date ?? booking.tour?.startDate);
+    const endDate = getStatusDate(booking.endDate ?? booking.tour?.endDate);
 
-    if (!endDate) {
+    if (!startDate && !endDate) {
         return "Upcoming";
     }
 
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const end = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+    const start = startDate ? new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate()) : null;
+    const end = endDate ? new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate()) : null;
 
-    if (today > end) {
+    if (start && today < start) {
+        return "Upcoming";
+    }
+
+    if (end && today > end) {
         return "Completed";
     }
 
-    return "Upcoming";
-};
-
-const isUpcomingBooking = (booking: TBookingRecord) => {
-    const status = normalizeStatus(booking.bookingStatus ?? booking.status);
-
-    if (status.includes("cancel") || status.includes("failed")) {
-        return false;
-    }
-
-    if (status.includes("upcoming")) {
-        return true;
-    }
-
-    return getTimelineStatus(booking) === "Upcoming";
+    return "Ongoing";
 };
 
 const formatCount = (count: number) => String(count).padStart(2, "0");
@@ -145,7 +138,7 @@ const getPaymentStatusClassName = (status?: string) => {
     return "text-xs font-semibold bg-gray-200 text-gray-700 px-2 py-1 rounded-full";
 };
 
-const getBatchTimelineStatus = (batch: TBookingBatch, booking: TBookingRecord): "Upcoming" | "Completed" => {
+const getBatchTimelineStatus = (batch: TBookingBatch, booking: TBookingRecord): "Upcoming" | "Ongoing" | "Completed" => {
     return getTimelineStatus({
         startDate: batch.startDate ?? batch.date ?? booking.startDate ?? booking.date ?? booking.tour?.startDate,
         endDate: batch.endDate ?? booking.tour?.endDate ?? booking.endDate,
@@ -175,6 +168,18 @@ const getBookingBatches = (booking: TBookingRecord): TBookingBatch[] => {
     ];
 };
 
+const isVisibleBooking = (booking: TBookingRecord) => {
+    return getBookingBatches(booking).some((batch) => {
+        const status = normalizeStatus(batch.bookingStatus ?? batch.status ?? booking.bookingStatus ?? booking.status);
+
+        if (status.includes("cancel") || status.includes("failed")) {
+            return false;
+        }
+
+        return getBatchTimelineStatus(batch, booking) !== "Completed";
+    });
+};
+
 const getBatchKey = (batch: TBookingBatch) => {
     return [
         batch.batchNo,
@@ -194,18 +199,6 @@ const getBookingGroupKey = (booking: TBookingRecord) => {
     return slug || `${title ?? "tour"}-${location ?? "location"}`;
 };
 
-const formatAmount = (amount?: number) => {
-    if (typeof amount !== "number") {
-        return "N/A";
-    }
-
-    return new Intl.NumberFormat("en-BD", {
-        style: "currency",
-        currency: "BDT",
-        maximumFractionDigits: 0,
-    }).format(amount);
-};
-
 const UserDashboard = () => {
     const { data: wishlistData, isLoading: isWishlistLoading } = useGetWishlistQuery(undefined);
     const { data: bookingData, isLoading: isBookingLoading } = useGetMyBookingsQuery({ page: 1, limit: 10 });
@@ -218,7 +211,7 @@ const UserDashboard = () => {
         : [];
 
     const totalBookings = bookings.length;
-    const upcomingTours = bookings.filter(isUpcomingBooking).length;
+    const upcomingTours = bookings.filter(isVisibleBooking).length;
     const wishlistCount = wishlistItems.length;
 
     const recentBookings = bookings.length
@@ -262,7 +255,7 @@ const UserDashboard = () => {
 
                 return grouped;
             }, [])
-            .filter((booking) => getBookingBatches(booking).some((batch) => getBatchTimelineStatus(batch, booking) === "Upcoming"))
+            .filter(isVisibleBooking)
             .slice(0, 5) // Show up to 5 recent tours
         : [];
 
@@ -360,9 +353,20 @@ const UserDashboard = () => {
                 ) : recentBookings.length > 0 ? (
                     <div className="space-y-4 mt-5">
                         {recentBookings.map((booking, bookingIndex) => {
-                            const bookingStatus = getTimelineStatus(booking);
                             const detailsUrl = getBookingDetailsUrl(booking);
                             const batchItems = getBookingBatches(booking);
+                            const visibleBatchItems = batchItems.filter((batch) => {
+                                const status = normalizeStatus(batch.bookingStatus ?? batch.status ?? booking.bookingStatus ?? booking.status);
+
+                                if (status.includes("cancel") || status.includes("failed")) {
+                                    return false;
+                                }
+
+                                return getBatchTimelineStatus(batch, booking) !== "Completed";
+                            });
+                            const bookingStatus = visibleBatchItems.some((batch) => getBatchTimelineStatus(batch, booking) === "Ongoing")
+                                ? "Ongoing"
+                                : "Upcoming";
 
                             return (
                                 <div key={`${booking._id ?? detailsUrl}-${bookingIndex}`} className="border border-gray-200 rounded-xl p-3 md:p-4 bg-white">
@@ -372,14 +376,14 @@ const UserDashboard = () => {
                                             <h2 className='mt-1 mb-2 flex flex-wrap items-center gap-2'>
                                                 <Link to={detailsUrl} className='text-gray-800 hover:text-primary-500 text-xl font-bold cursor-pointer duration-300'>{booking?.tour?.title ?? booking?.title ?? "Tour name"}</Link>
                                                 <span className={getStatusClassName(bookingStatus)}>{bookingStatus}</span>
-                                                <span className="text-xs font-medium bg-primary-100 text-primary-700 px-3 py-[3px] rounded-full">{batchItems.length} Batch{batchItems.length > 1 ? "es" : ""}</span>
+                                                <span className="text-xs font-medium bg-primary-100 text-primary-700 px-3 py-[3px] rounded-full">{visibleBatchItems.length} Batch{visibleBatchItems.length > 1 ? "es" : ""}</span>
                                             </h2>
                                             <p className='text-sm text-gray-500 font-medium inline-flex gap-1 pr-3'><span><FaLocationDot size={14} className="mt-1" /></span> {booking?.tour?.arrivalLocation ?? booking?.arrivalLocation ?? "N/A"}</p>
                                         </div>
                                     </div>
                                     <div className="mt-3">
                                         <div className="grid gap-2 sm:grid-cols-2 xl:grid-cols-3">
-                                            {batchItems.map((batch, batchIndex) => {
+                                            {visibleBatchItems.map((batch, batchIndex) => {
                                                 const batchStatus = getBatchTimelineStatus(batch, booking);
                                                 const batchNoFromApi = batch.batchNo ?? batch.batchNumber;
                                                 const batchNo = (() => {
@@ -387,7 +391,7 @@ const UserDashboard = () => {
                                                         return String(batchNoFromApi);
                                                     }
 
-                                                    const uniqueBatchKeys = Array.from(new Set(batchItems.map((item) => getBatchKey(item) || `idx-${batchItems.indexOf(item)}`)));
+                                                    const uniqueBatchKeys = Array.from(new Set(visibleBatchItems.map((item) => getBatchKey(item) || `idx-${visibleBatchItems.indexOf(item)}`)));
                                                     const currentKey = getBatchKey(batch) || `idx-${batchIndex}`;
                                                     return String(uniqueBatchKeys.indexOf(currentKey) + 1);
                                                 })();
@@ -411,7 +415,7 @@ const UserDashboard = () => {
                                                         <div className="mt-2 flex items-center gap-2 flex-wrap">
                                                             <span className={paymentStatusClass}>{paymentStatus}</span>
                                                             <span className="text-xs font-semibold bg-white text-gray-700 px-2 py-1 rounded-full border border-gray-200">
-                                                                {formatAmount(amount)}
+                                                                {formatCurrency(amount)}
                                                             </span>
                                                         </div>
 

@@ -6,10 +6,12 @@ import { Link } from 'react-router';
 import CommonMetadata from '@/components/utilities/CommonMetadata';
 import JsonLd from '@/components/utilities/JsonLd';
 import TriPlanBanner from "@/assets/images/seo/triplan-banner.webp";
+import RouteProgressBar from '@/components/utilities/RouteProgressBar';
 
 const LoginPage = () => {
     return (
         <>
+            <RouteProgressBar />
             <CommonMetadata
                 title="Login – Access Your triPlan Account"
                 description="Sign in to your triPlan account to manage bookings, explore personalized tour recommendations, and enjoy a seamless travel planning experience."

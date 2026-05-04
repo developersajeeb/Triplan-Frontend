@@ -12,6 +12,7 @@ import { OtpExpireTimeInSeconds } from '@/config';
 import { useSendOtpMutation, useVerifyOtpMutation } from '@/redux/features/auth/auth.api';
 import { toast } from 'sonner';
 import { Skeleton } from '@/components/ui/skeleton';
+import RouteProgressBar from '@/components/utilities/RouteProgressBar';
 
 const FormSchema = z.object({
     pin: z.string().min(4, {
@@ -148,6 +149,7 @@ export default function VerifyPage() {
     return (
         <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="p-5 bg-cover bg-center bg-no-repeat h-screen bg-primary-50">
+                <RouteProgressBar />
                 <div className="flex items-center justify-center h-full min-h-full text-center z-10 relative">
                     <div className='max-w-[400px] w-full'>
                         <span className='inline-flex items-center justify-center mb-5 bg-primary-200 border-[15px] border-primary-100 p-4 rounded-full text-primary-400'><FaShieldAlt size={40} /></span>

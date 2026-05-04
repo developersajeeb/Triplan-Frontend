@@ -6,10 +6,12 @@ import { Link } from "react-router";
 import { RegisterFrom } from './RegisterFrom';
 import CommonMetadata from '@/components/utilities/CommonMetadata';
 import JsonLd from '@/components/utilities/JsonLd';
+import RouteProgressBar from '@/components/utilities/RouteProgressBar';
 
 export default function RegistrationPage() {
   return (
     <>
+      <RouteProgressBar />
       <div className='rounded-[20px] grid grid-cols-1 lg:grid-cols-2 min-h-svh'>
         <img className='w-full min-h-full h-full object-cover order-2 lg:order-1' src={RegImage} alt="login image" />
 

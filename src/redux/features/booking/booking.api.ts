@@ -7,6 +7,15 @@ type IMyBookingQueryParams = {
   status?: string;
 };
 
+type IAdminBookingQueryParams = {
+  page?: number;
+  limit?: number;
+  search?: string;
+  status?: string;
+  paymentStatus?: string;
+  sort?: string;
+};
+
 export type IAdminDashboardSummary = {
   stats: {
     totalRevenue: number;
@@ -89,6 +98,29 @@ export const bookingApi = baseApi.injectEndpoints({
       providesTags: ["BOOKING"],
     }),
 
+    getAdminBookings: builder.query({
+      query: (args: IAdminBookingQueryParams = {}) => ({
+        url: "/booking",
+        method: "GET",
+        params: {
+          page: args.page ?? 1,
+          limit: args.limit ?? 10,
+          ...(args.search ? { search: args.search } : {}),
+          ...(args.status && args.status !== "all" ? { status: args.status } : {}),
+          ...(args.paymentStatus && args.paymentStatus !== "all" ? { paymentStatus: args.paymentStatus } : {}),
+          ...(args.sort ? { sort: args.sort } : {}),
+        },
+      }),
+      transformResponse: (response: { data?: unknown[] } | unknown) => {
+        if (response && typeof response === "object" && "data" in response) {
+          return response;
+        }
+
+        return { data: [] };
+      },
+      providesTags: ["BOOKING"],
+    }),
+
     getAdminDashboardSummary: builder.query<IAdminDashboardSummary, void>({
       query: () => ({
         url: "/booking/dashboard-summary",
@@ -105,5 +137,6 @@ export const {
   useInitPaymentMutation,
   useCheckAvailabilityMutation,
   useGetMyBookingsQuery,
+  useGetAdminBookingsQuery,
   useGetAdminDashboardSummaryQuery,
 } = bookingApi;

@@ -20,8 +20,10 @@ import { TbMoneybag } from "react-icons/tb";
 import { TbSettings } from "react-icons/tb";
 import { PiMapPinArea } from "react-icons/pi";
 import { MdOutlineAddLocationAlt } from "react-icons/md";
+import { LuCalendarRange } from "react-icons/lu";
 
 const AdminDashboard = lazy(() => import("@/pages/admin/admin-dashboard"));
+const AdminBookings = lazy(() => import("@/pages/admin/bookings"));
 
 export const adminSidebarMenus: ISidebarItem[] = [
     {
@@ -38,6 +40,12 @@ export const adminSidebarMenus: ISidebarItem[] = [
                 url: "/admin/tour-listing",
                 component: TourListing,
                 icon: CiBoxList,
+            },
+            {
+                title: "Bookings",
+                url: "/admin/bookings",
+                component: AdminBookings,
+                icon: LuCalendarRange,
             },
             {
                 title: "Add Tour",

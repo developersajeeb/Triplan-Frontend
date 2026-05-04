@@ -3,10 +3,12 @@ import { AdminSidebar } from '../shared/sidebars/AdminSidebar';
 import { SidebarInset, SidebarProvider, SidebarTrigger } from '../ui/sidebar';
 import { Separator } from '../ui/separator';
 import ScrollToTop from '../utilities/ScrollToTop';
+import RouteProgressBar from '../utilities/RouteProgressBar';
 
 const AdminLayout = () => {
     return (
         <SidebarProvider>
+            <RouteProgressBar />
             <AdminSidebar />
 
             <SidebarInset>

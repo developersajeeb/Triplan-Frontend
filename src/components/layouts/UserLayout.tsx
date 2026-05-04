@@ -4,10 +4,12 @@ import { UserSidebar } from '../shared/sidebars/UserSidebar';
 import Footer from '../utilities/Footer';
 import GuestNavBar from '../utilities/GuestNavBar';
 import ScrollToTop from '../utilities/ScrollToTop';
+import RouteProgressBar from '../utilities/RouteProgressBar';
 
 const UserLayout = () => {
     return (
         <>
+            <RouteProgressBar />
             <GuestNavBar />
             <div className='tp-container pt-2 pb-8 md:py-8 lg:py-16'>
                 <SidebarProvider className='gap-6'>

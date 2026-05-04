@@ -14,6 +14,7 @@ import {
 import { Skeleton } from '@/components/ui/skeleton';
 import type { RecentBookingItem } from '@/types/dashboard.type';
 import { formatCurrency } from '@/config';
+import { Link } from 'react-router';
 
 interface RecentBookingsTableProps {
     data: RecentBookingItem[];
@@ -50,8 +51,8 @@ const RecentBookingsTable: React.FC<RecentBookingsTableProps> = ({ data, isLoadi
                         Latest 4 bookings
                     </p>
                 </div>
-                <Button variant="outline" size="sm">
-                    View All
+                <Button variant="outline" size="sm" asChild>
+                    <Link to="/admin/bookings">View All</Link>
                 </Button>
             </div>
             <div className="overflow-x-auto pb-5">
