@@ -1,7 +1,7 @@
 import DestinationCard from "@/components/modules/destination/DestinationCard";
 import PageBanner from "@/components/shared/sections/PageBanner";
 import { Skeleton } from "@/components/ui/skeleton";
-import { useGetDivisionsQuery } from "@/redux/features/division/division.api";
+import { useGetDivisionsQuery } from "@/redux/features/destination/destination.api";
 import type { IDivision } from "@/types/division.type";
 import { useEffect } from "react";
 import { useForm, type FieldValues } from "react-hook-form";

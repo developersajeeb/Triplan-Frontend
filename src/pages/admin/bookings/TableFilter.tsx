@@ -76,7 +76,7 @@ const TableFilter: React.FC<Props> = ({
     <section className="flex flex-wrap justify-between gap-5 p-5">
       <div className="flex gap-3 items-center">
         <form onSubmit={handleSearchSubmit} className="flex items-center gap-2">
-          <div className="relative w-full !max-w-[360px]">
+          <div className="relative w-full min-w-[300px]">
             <Input
               value={query}
               onChange={(e) => setQuery(e.target.value)}

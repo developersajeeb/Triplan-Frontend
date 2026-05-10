@@ -21,6 +21,7 @@ import { Input } from "@/components/ui/input";
 import { useAddTourTypeMutation } from "@/redux/features/tour/tour.api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogDescription } from "@radix-ui/react-dialog";
+import { Plus } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { RiLoaderLine } from "react-icons/ri";
@@ -66,7 +67,9 @@ export function AddTourTypeModal() {
     <Dialog open={open} onOpenChange={setOpen}>
       <form>
         <DialogTrigger asChild>
-          <Button className="tp-action-btn">Add Tour Type</Button>
+          <Button className="tp-action-btn inline-flex items-center gap-2">
+            <Plus size={16} /> Add Tour Type
+          </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
@@ -76,7 +79,7 @@ export function AddTourTypeModal() {
             </DialogDescription>
           </DialogHeader>
           <Form {...form}>
-            <form id="add-tour-type" onSubmit={form.handleSubmit(onSubmit)}>
+            <form className="mt-6 mb-4" id="add-tour-type" onSubmit={form.handleSubmit(onSubmit)}>
               <FormField
                 control={form.control}
                 name="name"

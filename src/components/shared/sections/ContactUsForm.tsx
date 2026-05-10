@@ -14,10 +14,9 @@ const ContactUsForm = () => {
     const [fromSuccessMassage, setFromSuccessMassage] = useState<string>('');
     const [fromErrorMassage, setFromErrorMassage] = useState<string>('');
 
-    const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    const onSubmit: SubmitHandler<FieldValues> = async () => {
         try {
             setIsLoginBtnLoading(true);
-            console.log("Form Data:", data);
             setFromSuccessMassage("Thank you for reaching out to triPlan. Our team will get back to you shortly.");
             form.reset();
 

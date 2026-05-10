@@ -1,4 +1,4 @@
-import type { ITourPackage } from "@/types/tour.type";
+import type { ITourPackage } from "./tour.type";
 
 export type SelectOption = {
   value: string;

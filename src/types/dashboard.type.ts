@@ -31,7 +31,7 @@ export type RecentBookingItem = {
     amount: number;
     status: string;
     date: string;
-    rating: number | null;
+    guestCount: number;
 };
 
 export type DashboardResponse = {

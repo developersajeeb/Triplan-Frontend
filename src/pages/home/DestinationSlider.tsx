@@ -4,7 +4,7 @@ import styles from "./style/destination_slider.module.scss";
 import { Link } from "react-router";
 import WhiteSvgIcon from "@/components/shared/blocks/WhiteSvgIcon";
 import { useEffect, useRef } from "react";
-import { useGetDivisionsQuery } from "@/redux/features/division/division.api";
+import { useGetDivisionsQuery } from "@/redux/features/destination/destination.api";
 import type { IDivision } from "@/types/division.type";
 import { Skeleton } from "@/components/ui/skeleton";
 import DestinationCard from "@/components/modules/destination/DestinationCard";

@@ -90,8 +90,10 @@ export default function TourReviewSection({ tourId, sectionId }: TourReviewSecti
   const { data: reviewData, isLoading: isReviewsLoading } = useGetTourReviewsQuery(tourId || "", {
     skip: !tourId,
   });
-  const { data: eligibilityData } = useGetReviewEligibilityQuery(tourId || "", {
-    skip: !tourId,
+
+  const [shouldCheckEligibility, setShouldCheckEligibility] = useState<boolean>(false);
+  const { data: eligibilityData, isFetching: isCheckingEligibility } = useGetReviewEligibilityQuery(tourId || "", {
+    skip: !tourId || !shouldCheckEligibility,
   });
 
   const reviewState = reviewData?.data;
@@ -154,11 +156,19 @@ export default function TourReviewSection({ tourId, sectionId }: TourReviewSecti
           <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary-500">Reviews</p>
           <h3 className="text-2xl font-semibold text-gray-800">Guest feedback</h3>
         </div>
-        {!isReviewsLoading && summary && (
+        <div className="flex items-center gap-3">
+          {!isReviewsLoading && summary && (
           <div className="rounded-full bg-primary-100 px-4 py-2 text-sm font-semibold text-primary-700">
             {summary.overallRating.toFixed(1)} / 5 from {summary.totalReviews} review{summary.totalReviews === 1 ? "" : "s"}
           </div>
-        )}
+          )}
+          {/* If there are no reviews show a CTA to check eligibility (avoids automatic 403 on page load) */}
+          {!isReviewsLoading && reviews.length === 0 && !canReview && (
+            <Button size="sm" variant="outline" onClick={() => setShouldCheckEligibility(true)} className="ml-2">
+              {isCheckingEligibility ? "Checking..." : "Write a review"}
+            </Button>
+          )}
+        </div>
       </div>
 
       {isReviewsLoading ? (

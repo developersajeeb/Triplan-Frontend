@@ -6,7 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
-import { useGetDivisionsQuery } from "@/redux/features/division/division.api";
+import { useGetDivisionsQuery } from "@/redux/features/destination/destination.api";
 import { useGetTourTypesQuery } from "@/redux/features/tour/tour.api";
 import type { RootState } from "@/redux/store";
 import type { IDivision } from "@/types/division.type";

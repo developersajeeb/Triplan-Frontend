@@ -20,21 +20,22 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useAddDivisionMutation } from "@/redux/features/division/division.api";
+import { useAddDivisionMutation } from "@/redux/features/destination/destination.api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { DialogDescription } from "@radix-ui/react-dialog";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { RiLoaderLine } from "react-icons/ri";
+import { Plus } from "lucide-react";
 import { toast } from "sonner";
 import z from "zod";
 
 const typeSchema = z.object({
     name: z
         .string()
-        .nonempty({ message: "Division name is required." })
-        .min(2, { message: "Division must be at least 2 characters long." })
-        .max(100, { message: "Division cannot exceed 100 characters." }),
+        .nonempty({ message: "Destination name is required." })
+        .min(2, { message: "Destination must be at least 2 characters long." })
+        .max(100, { message: "Destination cannot exceed 100 characters." }),
     description: z
         .string()
         .nonempty({ message: "Description is required." })
@@ -68,13 +69,13 @@ export function AddDestinationModal() {
             const res = await addDivision(formData).unwrap();
 
             if (res.success) {
-                toast.success("division Added");
+                toast.success("Destination added");
                 seIsBtnLoading(false);
                 form.reset();
                 setOpen(false);
             }
         } catch (error: any) {
-            toast.error(error?.data?.message || "Failed to add division.");
+            toast.error(error?.data?.message || "Failed to add destination.");
         } finally {
             seIsBtnLoading(false);
         }
@@ -83,13 +84,13 @@ export function AddDestinationModal() {
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button className="tp-action-btn">Add Division</Button>
+                <Button className="tp-action-btn inline-flex items-center gap-2"><Plus size={16} /> Add Destination</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle className="text-xl">Add Division</DialogTitle>
+                    <DialogTitle className="text-xl">Add Destination</DialogTitle>
                     <DialogDescription className="sr-only">
-                        Please enter the division name and save to add it.
+                        Please enter the destination name and save to add it.
                     </DialogDescription>
                 </DialogHeader>
                 <Form {...form}>
@@ -99,7 +100,7 @@ export function AddDestinationModal() {
                             name="name"
                             render={({ field }) => (
                                 <FormItem className="space-y-1">
-                                    <FormLabel className="text-gray-800">Division Name<span className="text-destructive text-base">*</span></FormLabel>
+                                    <FormLabel className="text-gray-800">Destination Name<span className="text-destructive text-base">*</span></FormLabel>
                                     <FormControl>
                                         <Input
                                             className="tp-input"

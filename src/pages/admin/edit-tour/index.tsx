@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { useGetDivisionsQuery } from "@/redux/features/division/division.api";
+import { useGetDivisionsQuery } from "@/redux/features/destination/destination.api";
 import { useGetTourTypesQuery, useGetSingleTourQuery, useUpdateTourMultipartMutation } from "@/redux/features/tour/tour.api";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { format, formatISO } from "date-fns";
@@ -41,7 +41,8 @@ import { BsFillPatchQuestionFill } from "react-icons/bs";
 import { convertTo24HourTime } from "@/utils/time";
 import { useParams } from "react-router";
 import type { ITourBatch, ITourFaqItem } from "@/types/tour.type";
-import type { SelectOption, TourPayload } from "./types";
+import type { SelectOption, TourPayload } from "@/types";
+import { Skeleton } from "@/components/ui/skeleton";
 
 const batchSchema = z.object({
   costFrom: z.string().min(1, "Cost is required"),
@@ -78,8 +79,9 @@ export default function EditTour() {
 
   const { data: divisionData, isLoading: divisionLoading } = useGetDivisionsQuery(undefined);
   const { data: tourTypeData } = useGetTourTypesQuery(undefined);
-  const { data: tourData } = useGetSingleTourQuery(String(slug));
+  const { data: tourData, isLoading: tourLoading } = useGetSingleTourQuery(String(slug));
   const [updateTourMultipart] = useUpdateTourMultipartMutation();
+  const [isInitializing, setIsInitializing] = useState<boolean>(true);
 
   const divisionOptions: SelectOption[] =
     divisionData?.data?.map((item: { _id: string; name: string }) => ({
@@ -164,6 +166,7 @@ export default function EditTour() {
 
   useEffect(() => {
     if (tourData) {
+      setIsInitializing(true);
       // map tour data to form values
       form.reset({
         title: tourData.title || "",
@@ -202,6 +205,7 @@ export default function EditTour() {
       });
 
       setExistingImages(Array.isArray(tourData.images) ? tourData.images : []);
+      setIsInitializing(false);
     }
   }, [tourData, form]);
 
@@ -278,6 +282,39 @@ export default function EditTour() {
 
   if (!slug) return null;
 
+  if (tourLoading || isInitializing) {
+    return (
+      <>
+        <h2 className="text-2xl font-bold"><Skeleton className="h-8 w-48" /></h2>
+        <p className="text-base font-medium text-gray-600 mb-5"><Skeleton className="h-4 w-64 mt-2" /></p>
+
+        <div className="space-y-5 mb-5">
+          <div className="space-y-4 w-full bg-white px-8 pt-7 pb-9 rounded-xl tp-shadow">
+            <Skeleton className="h-6 w-56 mb-4" />
+            <div className="grid md:grid-cols-2 gap-5">
+              <Skeleton className="h-12 w-full rounded-md" />
+              <Skeleton className="h-12 w-full rounded-md" />
+            </div>
+          </div>
+
+          <div className="space-y-4 w-full bg-white px-8 pt-7 pb-9 rounded-xl tp-shadow">
+            <Skeleton className="h-6 w-56 mb-4" />
+            <Skeleton className="h-32 w-full rounded-md" />
+          </div>
+
+          <div className="space-y-4 w-full bg-white px-8 pt-7 pb-9 rounded-xl tp-shadow">
+            <Skeleton className="h-6 w-56 mb-4" />
+            <div className="grid md:grid-cols-3 gap-4">
+              <Skeleton className="h-12 w-full rounded-md" />
+              <Skeleton className="h-12 w-full rounded-md" />
+              <Skeleton className="h-12 w-full rounded-md" />
+            </div>
+          </div>
+        </div>
+      </>
+    );
+  }
+
   return (
     <>
       <h2 className="text-2xl font-bold">Edit Tour</h2>
@@ -308,7 +345,7 @@ export default function EditTour() {
                     <FormLabel className="font-semibold text-gray-600 text-sm">Destinations<span className="text-destructive text-base">*</span></FormLabel>
                     <Select
                       onValueChange={field.onChange}
-                      defaultValue={field.value}
+                      value={field.value}
                       disabled={divisionLoading}
                     >
                       <FormControl>
@@ -332,7 +369,7 @@ export default function EditTour() {
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel className="font-semibold text-gray-600 text-sm">Tour Type<span className="text-destructive text-base">*</span></FormLabel>
-                    <Select onValueChange={field.onChange} defaultValue={field.value}>
+                    <Select onValueChange={field.onChange} value={field.value}>
                       <FormControl>
                         <SelectTrigger className="tp-select">
                           <SelectValue placeholder="Select a tour type" />

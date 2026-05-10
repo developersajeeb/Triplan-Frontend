@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { cn } from '@/lib/utils';
 import { OTPInput, type SlotProps } from "input-otp"
 import { useEffect, useId, useRef, useState } from 'react';
@@ -30,7 +31,7 @@ export default function VerifyPage() {
     const [sendOtp] = useSendOtpMutation();
     const [isSendingOtp, setIsSendingOtp] = useState<boolean>(false);
     const [verifyOtp] = useVerifyOtpMutation();
-    const timerId = useRef<NodeJS.Timeout | null>(null);
+    const timerId = useRef<ReturnType<typeof setInterval> | null>(null);
     const isOtpSendingRef = useRef(false);
     const effectRan = useRef(false);
 
@@ -106,7 +107,8 @@ export default function VerifyPage() {
                 startTimer(expiryTime);
             }
         } catch (err) {
-            console.log(err);
+            const message = (err as any)?.data?.message || (err as any)?.message || 'Failed to send OTP';
+            toast.error(message, { id: toastId });
         } finally {
             isOtpSendingRef.current = false;
             setIsSendingOtp(false);
@@ -127,8 +129,6 @@ export default function VerifyPage() {
     });
 
     const onSubmit = async (data: z.infer<typeof FormSchema>) => {
-        console.log(data);
-
         const toastId = toast.loading("Verifying OTP");
         const userInfo = {
             email,
@@ -142,7 +142,8 @@ export default function VerifyPage() {
                 navigate("/login");
             }
         } catch (err) {
-            console.log(err);
+            const message = (err as any)?.data?.message || (err as any)?.message || 'OTP verification failed';
+            toast.error(message, { id: toastId });
         }
     }
 

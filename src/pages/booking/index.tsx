@@ -145,7 +145,6 @@ export default function Booking() {
     try {
       setIsLoginBtnLoading(true);
       const bookingRes = await createBooking(bookingData).unwrap();
-      console.log('bookingRes:', bookingRes?.data?.booking?._id);
 
       const paymentUrlFromBooking = resolvePaymentUrl(bookingRes);
       if (paymentUrlFromBooking) {
@@ -157,7 +156,6 @@ export default function Booking() {
       if (!bookingId) return;
 
       const paymentRes = await initPayment(bookingId).unwrap();
-      console.log('paymentRes:', paymentRes);
       const paymentUrl = resolvePaymentUrl(paymentRes);
 
       if (paymentUrl) {
@@ -165,7 +163,7 @@ export default function Booking() {
         return;
       }
 
-      toast.error("Payment URL পাওয়া যায়নি। আবার চেষ্টা করুন।");
+      toast.error("Payment URL not found. Please try again.");
     } catch (error) {
       console.error(error);
       const err = error as { data?: { message?: string } };

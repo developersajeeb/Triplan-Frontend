@@ -37,6 +37,7 @@ import { useNavigate } from "react-router";
 import TourReviewSection from "./TourReviewSection";
 import { useGetTourReviewsQuery } from "@/redux/features/review/review.api";
 import { formatCurrency } from "@/config";
+import { useCreateEnquiryMutation } from "@/redux/features/enquiry/enquiry.api";
 
 export default function TourDetails() {
   const { slug } = useParams();
@@ -79,6 +80,7 @@ export default function TourDetails() {
   const [isLoginBtnLoading, setIsLoginBtnLoading] = useState<boolean>(false);
   const [openEnquiry, setOpenEnquiry] = useState<boolean>(false);
   const [guest, setGuest] = useState<number>(1);
+  const [createEnquiry, { isLoading: isSubmittingEnquiry }] = useCreateEnquiryMutation();
 
   const batchOptions = tourData?.batches ?? [];
   const [selectedBatchId, setSelectedBatchId] = useState<string>("");
@@ -146,9 +148,19 @@ export default function TourDetails() {
     batchOptions.find((batch) => getBatchStatus(batch) !== "Closed") ||
     batchOptions[0];
 
-  const enquiryOnSubmit: SubmitHandler<FieldValues> = async () => {
+  const enquiryOnSubmit: SubmitHandler<FieldValues> = async (values) => {
     try {
       setIsLoginBtnLoading(true);
+
+      await createEnquiry({
+        name: String(values.name || "").trim(),
+        email: String(values.email || "").trim(),
+        phone: String(values.phone || "").trim(),
+        message: String(values.message || "").trim(),
+        tourTitle: tourData?.title,
+        tourSlug: tourData?.slug,
+      }).unwrap();
+
       toast.success("Thank you for reaching out. We will get back to you shortly.");
       enquiryForm.reset();
       setOpenEnquiry(false);
@@ -1056,12 +1068,12 @@ export default function TourDetails() {
                         </DialogClose>
 
                         <Button
-                          disabled={isLoginBtnLoading}
+                          disabled={isLoginBtnLoading || isSubmittingEnquiry}
                           type="submit"
-                          className={`tp-primary-btn-light !py-5 !px-5 ${isLoginBtnLoading && "pointer-events-none"
+                          className={`tp-primary-btn-light !py-5 !px-5 ${(isLoginBtnLoading || isSubmittingEnquiry) && "pointer-events-none"
                             }`}
                         >
-                          {isLoginBtnLoading ? (
+                          {isLoginBtnLoading || isSubmittingEnquiry ? (
                             <>
                               Sending{" "}
                               <RiLoaderLine className="ml-2 w-4 h-4 animate-spin" />

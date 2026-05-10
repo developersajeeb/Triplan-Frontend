@@ -93,22 +93,22 @@ const formatDate = (value?: string) => {
 
 const BookingsDataTable = ({ data, isLoading = false }: Props) => {
   return (
-    <div className="overflow-x-auto">
-      <Table className="min-w-[1240px]">
+    <div className="w-full overflow-x-auto">
+      <Table className="w-full min-w-[1240px]">
         <TableCaption>Admin bookings list</TableCaption>
         <TableHeader>
           <TableRow className="bg-primary-50 hover:bg-primary-50">
             <TableHead className="min-w-[60px] max-w-[60px] text-sm font-bold py-3 pl-6">No.</TableHead>
-            <TableHead className="min-w-[160px] text-sm font-bold py-3">Customer</TableHead>
-            <TableHead className="min-w-[220px] text-sm font-bold py-3">Email</TableHead>
-            <TableHead className="min-w-[140px] text-sm font-bold py-3">Phone</TableHead>
-            <TableHead className="min-w-[220px] text-sm font-bold py-3">Tour</TableHead>
-            <TableHead className="min-w-[120px] text-sm font-bold py-3">Guests</TableHead>
-            <TableHead className="min-w-[120px] text-sm font-bold py-3">Date</TableHead>
-            <TableHead className="min-w-[120px] text-sm font-bold py-3">Amount</TableHead>
-            <TableHead className="min-w-[120px] text-sm font-bold py-3">Status</TableHead>
-            <TableHead className="min-w-[100px] text-sm font-bold py-3">Payment</TableHead>
-            <TableHead className="text-sm font-bold py-3 pr-6 text-right min-w-[200px]">Actions</TableHead>
+            <TableHead className="min-w-[160px] max-w-[160px] text-sm font-bold py-3">Customer</TableHead>
+            <TableHead className="min-w-[220px] max-w-[220px] text-sm font-bold py-3">Email</TableHead>
+            <TableHead className="min-w-[140px] max-w-[140px] text-sm font-bold py-3">Phone</TableHead>
+            <TableHead className="min-w-[220px] max-w-[220px] text-sm font-bold py-3">Tour</TableHead>
+            <TableHead className="min-w-[80px] max-w-[80px] text-sm font-bold py-3">Guests</TableHead>
+            <TableHead className="min-w-[120px] max-w-[120px] text-sm font-bold py-3">Date</TableHead>
+            <TableHead className="min-w-[100px] max-w-[100px] text-sm font-bold py-3">Amount</TableHead>
+            <TableHead className="min-w-[100px] max-w-[100px] text-sm font-bold py-3">Status</TableHead>
+            <TableHead className="min-w-[80px] max-w-[80px] text-sm font-bold py-3">Payment</TableHead>
+            <TableHead className="text-sm font-bold py-3 pr-6 text-right min-w-[180px]">Actions</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -140,7 +140,7 @@ const BookingsDataTable = ({ data, isLoading = false }: Props) => {
                   {String(index + 1).padStart(2, '0')}
                 </TableCell>
                 <TableCell className="py-3 font-medium text-slate-900">{row.customer || 'N/A'}</TableCell>
-                <TableCell className="py-3 text-slate-700">{row.email || 'N/A'}</TableCell>
+                <TableCell className="py-3 text-slate-700 break-all">{row.email || 'N/A'}</TableCell>
                 <TableCell className="py-3 text-slate-700">{row.phone || 'N/A'}</TableCell>
                 <TableCell className="py-3 text-slate-800">
                   <Link

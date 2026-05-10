@@ -18,10 +18,9 @@ const Footer = () => {
     const [isLoginBtnLoading, setIsLoginBtnLoading] = useState<boolean>(false);
     const [fromSuccessMassage, setFromSuccessMassage] = useState<string>('');
 
-    const onSubmit: SubmitHandler<FieldValues> = async (data) => {
+    const onSubmit: SubmitHandler<FieldValues> = async () => {
         try {
             setIsLoginBtnLoading(true);
-            console.log("Form Data:", data);
             setFromSuccessMassage("Subscription successful! Thank you for joining us.");
             form.reset();
 

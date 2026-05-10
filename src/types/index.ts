@@ -5,8 +5,10 @@ import type { ITourListItem } from "./tour.type";
 // Child file export
 export type { ISendOtp, IVerifyOtp, ILogin } from "./auth.type";
 export type { ITourListItem, ITourListItemWithReview, ITourPackage } from "./tour.type";
-export type { IReview, IReviewEligibility, IReviewSummary, ITourReviewResponse, IUserReview } from "./review.type";
+export type { IAdminReview, IReview, IReviewEligibility, IReviewSummary, ITourReviewResponse, IUserReview } from "./review.type";
+export type { IAdminEnquiry, IEnquiryStatus } from "./enquiry.type";
 export type { IBookingBatch, IBookingPayment, IBookingRecord, IBookingTour, IMyBookingsDataTableProps } from "./booking.type";
+export type { SelectOption, TourPayload } from "./edit-tour.type";
 
 export interface IResponse<T> {
   statusCode: number;

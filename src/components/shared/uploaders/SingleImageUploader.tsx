@@ -1,14 +1,16 @@
 import { AlertCircleIcon, ImageIcon, UploadIcon, XIcon } from "lucide-react"
 import { useFileUpload } from "@/hooks/use-file-upload"
-import { useEffect } from "react"
+import { useEffect, useMemo, useState } from "react"
 
 interface Props {
   onChange: (file: File | null) => void
+  defaultImageUrl?: string | null
 }
 
-export default function SingleImageUploader({ onChange }: Props) {
+export default function SingleImageUploader({ onChange, defaultImageUrl = null }: Props) {
   const maxSizeMB = 2
   const maxSize = maxSizeMB * 1024 * 1024
+  const [defaultPreview, setDefaultPreview] = useState<string | null>(defaultImageUrl)
 
   const [
     { files, isDragging, errors },
@@ -26,6 +28,10 @@ export default function SingleImageUploader({ onChange }: Props) {
     maxSize,
   })
 
+    useEffect(() => {
+      setDefaultPreview(defaultImageUrl)
+    }, [defaultImageUrl])
+
   useEffect(() => {
     if (files.length > 0) {
       const firstFile = files[0].file
@@ -39,7 +45,26 @@ export default function SingleImageUploader({ onChange }: Props) {
     }
   }, [files, onChange])
 
-  const previewUrl = files[0]?.preview || null
+  const previewUrl = files[0]?.preview || defaultPreview
+  const hasSelectedFile = files.length > 0 || Boolean(defaultPreview)
+
+  const displayedFileName = useMemo(() => {
+    if (files[0]?.file instanceof File) {
+      return files[0].file.name
+    }
+
+    return defaultPreview ? "Existing image" : "Uploaded image"
+  }, [files, defaultPreview])
+
+  const handleRemoveImage = () => {
+    if (files.length > 0) {
+      removeFile(files[0].id)
+      return
+    }
+
+    setDefaultPreview(null)
+    onChange(null)
+  }
 
   return (
     <div className="flex flex-col gap-2 !mt-5">
@@ -59,11 +84,11 @@ export default function SingleImageUploader({ onChange }: Props) {
             aria-label="Upload image file"
           />
           {previewUrl ? (
-            <div className="absolute">
+            <div className="absolute inset-0 p-4">
               <img
                 src={previewUrl}
-                alt={files[0]?.file?.name || "Uploaded image"}
-                className="max-h-full rounded-lg object-contain w-full"
+                alt={displayedFileName}
+                className="h-full w-full rounded-lg object-contain"
               />
             </div>
           ) : (
@@ -92,15 +117,27 @@ export default function SingleImageUploader({ onChange }: Props) {
           )}
         </div>
 
-        {previewUrl && (
+        {hasSelectedFile && previewUrl && (
           <div className="absolute top-4 right-4">
             <button
               type="button"
               className="focus-visible:border-ring focus-visible:ring-ring/50 z-50 flex size-8 cursor-pointer items-center justify-center rounded-full bg-black/60 text-white transition-[color,box-shadow] outline-none hover:bg-black/80 focus-visible:ring-[3px]"
-              onClick={() => removeFile(files[0]?.id)}
+              onClick={handleRemoveImage}
               aria-label="Remove image"
             >
               <XIcon className="size-4" aria-hidden="true" />
+            </button>
+          </div>
+        )}
+
+        {previewUrl && (
+          <div className="absolute bottom-4 left-4">
+            <button
+              type="button"
+              className="rounded-md bg-white/90 px-3 py-1.5 text-sm font-medium text-gray-700 shadow-sm hover:bg-white"
+              onClick={openFileDialog}
+            >
+              Replace image
             </button>
           </div>
         )}

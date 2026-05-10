@@ -1,4 +1,4 @@
-import { useGetSingleDivisionsQuery } from "@/redux/features/division/division.api";
+import { useGetSingleDivisionsQuery } from "@/redux/features/destination/destination.api";
 import { useParams, useSearchParams } from "react-router";
 import pageBgImage from '@/assets/images/page-banner-bg.jpg';
 import { Skeleton } from "@/components/ui/skeleton";
@@ -47,9 +47,6 @@ const DestinationDetails = () => {
     }
 
     const { data: toursData, isLoading: isTourLoading, isFetching } = useGetAllToursQuery({ ...queryParams, status: "active" });
-
-    console.log(toursData);
-
 
     useEffect(() => {
         form.setValue("search", searchValueFromURL);

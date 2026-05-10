@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Star } from 'lucide-react';
+import { MapPin, Users } from 'lucide-react';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import {
@@ -66,7 +66,7 @@ const RecentBookingsTable: React.FC<RecentBookingsTableProps> = ({ data, isLoadi
                             <TableHead className="min-w-[100px] text-sm font-bold py-3">Amount</TableHead>
                             <TableHead className="min-w-[100px] text-sm font-bold py-3">Date</TableHead>
                             <TableHead className="min-w-[100px] text-sm font-bold py-3">Status</TableHead>
-                            <TableHead className="min-w-[80px] text-sm font-bold py-3">Rating</TableHead>
+                            <TableHead className="min-w-[100px] text-sm font-bold py-3">Guests</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -84,7 +84,7 @@ const RecentBookingsTable: React.FC<RecentBookingsTableProps> = ({ data, isLoadi
                             ))
                             : data.length === 0 ? (
                                 <TableRow>
-                                    <TableCell colSpan={8} className="py-10 text-center text-gray-500">
+                                    <TableCell colSpan={7} className="py-10 text-center text-gray-500">
                                         No recent bookings found.
                                     </TableCell>
                                 </TableRow>
@@ -129,16 +129,10 @@ const RecentBookingsTable: React.FC<RecentBookingsTableProps> = ({ data, isLoadi
                                                 </span>
                                             </TableCell>
                                             <TableCell className="py-3">
-                                                {booking.rating ? (
-                                                    <div className="flex items-center gap-1">
-                                                        <Star className="w-4 h-4 fill-yellow-400 text-yellow-400" />
-                                                        <span className="text-sm font-medium text-slate-900">
-                                                            {booking.rating.toFixed(1)}
-                                                        </span>
-                                                    </div>
-                                                ) : (
-                                                    <span className="text-slate-400 text-sm">—</span>
-                                                )}
+                                                <div className="flex items-center gap-1 text-slate-900">
+                                                    <Users className="w-4 h-4 text-slate-400" />
+                                                    <span className="text-sm font-medium">{booking.guestCount}</span>
+                                                </div>
                                             </TableCell>
                                         </TableRow>
                                     );

@@ -49,9 +49,8 @@ export function LoginForm({
 
     const onSubmit: SubmitHandler<FieldValues> = async (data) => {
         setIsLoginBtnLoading(true);
-        try {
-            const res = await login(data).unwrap();
-            console.log(res);
+            try {
+            await login(data).unwrap();
             toast.success('Login Successfully');
             navigate(from, { replace: true });
             sessionStorage.removeItem("triplan:returnTo");

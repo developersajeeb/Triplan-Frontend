@@ -1,6 +1,6 @@
 import { baseApi } from "@/redux/baseApi";
 import type { IResponse } from "@/types";
-import type { IReview, IReviewEligibility, ITourReviewResponse, IUserReview } from "@/types/review.type";
+import type { IAdminReview, IReview, IReviewEligibility, ITourReviewResponse, IUserReview } from "@/types/review.type";
 
 export const reviewApi = baseApi.injectEndpoints({
   endpoints: (builder) => ({
@@ -52,6 +52,29 @@ export const reviewApi = baseApi.injectEndpoints({
       }),
       invalidatesTags: ["REVIEW"],
     }),
+    getAdminReviews: builder.query<IResponse<IAdminReview[]>, Record<string, string | number>>({
+      query: (params) => ({
+        url: "/review/admin",
+        method: "GET",
+        params,
+      }),
+      providesTags: ["REVIEW"],
+    }),
+    deleteAdminReview: builder.mutation<IResponse<{ _id: string }>, string>({
+      query: (reviewId) => ({
+        url: `/review/admin/${reviewId}`,
+        method: "DELETE",
+      }),
+      invalidatesTags: ["REVIEW"],
+    }),
+    updateAdminReview: builder.mutation<IResponse<IReview>, { reviewId: string; payload: FormData }>({
+      query: ({ reviewId, payload }) => ({
+        url: `/review/admin/${reviewId}`,
+        method: "PATCH",
+        data: payload,
+      }),
+      invalidatesTags: ["REVIEW"],
+    }),
   }),
 });
 
@@ -62,4 +85,7 @@ export const {
   useGetMyReviewsQuery,
   useDeleteMyReviewMutation,
   useUpdateMyReviewMutation,
+  useGetAdminReviewsQuery,
+  useDeleteAdminReviewMutation,
+  useUpdateAdminReviewMutation,
 } = reviewApi;

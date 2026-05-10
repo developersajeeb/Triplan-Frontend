@@ -40,6 +40,22 @@ export interface IUserReview {
   overallRating: number;
 }
 
+export interface IAdminReview {
+  _id: string;
+  tourTitle: string;
+  tourSlug: string;
+  createdAt: string;
+  userName: string;
+  userEmail: string;
+  guideRating: number;
+  serviceRating: number;
+  transportationRating: number;
+  organizationRating: number;
+  comment: string;
+  images: string[];
+  overallRating: number;
+}
+
 export interface ITourReviewResponse {
   summary: IReviewSummary;
   reviews: IReview[];

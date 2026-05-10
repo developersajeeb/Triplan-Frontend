@@ -1,33 +1,51 @@
 import { config } from "@/config";
-import axios from "axios";
+import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 
 export const axiosInstance = axios.create({
   baseURL: config.baseUrl,
   withCredentials: true,
 });
 
-// Add a request interceptor
+const refreshClient = axios.create({
+  baseURL: config.baseUrl,
+  withCredentials: true,
+});
+
 axiosInstance.interceptors.request.use(
-  function (config) {
-    // Do something before request is sent
-    return config;
+  function (requestConfig) {
+    return requestConfig;
   },
   function (error) {
-    // Do something with request error
     return Promise.reject(error);
   }
 );
 
-// Add a response interceptor
 axiosInstance.interceptors.response.use(
   function onFulfilled(response) {
-    // Any status code that lie within the range of 2xx cause this function to trigger
-    // Do something with response data
     return response;
   },
-  function onRejected(error) {
-    // Any status codes that falls outside the range of 2xx cause this function to trigger
-    // Do something with response error
-    return Promise.reject(error);
+  async function onRejected(error: AxiosError) {
+    const originalRequest = error.config as (AxiosRequestConfig & { _retry?: boolean }) | undefined;
+    const responseMessage = typeof error.response?.data === "object" && error.response?.data
+      ? (error.response.data as { message?: string }).message
+      : undefined;
+    const errorText = [responseMessage, error.message].filter(Boolean).join(" ");
+
+    const isAuthFailure = /(token|jwt|expired|unauthorized)/i.test(errorText);
+    const requestUrl = originalRequest?.url ?? "";
+    const isAuthEndpoint = /\/auth\/(login|refresh-token|logout)/.test(requestUrl);
+
+    if (!originalRequest || originalRequest._retry || !isAuthFailure || isAuthEndpoint) {
+      return Promise.reject(error);
+    }
+
+    originalRequest._retry = true;
+
+    try {
+      await refreshClient.post("/auth/refresh-token");
+      return axiosInstance(originalRequest);
+    } catch (refreshError) {
+      return Promise.reject(refreshError);
+    }
   }
 );
