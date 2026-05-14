@@ -21,9 +21,11 @@ import { TbSettings } from "react-icons/tb";
 import { PiMapPinArea } from "react-icons/pi";
 import { MdOutlineAddLocationAlt } from "react-icons/md";
 import { LuCalendarRange } from "react-icons/lu";
+import { LucideUsers2 } from "lucide-react";
 
 const AdminDashboard = lazy(() => import("@/pages/admin/admin-dashboard"));
 const AdminBookings = lazy(() => import("@/pages/admin/bookings"));
+const AdminUsers = lazy(() => import("@/pages/admin/users"));
 
 export const adminSidebarMenus: ISidebarItem[] = [
     {
@@ -46,6 +48,12 @@ export const adminSidebarMenus: ISidebarItem[] = [
                 url: "/admin/bookings",
                 component: AdminBookings,
                 icon: LuCalendarRange,
+            },
+            {
+                title: "Users",
+                url: "/admin/users",
+                component: AdminUsers,
+                icon: LucideUsers2,
             },
             {
                 title: "Add Tour",

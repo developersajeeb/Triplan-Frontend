@@ -1,0 +1,175 @@
+export type ExportRow = {
+  customer: string;
+  destination: string;
+  guests: number;
+  date: string;
+  amount: number;
+  status: string;
+};
+
+type BuildEarningsReportPdfParams = {
+  generatedAt: Date;
+  totalRevenue: number;
+  totalBookings: number;
+  activeUsers: number;
+  averageRating: number;
+  rows: ExportRow[];
+};
+
+const formatCurrency = (amount: number) =>
+  new Intl.NumberFormat('en-BD', {
+    style: 'currency',
+    currency: 'BDT',
+    minimumFractionDigits: 0,
+  }).format(amount);
+
+const escapePdfText = (value: string) =>
+  Array.from(
+    value
+      .normalize('NFKD')
+      .replace(/[\u0300-\u036f]/g, ''),
+  )
+    .filter((character) => {
+      const code = character.charCodeAt(0);
+      return code === 9 || code === 10 || code === 13 || (code >= 32 && code <= 126);
+    })
+    .join('')
+    .replace(/\\/g, '\\\\')
+    .replace(/\(/g, '\\(')
+    .replace(/\)/g, '\\)');
+
+const toPdfMoney = (amount: number) => formatCurrency(amount).replace(/^BDT\s*/i, 'BDT ');
+
+const formatReportStatus = (value?: string) => {
+  const normalized = (value ?? '').trim().toLowerCase();
+
+  if (normalized === 'paid' || normalized.includes('complete')) {
+    return 'Complete';
+  }
+
+  if (normalized === 'unpaid' || normalized.includes('pending')) {
+    return 'Pending';
+  }
+
+  if (normalized === 'cancelled' || normalized === 'cancel') {
+    return 'Cancel';
+  }
+
+  return value || 'N/A';
+};
+
+export const buildEarningsReportPdf = (params: BuildEarningsReportPdfParams) => {
+  const pageWidth = 842;
+  const pageHeight = 595;
+  const commands: string[] = [];
+
+  const topY = (y: number) => pageHeight - y;
+  const rect = (x: number, y: number, w: number, h: number, color: string) => {
+    commands.push(`${color} rg`);
+    commands.push(`${x} ${y} ${w} ${h} re f`);
+  };
+  const line = (x1: number, y1: number, x2: number, y2: number, color = '0.82 0.86 0.91') => {
+    commands.push(`${color} RG`);
+    commands.push('1 w');
+    commands.push(`${x1} ${y1} m ${x2} ${y2} l S`);
+  };
+  const text = (x: number, y: number, size: number, value: string, color = '0 0 0') => {
+    commands.push(`BT /F1 ${size} Tf ${color} rg 1 0 0 1 ${x} ${y} Tm (${escapePdfText(value)}) Tj ET`);
+  };
+
+  rect(0, topY(0) - 92, pageWidth, 92, '0.08 0.13 0.25');
+  rect(0, topY(92) - 10, pageWidth, 10, '0.20 0.60 0.86');
+  text(34, topY(32), 24, 'Earnings Report', '1 1 1');
+  text(34, topY(56), 10, `Generated ${params.generatedAt.toLocaleDateString('en-BD')} at ${params.generatedAt.toLocaleTimeString('en-BD', { hour: '2-digit', minute: '2-digit' })}`, '0.88 0.92 0.98');
+  text(610, topY(34), 11, 'TriPlan Admin', '0.88 0.92 0.98');
+  text(610, topY(52), 11, 'Revenue and payment summary', '0.88 0.92 0.98');
+
+  const cards = [
+    { x: 34, title: 'Total Revenue', value: toPdfMoney(params.totalRevenue), color: '0.13 0.59 0.95' },
+    { x: 231, title: 'Total Bookings', value: String(params.totalBookings), color: '0.16 0.70 0.45' },
+    { x: 428, title: 'Active Users', value: String(params.activeUsers), color: '0.95 0.67 0.11' },
+    { x: 625, title: 'Average Rating', value: params.averageRating.toFixed(1), color: '0.83 0.31 0.86' },
+  ];
+
+  cards.forEach((card) => {
+    rect(card.x, topY(124) - 70, 164, 70, '0.97 0.98 0.99');
+    rect(card.x, topY(124) - 70, 164, 6, card.color);
+    text(card.x + 14, topY(152), 10, card.title, '0.33 0.39 0.46');
+    text(card.x + 14, topY(176), 18, card.value, '0.07 0.12 0.20');
+  });
+
+  text(34, topY(216), 14, 'Latest Earnings Entries', '0.07 0.12 0.20');
+
+  const tableTop = 232;
+  const tableX = 34;
+  const tableWidth = 774;
+  const headerHeight = 24;
+  const rowHeight = 22;
+  const colWidths = [150, 220, 90, 90, 104, 70];
+  const headers = ['Customer', 'Destination', 'Amount', 'Status', 'Date', 'Guests'];
+
+  rect(tableX, topY(tableTop) - headerHeight, tableWidth, headerHeight, '0.91 0.94 0.97');
+  let cursorX = tableX;
+  headers.forEach((header, index) => {
+    text(cursorX + 8, topY(tableTop) - 16, 9.5, header, '0.22 0.29 0.37');
+    cursorX += colWidths[index];
+  });
+
+  line(tableX, topY(tableTop) - headerHeight, tableX + tableWidth, topY(tableTop) - headerHeight);
+
+  params.rows.slice(0, 9).forEach((row, index) => {
+    const yTop = tableTop + headerHeight + index * rowHeight;
+    const isAlt = index % 2 === 1;
+    rect(tableX, topY(yTop) - rowHeight, tableWidth, rowHeight, isAlt ? '0.98 0.99 1' : '1 1 1');
+
+    const values = [
+      row.customer,
+      row.destination,
+      toPdfMoney(row.amount),
+      formatReportStatus(row.status),
+      row.date,
+      String(row.guests),
+    ];
+
+    let x = tableX;
+    values.forEach((value, valueIndex) => {
+      text(x + 8, topY(yTop) - 14, 8.5, value, valueIndex === 3 ? '0.09 0.53 0.32' : '0.12 0.16 0.20');
+      x += colWidths[valueIndex];
+    });
+
+    line(tableX, topY(yTop) - rowHeight, tableX + tableWidth, topY(yTop) - rowHeight, '0.90 0.92 0.95');
+  });
+
+  text(34, 28, 9, 'Generated by TriPlan Earnings Export', '0.44 0.50 0.58');
+
+  const contentStream = commands.join('\n');
+
+  const contentObject = `<< /Length ${contentStream.length} >>\nstream\n${contentStream}\nendstream`;
+  const pageObject = `<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${pageWidth} ${pageHeight}] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>`;
+
+  const pdfObjects = [
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    pageObject,
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+    contentObject,
+  ];
+
+  let pdf = '%PDF-1.4\n';
+  const xrefOffsets: number[] = [0];
+
+  pdfObjects.forEach((body, index) => {
+    xrefOffsets.push(pdf.length);
+    pdf += `${index + 1} 0 obj\n${body}\nendobj\n`;
+  });
+
+  const xrefStart = pdf.length;
+  pdf += `xref\n0 ${pdfObjects.length + 1}\n`;
+  pdf += '0000000000 65535 f \n';
+  for (let index = 1; index <= pdfObjects.length; index += 1) {
+    pdf += `${String(xrefOffsets[index]).padStart(10, '0')} 00000 n \n`;
+  }
+  pdf += `trailer\n<< /Size ${pdfObjects.length + 1} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`;
+
+  return pdf;
+};

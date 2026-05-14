@@ -225,7 +225,7 @@ const Reviews = () => {
                     </DialogHeader>
 
                     {viewingReview ? (
-                        <div className="space-y-5">
+                        <div className="space-y-5 mt-6">
                             <div className="flex flex-wrap items-start justify-between gap-3">
                                 <div>
                                     <p className="text-lg font-semibold text-gray-800">{viewingReview.userName}</p>
@@ -282,7 +282,7 @@ const Reviews = () => {
                         <DialogDescription className="sr-only">Review edit modal</DialogDescription>
                     </DialogHeader>
 
-                    <div className="space-y-4">
+                    <div className="space-y-4 mt-6">
                         <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
                             {[
                                 ['guideRating', 'Guide', editForm.guideRating],
