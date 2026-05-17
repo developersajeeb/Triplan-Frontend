@@ -31,6 +31,7 @@ const BlogDetails = lazy(() => import("@/pages/blog-details"));
 const PrivacyPolicyPage = lazy(() => import("@/pages/privacy-policy"));
 const TermsOfService = lazy(() => import("@/pages/terms-of-service"));
 import EditTour from "@/pages/admin/edit-tour";
+import EditBlog from "@/pages/admin/edit-blog";
 
 export const router = createBrowserRouter([
   {
@@ -123,6 +124,7 @@ export const router = createBrowserRouter([
     children: [
       { index: true, element: <Navigate to="/admin/dashboard" /> },
         { path: "edit-tour/:slug", Component: EditTour },
+        { path: "edit-blog/:slug", Component: EditBlog },
       ...generateRoutes(adminSidebarMenus),
     ],
   },

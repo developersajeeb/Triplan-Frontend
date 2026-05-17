@@ -9,6 +9,7 @@ export type { IAdminReview, IReview, IReviewEligibility, IReviewSummary, ITourRe
 export type { IAdminEnquiry, IEnquiryStatus } from "./enquiry.type";
 export type { IBookingBatch, IBookingPayment, IBookingRecord, IBookingTour, IMyBookingsDataTableProps } from "./booking.type";
 export type { SelectOption, TourPayload } from "./edit-tour.type";
+export type { BlogStatus, IBlog, IBlogListItem } from "./blog.type";
 
 export interface IResponse<T> {
   statusCode: number;

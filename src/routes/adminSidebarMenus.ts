@@ -1,5 +1,6 @@
-// import AdminDashboard from "@/pages/admin/admin-dashboard/AdminDashboard";
 import Earnings from "@/pages/admin/earnings";
+import Blogs from "@/pages/admin/blogs";
+import AddBlog from "@/pages/admin/add-blog";
 import Enquiries from "@/pages/admin/enquiries";
 import Reviews from "@/pages/admin/reviews";
 import Settings from "@/pages/admin/settings";
@@ -10,18 +11,18 @@ import Destination from "@/pages/admin/destination";
 import AddTour from "@/pages/admin/add-tour";
 import type { ISidebarItem } from "@/types";
 import { lazy } from "react";
-import { LuLayoutDashboard } from "react-icons/lu";
+import { LuLayoutDashboard, LuNotebookPen } from "react-icons/lu";
 import { CiBoxList } from "react-icons/ci";
 import { TbArrowGuide } from "react-icons/tb";
 import { VscTypeHierarchySuper } from "react-icons/vsc";
 import { RiUserStarLine } from "react-icons/ri";
 import { LiaUserSecretSolid } from "react-icons/lia";
-import { TbMoneybag } from "react-icons/tb";
-import { TbSettings } from "react-icons/tb";
+import { TbMoneybag, TbSettings } from "react-icons/tb";
 import { PiMapPinArea } from "react-icons/pi";
 import { MdOutlineAddLocationAlt } from "react-icons/md";
 import { LuCalendarRange } from "react-icons/lu";
 import { LucideUsers2 } from "lucide-react";
+import { MdOutlinePostAdd } from "react-icons/md";
 
 const AdminDashboard = lazy(() => import("@/pages/admin/admin-dashboard"));
 const AdminBookings = lazy(() => import("@/pages/admin/bookings"));
@@ -29,7 +30,7 @@ const AdminUsers = lazy(() => import("@/pages/admin/users"));
 
 export const adminSidebarMenus: ISidebarItem[] = [
     {
-        title: "Management",
+        title: "Overview",
         items: [
             {
                 title: "Dashboard",
@@ -37,23 +38,16 @@ export const adminSidebarMenus: ISidebarItem[] = [
                 component: AdminDashboard,
                 icon: LuLayoutDashboard,
             },
+        ],
+    },
+    {
+        title: "Tours",
+        items: [
             {
                 title: "Tour Listing",
                 url: "/admin/tour-listing",
                 component: TourListing,
                 icon: CiBoxList,
-            },
-            {
-                title: "Bookings",
-                url: "/admin/bookings",
-                component: AdminBookings,
-                icon: LuCalendarRange,
-            },
-            {
-                title: "Users",
-                url: "/admin/users",
-                component: AdminUsers,
-                icon: LucideUsers2,
             },
             {
                 title: "Add Tour",
@@ -79,6 +73,40 @@ export const adminSidebarMenus: ISidebarItem[] = [
                 component: Destination,
                 icon: PiMapPinArea,
             },
+        ],
+    },
+    {
+        title: "Blog",
+        items: [
+            {
+                title: "All Blogs",
+                url: "/admin/blogs",
+                component: Blogs,
+                icon: LuNotebookPen,
+            },
+            {
+                title: "Add Blog",
+                url: "/admin/add-blog",
+                component: AddBlog,
+                icon: MdOutlinePostAdd,
+            },
+        ],
+    },
+    {
+        title: "Community",
+        items: [
+            {
+                title: "Users",
+                url: "/admin/users",
+                component: AdminUsers,
+                icon: LucideUsers2,
+            },
+            {
+                title: "Bookings",
+                url: "/admin/bookings",
+                component: AdminBookings,
+                icon: LuCalendarRange,
+            },
             {
                 title: "Reviews",
                 url: "/admin/reviews",
@@ -94,7 +122,7 @@ export const adminSidebarMenus: ISidebarItem[] = [
         ],
     },
     {
-        title: "Business",
+        title: "Finance",
         items: [
             {
                 title: "Earnings",
@@ -105,7 +133,7 @@ export const adminSidebarMenus: ISidebarItem[] = [
         ],
     },
     {
-        title: "Profile",
+        title: "System",
         items: [
             {
                 title: "Settings",

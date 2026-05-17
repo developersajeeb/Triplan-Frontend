@@ -8,7 +8,7 @@ interface Props {
 }
 
 export default function SingleImageUploader({ onChange, defaultImageUrl = null }: Props) {
-  const maxSizeMB = 2
+  const maxSizeMB = 1.5
   const maxSize = maxSizeMB * 1024 * 1024
   const [defaultPreview, setDefaultPreview] = useState<string | null>(defaultImageUrl)
 

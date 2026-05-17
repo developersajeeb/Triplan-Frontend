@@ -8,12 +8,13 @@ import { useForm, type FieldValues, type SubmitHandler } from "react-hook-form"
 import { useLoginMutation } from "@/redux/features/auth/auth.api"
 import { toast } from "sonner"
 import { Form, FormControl, FormField, FormItem, FormMessage } from "@/components/ui/form"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { RiLoaderLine } from "react-icons/ri";
-import { FiEye, FiEyeOff } from "react-icons/fi"
+import { FiAlertCircle, FiEye, FiEyeOff } from "react-icons/fi"
 import z from "zod"
 import { zodResolver } from "@hookform/resolvers/zod"
 import SocialLogin from "@/components/shared/blocks/SocialLogin"
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 
 const loginSchema = z.object({
     email: z
@@ -32,9 +33,11 @@ export function LoginForm({
     ...props
 }: React.ComponentProps<"div">) {
     const [showPassword, setShowPassword] = useState<boolean>(false);
+    const [accountNotice, setAccountNotice] = useState<{ title: string; description: string } | null>(null);
     const location = useLocation();
     const searchParams = new URLSearchParams(location.search);
     const queryReturnTo = searchParams.get("returnTo");
+    const queryError = searchParams.get("error");
     const from = queryReturnTo || sessionStorage.getItem("triplan:returnTo") || "/";
     const navigate = useNavigate();
     const form = useForm<z.infer<typeof loginSchema>>({
@@ -47,9 +50,34 @@ export function LoginForm({
     const [login] = useLoginMutation();
     const [isLoginBtnLoading, setIsLoginBtnLoading] = useState<boolean>(false);
 
+    useEffect(() => {
+        if (!queryError) {
+            return;
+        }
+
+        setAccountNotice({
+            title: "Account blocked",
+            description:
+                queryError === "You are blocked. Contact support."
+                    ? "Your account is currently blocked. Please contact support to restore access."
+                    : queryError,
+        });
+
+        const params = new URLSearchParams(location.search);
+        params.delete("error");
+
+        navigate(
+            {
+                pathname: location.pathname,
+                search: params.toString() ? `?${params.toString()}` : "",
+            },
+            { replace: true }
+        );
+    }, [location.pathname, location.search, navigate, queryError]);
+
     const onSubmit: SubmitHandler<FieldValues> = async (data) => {
         setIsLoginBtnLoading(true);
-            try {
+        try {
             await login(data).unwrap();
             toast.success('Login Successfully');
             navigate(from, { replace: true });
@@ -69,9 +97,17 @@ export function LoginForm({
                 toast.error("User does not exist");
                 return;
             }
-            
+
             if (error.data.message === "You have authenticated through Google. Please use google for login!") {
                 toast.error("You have authenticated through Google. Please use google for login!");
+                return;
+            }
+
+            if (error.data.message === "They are blocked. Contact support.") {
+                setAccountNotice({
+                    title: "Account blocked",
+                    description: "Your account is currently blocked. Please contact support to restore access.",
+                });
                 return;
             }
 
@@ -167,6 +203,45 @@ export function LoginForm({
                     </div>
                 </form>
             </Form>
+
+            <Dialog open={Boolean(accountNotice)} onOpenChange={(open) => !open && setAccountNotice(null)}>
+                <DialogContent className="border-0 bg-transparent p-0 shadow-none">
+                    <div className="mb-5 inline-flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 text-primary shadow-sm shadow-primary/10 ring-8 ring-primary/5">
+                        <FiAlertCircle className="h-7 w-7" />
+                    </div>
+
+                    <DialogHeader className="text-left">
+                        <DialogTitle className="text-2xl font-bold tracking-tight text-slate-900">
+                            {accountNotice?.title || "Account blocked"}
+                        </DialogTitle>
+                        <DialogDescription className="mt-2 text-sm leading-6 text-slate-600">
+                            {accountNotice?.description || "Your account is currently blocked. Please contact support to restore access."}
+                        </DialogDescription>
+                    </DialogHeader>
+
+                    <div className="mt-5 rounded-2xl border border-slate-200 bg-slate-50/80 p-4 text-sm leading-6 text-slate-700">
+                        If this looks incorrect, ask support to review the account status and mention the email used to sign in.
+                    </div>
+
+                    <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:justify-end">
+                        <Button
+                            type="button"
+                            variant="outline"
+                            className="h-11 rounded-full border-slate-200 bg-white px-5 text-slate-700 hover:bg-slate-50"
+                            onClick={() => setAccountNotice(null)}
+                        >
+                            Close
+                        </Button>
+                        <Button
+                            type="button"
+                            className="h-11 rounded-full bg-gradient-to-r from-primary-600 to-cyan-500 px-5 text-white shadow-lg shadow-primary/20 hover:from-primary-500 hover:to-cyan-400"
+                            onClick={() => setAccountNotice(null)}
+                        >
+                            Got it
+                        </Button>
+                    </div>
+                </DialogContent>
+            </Dialog>
         </div>
     )
 }

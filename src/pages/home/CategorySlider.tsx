@@ -1,101 +1,101 @@
-'use client';
-import { useState } from 'react';
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Pagination } from 'swiper/modules';
-import 'swiper/css';
-import 'swiper/css/pagination';
-import styles from './style/category_slider.module.scss';
-import ctgBg from '@/assets/images/tour_login_bg.jpg';
+import { useGetTourTypesQuery } from '@/redux/features/tour/tour.api';
+import type { ITourType } from '@/types/tour.type';
+import { useNavigate } from 'react-router';
 
-const categories = [
-  { title: 'Cruises', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' },
-  { title: 'Hiking', image: 'https://images.unsplash.com/photo-1500530855697-b586d89ba3ee' },
-  { title: 'Airbirds', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?fit=crop&w=900&q=80' },
-  { title: 'Wildlife', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?fit=crop&w=900&q=80' },
-  { title: 'Walking', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?fit=crop&w=900&q=80' },
-  { title: 'Nature', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?fit=crop&w=900&q=80' },
-  { title: 'Beach', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?fit=crop&w=900&q=80' },
-  { title: 'Cruise 2', image: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e' },
-];
+type TourTypeCard = ITourType;
+
+type TourTypeCardWithCount = TourTypeCard & {
+  tourCount?: number;
+  count?: number;
+  totalTour?: number;
+  totalTourListing?: number;
+  toursCount?: number;
+  tourListingsCount?: number;
+  totalListing?: number;
+  tourPackageCount?: number;
+};
+
+const buildTourTypeCards = (tourTypes?: ITourType[]): TourTypeCardWithCount[] => {
+  if (!Array.isArray(tourTypes)) {
+    return [];
+  }
+
+  return tourTypes.map((tourType) => tourType);
+};
+
+const getTourCount = (item: TourTypeCardWithCount) => {
+  const count =
+    item.tourCount ??
+    item.count ??
+    item.totalTour ??
+    item.totalTourListing ??
+    item.toursCount ??
+    item.tourListingsCount ??
+    item.totalListing ??
+    item.tourPackageCount;
+
+  return typeof count === 'number' && Number.isFinite(count) && count > 0 ? count : null;
+};
 
 export default function CategorySlider() {
-  const middleIndex = Math.floor(categories.length / 2);
-  const [activeIndex, setActiveIndex] = useState(middleIndex);
+  const navigate = useNavigate();
+  const { data: tourTypes } = useGetTourTypesQuery({ limit: 10 });
+  const tourTypeCards = buildTourTypeCards(tourTypes?.data);
 
-  const VISIBLE_SIDE = 5;
-  const ANGLE_STEP = 20;
-  const OUTER_ANGLE = 0;
-  const ARC_STRENGTH = 10;
-  const H_GAP = 0;
+  const handleViewTours = (tourTypeName: string) => {
+    navigate(`/tours?tourType=${encodeURIComponent(tourTypeName)}&page=1`);
+  };
 
   return (
-    <section className="py-12 md:py-16 lg:py-20 bg-cover bg-no-repeat bg-center" style={{ backgroundImage: `url(${ctgBg})` }}>
-      <div className={styles["tp-ctg-slider"]}>
-        <div className="tp-container">
+    <section className="relative overflow-hidden py-12 md:py-16 lg:py-20 bg-[radial-gradient(circle_at_top_left,_rgba(59,130,246,0.16),_transparent_30%),radial-gradient(circle_at_top_right,_rgba(251,191,36,0.14),_transparent_28%),linear-gradient(180deg,_#ffffff_0%,_#f8fafc_55%,_#eff6ff_100%)]">
+      <div className="absolute inset-0 bg-[linear-gradient(135deg,rgba(255,255,255,0.55)_0%,rgba(255,255,255,0)_30%,rgba(255,255,255,0.35)_100%)]" />
+      <div className="relative tp-container">
+        <div className="mb-8 flex flex-col gap-4 text-center sm:mb-10 lg:mb-12">
           <h4 className="section-sub-title text-center text-primary-950">Wonderful Place For You</h4>
-          <h2 className="section-title text-center text-primary-950 mb-6 sm:mb-10 lg:mb-12">Tour Categories</h2>
-          <Swiper
-            slidesPerView={5}
-            spaceBetween={20}
-            centeredSlides={true}
-            pagination={{ clickable: true }}
-            initialSlide={middleIndex}
-            breakpoints={{
-              0: { slidesPerView: 1 },
-              640: { slidesPerView: 2 },
-              768: { slidesPerView: 3 },
-              1024: { slidesPerView: 5 },
-            }}
-            modules={[Pagination]}
-            onSlideChange={(swiper) => setActiveIndex(swiper.activeIndex)}
-            onSwiper={(swiper) => setActiveIndex(swiper.activeIndex)}
-          >
-            {categories.map((item, index) => {
-              const offset = index - activeIndex;
-              const absOffset = Math.abs(offset);
-              const inVisibleRange = absOffset <= VISIBLE_SIDE;
-
-              const baseAngle = offset * ANGLE_STEP;
-              const rotateY = Math.max(-OUTER_ANGLE, Math.min(OUTER_ANGLE, baseAngle));
-
-              const translateY = inVisibleRange ? Math.pow(offset, 2) * ARC_STRENGTH : 40 + absOffset * 10;
-              const translateX = inVisibleRange ? offset * H_GAP * 0 : offset * H_GAP * 0;
-
-              const zIndex = inVisibleRange ? 100 - absOffset * 10 : 10;
-              const opacity = inVisibleRange ? Math.max(1 - absOffset * 0.08, 0.6) : 0.25;
-
-              const transform = `translateX(${translateX}px) translateY(${translateY}px) rotateY(${rotateY}deg)`;
-
-              return (
-                <SwiperSlide key={index} className='pb-20'>
-                  <div
-                    className="group text-center transition-transform duration-500"
-                    style={{
-                      transform,
-                      zIndex,
-                      opacity,
-                      willChange: 'transform, opacity',
-                      pointerEvents: inVisibleRange ? 'auto' : 'none',
-                    }}
-                  >
-                    <div className="relative w-full h-[240px] overflow-hidden rounded-[24px] shadow-xl">
-                      <img
-                        src={item.image}
-                        alt={item.title}
-                        draggable={false}
-                        className="w-full h-full object-cover rounded-[24px] transition-transform duration-500 group-hover:scale-110"
-                        style={{ backfaceVisibility: 'hidden' }}
-                      />
-                    </div>
-
-                    <h3 className="mt-4 text-[20px] font-semibold text-primary-900 hover:text-primary-400 duration-300 cursor-pointer">{item.title}</h3>
-                    <p className="text-[14px] font-medium text-primary-900 cursor-pointer">See More</p>
-                  </div>
-                </SwiperSlide>
-              );
-            })}
-          </Swiper>
+          <h2 className="section-title text-center text-primary-950 mb-0">Tour Types</h2>
         </div>
+
+        {tourTypeCards.length > 0 ? (
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            {tourTypeCards.map((item, index) => (
+              <article
+                key={item._id}
+                className="group relative overflow-hidden rounded-xl bg-white border-2 border-primary-100 p-6 shadow-sm transition-all duration-300 hover:shadow-lg hover:border-primary-300 cursor-pointer"
+              >
+                <div className="flex flex-col gap-4 h-full">
+                  <div className="flex items-center justify-between">
+                    <span className="inline-flex rounded-full bg-gray-100 px-3 py-1 text-sm font-semibold text-gray-700">
+                      {String(index + 1).padStart(2, '0')}
+                    </span>
+                    {getTourCount(item) !== null && (
+                      <span className="inline-flex rounded-full bg-primary-100 px-2.5 py-1 text-xs font-semibold text-primary-700">
+                        {getTourCount(item)}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex-1 flex flex-col gap-2">
+                    <h3 className="text-lg font-semibold text-gray-900 line-clamp-2">
+                      {item.name}
+                    </h3>
+                    <p className="text-xs text-gray-500">Explore this tour type</p>
+                  </div>
+
+                  <div className="pt-2 border-t border-primary-100">
+                    <button onClick={() => handleViewTours(item.name)} className="inline-flex text-sm font-medium text-primary-600 hover:text-primary-700 gap-1 transition-colors cursor-pointer bg-none border-none p-0">
+                      View tours
+                      <span>→</span>
+                    </button>
+                  </div>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="rounded-lg border border-gray-200 bg-white p-8 text-center text-gray-600 shadow-sm">
+            No tour types available right now.
+          </div>
+        )}
       </div>
     </section>
   );

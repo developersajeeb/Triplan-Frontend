@@ -7,7 +7,7 @@ import TourCardSlider from "@/components/modules/tour/TourCardSlider";
 import CustomerReview from "@/components/shared/sections/CustomerReview";
 import TourGuide from "@/components/modules/tourGuide/TourGuide";
 import PartnerLogos from "@/components/shared/sections/PartnerLogos";
-import NewsArticles from "./NewsArticles";
+import BlogSection from "./BlogSection";
 import HomeAccordion from "./HomeAccordion";
 import JsonLd from "@/components/utilities/JsonLd";
 import CommonMetadata from "@/components/utilities/CommonMetadata";
@@ -60,7 +60,7 @@ const Home = () => {
       <TourGuide />
       <CustomerReview />
       <PartnerLogos />
-      <NewsArticles />
+      <BlogSection />
       <HomeAccordion />
     </>
   );
