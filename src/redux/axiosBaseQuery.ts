@@ -17,18 +17,19 @@ const axiosBaseQuery =
   async ({ url, method, data, params, headers }) => {
     try {
       const result = await axiosInstance({
-        url: url,
+        url,
         method,
         data,
         params,
         headers,
+        timeout: 30000,
       });
       return { data: result.data };
     } catch (axiosError) {
       const err = axiosError as AxiosError;
       return {
         error: {
-          status: err.response?.status,
+          status: err.response?.status ?? (err.code === "ECONNABORTED" ? 408 : 500),
           data: err.response?.data || err.message,
         },
       };

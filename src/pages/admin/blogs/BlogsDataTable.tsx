@@ -3,6 +3,7 @@ import { formatDistanceToNowStrict } from 'date-fns';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow, TableCaption } from '@/components/ui/table';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Button } from '@/components/ui/button';
+import { GlobalDeleteConfirmation } from '@/components/shared/blocks/GlobalDeleteConfirmation';
 import { formatBlogDate } from './blog-data';
 import type { IBlogListItem } from '@/types';
 
@@ -90,9 +91,11 @@ const BlogsDataTable = ({ data, isLoading = false, onDelete }: Props) => {
                     <Link to={`/admin/edit-blog/${blog.slug}`} className="bg-slate-800 hover:bg-slate-900 text-white px-3 py-1 inline-flex items-center gap-1 rounded-lg text-sm font-medium text-center duration-300">
                       Edit
                     </Link>
-                    <Button type="button" variant="destructive" className="h-8 rounded-lg px-3 text-sm font-medium" onClick={() => onDelete(blog)}>
-                      Delete
-                    </Button>
+                    <GlobalDeleteConfirmation onConfirm={() => onDelete(blog)}>
+                      <Button type="button" variant="destructive" className="h-8 rounded-lg px-3 text-sm font-medium">
+                        Delete
+                      </Button>
+                    </GlobalDeleteConfirmation>
                   </div>
                 </TableCell>
               </TableRow>

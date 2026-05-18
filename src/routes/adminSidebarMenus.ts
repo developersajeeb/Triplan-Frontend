@@ -1,14 +1,3 @@
-import Earnings from "@/pages/admin/earnings";
-import Blogs from "@/pages/admin/blogs";
-import AddBlog from "@/pages/admin/add-blog";
-import Enquiries from "@/pages/admin/enquiries";
-import Reviews from "@/pages/admin/reviews";
-import Settings from "@/pages/admin/settings";
-import TourGuides from "@/pages/admin/tour-guides";
-import TourListing from "@/pages/admin/tour-listing";
-import TourTypes from "@/pages/admin/tour-type";
-import Destination from "@/pages/admin/destination";
-import AddTour from "@/pages/admin/add-tour";
 import type { ISidebarItem } from "@/types";
 import { lazy } from "react";
 import { LuLayoutDashboard, LuNotebookPen } from "react-icons/lu";
@@ -27,6 +16,17 @@ import { MdOutlinePostAdd } from "react-icons/md";
 const AdminDashboard = lazy(() => import("@/pages/admin/admin-dashboard"));
 const AdminBookings = lazy(() => import("@/pages/admin/bookings"));
 const AdminUsers = lazy(() => import("@/pages/admin/users"));
+const Earnings = lazy(() => import("@/pages/admin/earnings"));
+const Blogs = lazy(() => import("@/pages/admin/blogs"));
+const AddBlog = lazy(() => import("@/pages/admin/add-blog"));
+const Enquiries = lazy(() => import("@/pages/admin/enquiries"));
+const Reviews = lazy(() => import("@/pages/admin/reviews"));
+const Settings = lazy(() => import("@/pages/admin/settings"));
+const TourGuides = lazy(() => import("@/pages/admin/tour-guides"));
+const TourListing = lazy(() => import("@/pages/admin/tour-listing"));
+const TourTypes = lazy(() => import("@/pages/admin/tour-type"));
+const Destination = lazy(() => import("@/pages/admin/destination"));
+const AddTour = lazy(() => import("@/pages/admin/add-tour"));
 
 export const adminSidebarMenus: ISidebarItem[] = [
     {

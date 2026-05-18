@@ -80,12 +80,6 @@ const Blogs = () => {
   };
 
   const handleDelete = (blog: IBlogListItem) => {
-    const confirmDelete = window.confirm(`Delete "${blog.title}"?`);
-
-    if (!confirmDelete) {
-      return;
-    }
-
     deleteBlog(blog._id)
       .unwrap()
       .then(() => toast.success(`Blog "${blog.title}" deleted successfully.`))

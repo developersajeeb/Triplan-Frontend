@@ -4,11 +4,13 @@ import axios, { AxiosError, type AxiosRequestConfig } from "axios";
 export const axiosInstance = axios.create({
   baseURL: config.baseUrl,
   withCredentials: true,
+  timeout: 30000,
 });
 
 const refreshClient = axios.create({
   baseURL: config.baseUrl,
   withCredentials: true,
+  timeout: 15000,
 });
 
 axiosInstance.interceptors.request.use(

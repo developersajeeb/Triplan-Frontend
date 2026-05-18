@@ -1,25 +1,25 @@
 import App from "@/App";
 import AdminLayout from "@/components/layouts/AdminLayout";
-import LoginPage from "@/pages/login";
-import RegistrationPage from "@/pages/registration";
-import VerifyPage from "@/pages/verify";
 import { generateRoutes } from "@/utils/generateRoutes";
 import { createBrowserRouter, Navigate } from "react-router";
 import { adminSidebarMenus } from "./adminSidebarMenus";
 import UserLayout from "@/components/layouts/UserLayout";
 import { userSidebarMenus } from "./userSidebarMenus";
-import { withAuth } from "@/utils/withAuth";
+import { withAuth, withoutAuth } from "@/utils/withAuth";
 import type { TRole } from "@/types";
 import { role } from "@/constants/role";
-import TourDetails from "@/pages/tour-details";
-import Booking from "@/pages/booking";
-import PaymentSuccess from "@/pages/payment/PaymentSuccess";
-import PaymentFail from "@/pages/payment/PaymentFail";
-import PaymentCancel from "@/pages/payment/PaymentCancel";
-import Home from "@/pages/home";
 import { lazy } from "react";
-import ContactUs from "@/pages/contact-us";
 
+const LoginPage = lazy(() => import("@/pages/login"));
+const RegistrationPage = lazy(() => import("@/pages/registration"));
+const VerifyPage = lazy(() => import("@/pages/verify"));
+const TourDetails = lazy(() => import("@/pages/tour-details"));
+const Booking = lazy(() => import("@/pages/booking"));
+const PaymentSuccess = lazy(() => import("@/pages/payment/PaymentSuccess"));
+const PaymentFail = lazy(() => import("@/pages/payment/PaymentFail"));
+const PaymentCancel = lazy(() => import("@/pages/payment/PaymentCancel"));
+const Home = lazy(() => import("@/pages/home"));
+const ContactUs = lazy(() => import("@/pages/contact-us"));
 const AboutUs = lazy(() => import("@/pages/about"));
 const Tours = lazy(() => import("@/pages/tours"));
 const DestinationsPage = lazy(() => import("@/pages/destinations"));
@@ -30,8 +30,8 @@ const BlogPage = lazy(() => import("@/pages/blog"));
 const BlogDetails = lazy(() => import("@/pages/blog-details"));
 const PrivacyPolicyPage = lazy(() => import("@/pages/privacy-policy"));
 const TermsOfService = lazy(() => import("@/pages/terms-of-service"));
-import EditTour from "@/pages/admin/edit-tour";
-import EditBlog from "@/pages/admin/edit-blog";
+const EditTour = lazy(() => import("@/pages/admin/edit-tour"));
+const EditBlog = lazy(() => import("@/pages/admin/edit-blog"));
 
 export const router = createBrowserRouter([
   {
@@ -130,15 +130,15 @@ export const router = createBrowserRouter([
   },
 
   {
-    Component: LoginPage,
+    Component: withoutAuth(LoginPage),
     path: "login"
   },
   {
-    Component: RegistrationPage,
+    Component: withoutAuth(RegistrationPage),
     path: "registration"
   },
   {
-    Component: VerifyPage,
+    Component: withoutAuth(VerifyPage),
     path: "verify"
   }
 ]);

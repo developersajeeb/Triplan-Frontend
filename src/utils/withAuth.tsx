@@ -29,3 +29,17 @@ export const withAuth = (Component: ComponentType, requiredRole?: TRole) => {
     return <Component />;
   };
 };
+
+export const withoutAuth = (Component: ComponentType) => {
+  return function GuestWrapper() {
+    const { data, isLoading } = useUserInfoQuery(undefined);
+
+    if (isLoading) return null;
+
+    if (!isLoading && data?.data?.email) {
+      return <Navigate to="/" replace />;
+    }
+
+    return <Component />;
+  };
+};
